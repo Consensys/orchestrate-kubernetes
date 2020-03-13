@@ -1,0 +1,8 @@
+---
+bases:
+  - helmfile-common.yaml
+
+helmfiles:
+  - helmfile-kafka.yaml
+  - helmfile-stateful.yaml
+  - helmfile-core.yaml

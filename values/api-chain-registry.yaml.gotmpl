@@ -1,0 +1,22 @@
+---
+fullnameOverride: "api-chain-registry"
+image:
+  repository: "{{ .Environment.Values.repositories.orchestrate }}"
+  tag: "{{ .Environment.Values.tags.orchestrate }}"
+imageCredentials:
+  create: true
+  registry: {{ .Environment.Values.registry.url }}
+  username: {{ .Environment.Values.registry.credentials.username }}
+  password: {{ .Environment.Values.registry.credentials.password }}
+
+cmd:
+  name: chain-registry
+
+environment:
+  DB_DATABASE: chain-registry
+  DB_HOST: postgresql-chain-registry
+  DB_USER: chain-registry
+  CHAIN_REGISTRY_INIT:  {{ .Environment.Values.chainRegistry.init | quote }}
+  #CHAIN_REGISTRY_PROVIDER_NODES_REFRESH_INTERVAL: 1 * time.Second // default value
+  #TX_LISTENER_PROVIDER_REFRESH_INTERVAL: 5 * time.Second // default value
+  #CHAIN_REGISTRY_TYPE: postgres // default value

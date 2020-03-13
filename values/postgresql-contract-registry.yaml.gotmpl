@@ -1,0 +1,16 @@
+---
+fullnameOverride: "postgresql-contract-registry"
+replication:
+  enabled: false
+persistence:
+  enabled: {{ .Values | get "postgresql.persistence.enabled" true }}
+  storageClass: {{ .Values | get "postgresql.persistence.storageClass" "gp2" }}
+livenessProbe:
+  enabled: true
+readinessProbe:
+  enabled: true
+metrics:
+  enabled: false
+postgresqlDatabase: contract-registry
+postgresqlUsername: contract-registry
+postgresqlPassword: such-secret

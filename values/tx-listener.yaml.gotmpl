@@ -1,0 +1,37 @@
+---
+image:
+  repository: "{{ .Environment.Values.repositories.orchestrate }}"
+  tag: "{{ .Environment.Values.tags.orchestrate }}"
+fullnameOverride: "tx-listener"
+imageCredentials:
+  create: true
+  registry: {{ .Environment.Values.registry.url }}
+  username: {{ .Environment.Values.registry.credentials.username }}
+  password: {{ .Environment.Values.registry.credentials.password }}
+
+cmd:
+  name: tx-listener
+
+environment:
+  LISTENER_BLOCK_BACKOFF: "1s"
+  LISTENER_BLOCK_LIMIT: 40
+  LISTENER_DEPTH: 2
+  LISTENER_START: "3:oldest"
+  LISTENER_START_DEFAULT: "oldest"
+  ENVELOPE_STORE_URL: "api-envelope-store:80"
+  CONTRACT_REGISTRY_URL:  "api-contract-registry:80"
+  CHAIN_REGISTRY_URL: "http://api-chain-registry:8081"
+
+
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/instance
+                operator: In
+                values:
+                  - tx-listener
+          topologyKey: "failure-domain.beta.kubernetes.io/zone"
+        weight: 30

@@ -1,0 +1,20 @@
+---
+environment:
+  LOG_LEVEL: info
+  LOG_FORMAT: json
+  KAFKA_URL: "kafka:9092"
+  TOPIC_TX_RECOVER: "topic-tx-recover"
+  TOPIC_TX_CRAFTER: "topic-tx-crafter"
+  TOPIC_TX_SIGNER: "topic-tx-signer"
+  TOPIC_TX_SENDER: "topic-tx-sender"
+  KAFKA_GROUP_TX_CRAFTER: "tx-crafter-group"
+  KAFKA_GROUP_TX_SENDER: "tx-sender-group"
+  KAFKA_GROUP_TX_SIGNER: "tx-signer-group"
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: 16Mi
+  limits:
+    cpu: "300m"
+    memory: 64Mi

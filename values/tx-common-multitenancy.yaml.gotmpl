@@ -1,0 +1,6 @@
+---
+environment:
+  MULTI_TENANCY_ENABLED: {{ .Values | get "multitenancy.enabled" false }}
+  AUTH_JWT_CLAIMS_NAMESPACE: "http://tenant.info/"
+  AUTH_JWT_CERTIFICATE: {{ .Values | get "authentication.AUTH_JWT_CERTIFICATE" "" }}
+  AUTH_API_KEY: {{ .Values | get "authentication.AUTH_API_KEY" "" }}

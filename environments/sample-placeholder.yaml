@@ -1,0 +1,20 @@
+---
+txSigner:
+  environment:
+    SECRET_STORE: "hashicorp"
+    VAULT_VERIFY: "true"
+    VAULT_MOUNT_POINT: "secrets"
+    VAULT_SECRET_PATH: "<TARGET_NAMESPACE>/keys"
+    VAULT_ADDR: https://vault
+    VAULT_CACERT: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+    # Var specific to vault-agent
+    VAULT_SKIP_VERIFY: true
+
+vaultAgent:
+  role: tx-signer-<TARGET_NAMESPACE>
+
+chainRegistry:
+  init: '{"name":"<ETHEREUM_NODE_ID>","urls":["<ETHEREUM_NODE_URL>"]}'
+
+authentication:
+  AUTH_JWT_CERTIFICATE: "<CERTIFICATE_IDENTITY_PROVIDER>"

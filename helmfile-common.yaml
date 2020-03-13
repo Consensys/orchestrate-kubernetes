@@ -1,0 +1,18 @@
+---
+helmDefaults:
+  tillerNamespace: {{ requiredEnv "TARGET_NAMESPACE" }}
+  verify: false
+  wait: true
+  timeout: 600
+  recreatePods: false
+  force: false
+environments:
+  orchestrate-demo:
+    values:
+      - environments/orchestrate-demo.yaml
+      - values/tags.yaml
+repositories:
+  - name: helm-pegasys
+    url: https://pegasys.jfrog.io/artifactory/helm-pegasys/
+    username: <ACCOUNT_LOGIN>
+    password: <ACCOUNT_PASSWORD>

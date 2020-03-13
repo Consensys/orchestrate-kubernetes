@@ -1,0 +1,41 @@
+---
+bases:
+  - helmfile-common.yaml
+
+releases:
+  - name: redis-nonce
+    namespace: {{ requiredEnv "TARGET_NAMESPACE" }}
+    chart: stable/redis
+    version: 5.3.0
+    atomic: true
+    values:
+      - values/redis.yaml
+      - values/redis-nonce.yaml
+  - name: postgresql-envelope-store
+    namespace: {{ requiredEnv "TARGET_NAMESPACE" }}
+    chart: stable/postgresql
+    atomic: true
+    version: 8.1.4
+    values:
+      - values/postgresql-envelope-store.yaml.gotmpl
+  - name: postgresql-contract-registry
+    namespace: {{ requiredEnv "TARGET_NAMESPACE" }}
+    chart: stable/postgresql
+    atomic: true
+    version: 8.1.4
+    values:
+      - values/postgresql-contract-registry.yaml.gotmpl
+  - name: postgresql-chain-registry
+    namespace: {{ requiredEnv "TARGET_NAMESPACE" }}
+    chart: stable/postgresql
+    atomic: true
+    version: 8.1.4
+    values:
+      - values/postgresql-chain-registry.yaml.gotmpl
+  - name: vault
+    namespace: {{ requiredEnv "TARGET_NAMESPACE" }}
+    chart: helm-pegasys/vault
+    version: 0.1.0
+    atomic: true
+    values:
+      - values/vault.yaml.gotmpl

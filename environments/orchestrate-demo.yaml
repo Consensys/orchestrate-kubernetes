@@ -1,0 +1,38 @@
+---
+txSigner:
+  environment:
+    SECRET_STORE: "hashicorp"
+    VAULT_VERIFY: "true"
+    VAULT_MOUNT_POINT: "secrets"
+    VAULT_SECRET_PATH: "demo/keys"
+    VAULT_ADDR: https://vault
+    VAULT_CACERT: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+    VAULT_SKIP_VERIFY: true
+
+#Vault AWS KMS variable
+IAMRole: "<aws_iam_role>"
+Region: "<aws_region>"
+KMSKeyId: "<aws_kms_key_id>"
+DynamoDBTable: "orchestrate-vault-demo"
+SecretId: "<aws_secret_id>"
+
+vaultAgent:
+  role: tx-signer-demo
+
+chainRegistry:
+  init: '{"name": "rinkeby", "urls":["https://rinkeby.infura.io/v3/<INFURA_PROJECT_ID>"]}'
+
+## In-Memory storage
+## Default storage class are gp2 for AWS
+kafka:
+  persistence:
+    enabled: false
+    storageClass: "gp2"
+zookeeper:
+  persistence:
+    enabled: false
+    storageClass: "gp2"
+postgresql:
+  persistence:
+    enabled: false
+    storageClass: "gp2"

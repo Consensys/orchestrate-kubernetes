@@ -1,0 +1,44 @@
+---
+fullnameOverride: "tx-crafter"
+image:
+  repository: "{{ .Environment.Values.repositories.orchestrate }}"
+  tag: "{{ .Environment.Values.tags.orchestrate }}"
+imageCredentials:
+  create: true
+  registry: {{ .Environment.Values.registry.url }}
+  username: {{ .Environment.Values.registry.credentials.username }}
+  password: {{ .Environment.Values.registry.credentials.password }}
+
+cmd:
+  name: tx-crafter
+
+testImage:
+  repository: "{{ .Environment.Values.repositories.e2e }}"
+  tag: "{{ .Environment.Values.tags.e2e }}"
+  cmd: e2e
+testImageCredentials:
+  create: true
+  username: {{ .Environment.Values.registry.credentials.username }}
+  password: {{ .Environment.Values.registry.credentials.password }}
+testEnvironment:
+  CONTRACT_REGISTRY_URL: "api-contract-registry:80"
+  CHAIN_REGISTRY_URL: "http://api-chain-registry:8081"
+  {{- .Environment.Values.txCrafter.testEnvironment | toYaml | nindent 2 }}
+
+environment:
+  CONTRACT_REGISTRY_URL: "api-contract-registry:80"
+  CHAIN_REGISTRY_URL: "http://api-chain-registry:8081"
+  REDIS_URL: "redis-nonce-master:6379"
+
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/instance
+                operator: In
+                values:
+                  - tx-crafter
+          topologyKey: "failure-domain.beta.kubernetes.io/zone"
+        weight: 30

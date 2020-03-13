@@ -1,0 +1,11 @@
+---
+bases:
+  - helmfile-common.yaml
+
+releases:
+  - name: kafka
+    chart: incubator/kafka
+    version: 0.15.3
+    namespace: {{ requiredEnv "TARGET_NAMESPACE" }}
+    values:
+      - values/kafka.yaml.gotmpl

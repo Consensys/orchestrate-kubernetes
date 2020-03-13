@@ -1,0 +1,10 @@
+---
+environment:
+  LOG_LEVEL: info
+  LOG_FORMAT: json
+
+environmentSecrets:
+  DB_PASSWORD: such-secret
+
+initContainers: true
+initDBHook: true

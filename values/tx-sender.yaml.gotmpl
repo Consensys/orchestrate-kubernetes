@@ -1,0 +1,31 @@
+---
+image:
+  repository: "{{ .Environment.Values.repositories.orchestrate }}"
+  tag: "{{ .Environment.Values.tags.orchestrate }}"
+fullnameOverride: "tx-sender"
+imageCredentials:
+  create: true
+  registry: {{ .Environment.Values.registry.url }}
+  username: {{ .Environment.Values.registry.credentials.username }}
+  password: {{ .Environment.Values.registry.credentials.password }}
+
+cmd:
+  name: tx-sender
+
+environment:
+  ENVELOPE_STORE_URL: "api-envelope-store:80"
+  REDIS_URL: "redis-nonce-master:6379"
+  CHAIN_REGISTRY_URL: "http://api-chain-registry:8081"
+
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/instance
+                operator: In
+                values:
+                  - tx-sender
+          topologyKey: "failure-domain.beta.kubernetes.io/zone"
+        weight: 30

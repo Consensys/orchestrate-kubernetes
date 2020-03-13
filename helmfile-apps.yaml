@@ -1,0 +1,13 @@
+---
+bases:
+  - helmfile-common.yaml
+
+releases:
+  - name: bridge
+    namespace: {{ requiredEnv "TARGET_NAMESPACE" }}
+    chart: helm-pegasys/core-stack-worker
+    atomic: true
+    version: 0.3.2
+    values:
+      - values/tx-worker-common.yaml.gotmpl
+      - values/bridge.yaml.gotmpl

@@ -1,0 +1,32 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, build with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
+.DS_Store
+.idea
+*.iml
+.idea_modules/
+
+# Visual Code Studio
+.vscode
+
+# File-based project format
+*.iws
+*.ipr
+
+# Environment file
+.env
+
+.helm/
+.kube/
+.ash_history

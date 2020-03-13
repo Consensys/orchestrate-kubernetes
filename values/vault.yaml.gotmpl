@@ -1,0 +1,66 @@
+---
+replicaCount: 2
+
+image:
+  repository: vault
+  tag: 1.1.1
+  pullPolicy: IfNotPresent
+
+fullnameOverride: "vault"
+
+service:
+  type: ClusterIP
+  port: 443
+
+aws:
+  kube2iamRole: "{{ .Environment.Values.IAMRole }}"
+
+vault:
+  init:
+    enabled: true
+    awsRegion: "{{ .Environment.Values.Region }}"
+    awsSecretID: "{{ .Environment.Values.SecretId }}"
+    image:
+      repository: "eviln1/vault-init"
+      tag: "0.2"
+      pullPolicy: Always
+  provision:
+    enabled: true
+    awsRegion: "{{ .Environment.Values.Region }}"
+    awsSecretID: "{{ .Environment.Values.SecretId }}"
+    image:
+      repository: "eviln1/vault-init"
+      tag: "0.2"
+      pullPolicy: Always
+    secretsPath: "secrets"
+    policies:
+      - name: "tx-signer-demo"
+        policy: |
+          path "secrets/data/demo/keys/*" {
+            capabilities = ["create", "update", "read"]
+          }
+    roles:
+      - name: "tx-signer-demo"
+        serviceAccountNames: ["tx-signer"]
+        serviceAccountNamespaces: ["core-stack-demo"]
+        policies: ["tx-signer-demo"]
+  config:
+    listener:
+      tcp:
+        address: 0.0.0.0:8200
+        cluster_address: 0.0.0.0:8201
+        tls_disable: false
+        tls_cert_file: "/etc/tls/tls.crt"
+        tls_key_file: "/etc/tls/tls.key"
+    storage:
+      dynamodb:
+        ha_enabled: "true"
+        region: "{{ .Environment.Values.Region }}"
+        table: "{{ .Environment.Values.DynamoDBTable }}"
+    seal:
+      awskms:
+        region: "{{ .Environment.Values.Region }}"
+        kms_key_id: "{{ .Environment.Values.KMSKeyId }}"
+
+resources: {}
+affinity: {}
