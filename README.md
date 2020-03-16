@@ -18,9 +18,9 @@ For more information please refer to [PegaSys Orchestrate Official Documentation
 - [Requirements](#requirements)
   - [Deployment](#deployment)
   - [Vault for AWS](#vault-for-aws)
-- [Configure Orchestrate](#configure-orchestrate)
 - [Set-up Orchestrate ](#set-up-orchestrate)
   - [Set-up tiller ](#set-up-tiller )
+- [Configure Orchestrate](#configure-orchestrate)  
 - [Deploy Orchestrate](#deploy-orchestrate)
 - [Delete deployment of Orchestrate](#delete-deployment-of-orchestrate)
 
@@ -40,8 +40,6 @@ This is intended to get developers and ops people familiar with how to run Orche
 - [AWS KMS](https://aws.amazon.com/kms/) key for auto-unsealing
 - [AWS Secret](aws.amazon.com/secrets-manager)
 - [IAM](https://aws.amazon.com/iam/) Role allowing access to above ressources
-
-## Configure Orchestrate 
 
 ## Set-up Orchestrate 
 Set the env variable `TARGET_NAMESPACE`
@@ -68,6 +66,38 @@ Deploy tiller
 ```bash
 helm init --tiller-namespace $TARGET_NAMESPACE --upgrade --override 'spec.template.spec.containers[0].command'='{/tiller,--storage=secret}' --service-account tiller --wait
 ```
+
+## Configure Orchestrate 
+In `environments` directory, you will find a template with placeholder (`template-placeholder.yam`) and a sample (`orchestrate-demo.yaml`) 
+
+Before you can run Orchestrate, you have to set the following variables in files `tags.yaml`, `helmfile-common.yaml` and  `environments` directory
+
+#### Access to Docker and Helm registry
+You need to have credentials to pull docker image and helm chart to deploy Orchestrate. If you do not have credentials, please contact support@pegasys.tech
+
+In `tags.yaml` file
+- `registry.credentials.username`: Account of the Docker Registry to pull Orchestrate image
+- `registry.credentials.password`: Password of the Docker Registry to pull Orchestrate image
+
+In `helmfile-common.yaml` file
+- `repositories.username`: Account of the Helm Registry to pull Orchestrate Helm Chart
+- `repositories.password`: Password of the Helm Registry to pull Orchestrate Helm Chart
+
+#### Blockchain setting
+
+- `chainRegistry.init`: List of chains including name, URL to communicate with the blockchain 
+
+#### To use Harshircorps Vault in AWS, you to configure this variables
+- `IAMRole`: ARN of the AWS IAM role (string)
+- `Region`: AWS Region in which the resources are created (string)
+- `KMSKeyId`: The AWS KMS key ID to use for encryption and decryption (string)
+- `SecretId`: Alias / Name of the AWS Secretmanager's secret where the root token is stored (string)
+
+#### To use multi-tenancy
+- `multitenancy.enabled`: Enable the usage of multi-tenancy (default: false)
+- `AUTH_JWT_CLAIMS_NAMESPACE`: Tenant Namespace to retrieve the tenant id in the OpenId or Access Token (JWT) (default: "http://tenant.info/")
+- `authentication.AUTH_JWT_CERTIFICATE`: Certificate of the authentication service encoded in base64
+- `authentication.AUTH_API_KEY`: Key used for authentication (it should be used only for Orchestrate internal authenetication)
 
 ## Deploy Orchestrate
 Deploy Orchestrate and his dependency in namespace set in `TARGET_NAMESPACE` env variable

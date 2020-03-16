@@ -10,6 +10,13 @@ txSigner:
     # Var specific to vault-agent
     VAULT_SKIP_VERIFY: true
 
+#Vault AWS KMS variable
+IAMRole: "<aws_iam_role>"
+Region: "<aws_region>"
+KMSKeyId: "<aws_kms_key_id>"
+DynamoDBTable: "orchestrate-vault-<TARGET_NAMESPACE>"
+SecretId: "<aws_secret_id>"
+
 vaultAgent:
   role: tx-signer-<TARGET_NAMESPACE>
 
