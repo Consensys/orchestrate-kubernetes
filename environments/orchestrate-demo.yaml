@@ -1,5 +1,6 @@
 ---
-txSigner:
+#Transaction signer variables
+  txSigner:
   environment:
     SECRET_STORE: "hashicorp"
     VAULT_VERIFY: "true"
@@ -9,7 +10,7 @@ txSigner:
     VAULT_CACERT: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
     VAULT_SKIP_VERIFY: true
 
-#Vault AWS KMS variable
+#Vault AWS KMS variables
 IAMRole: "<aws_iam_role>"
 Region: "<aws_region>"
 KMSKeyId: "<aws_kms_key_id>"
@@ -22,8 +23,8 @@ vaultAgent:
 chainRegistry:
   init: '{"name": "rinkeby", "urls":["https://rinkeby.infura.io/v3/<INFURA_PROJECT_ID>"]}'
 
-## In-Memory storage
-## Default storage class are gp2 for AWS
+## In-memory storage variables 
+## Default storage class is gp2 for AWS
 kafka:
   persistence:
     enabled: false

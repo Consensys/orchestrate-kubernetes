@@ -16,16 +16,16 @@ For more information please refer to [PegaSys Orchestrate Official Documentation
 - [Orchestrate-Kubernetes](#Orchestrate-Kubernetes)
   - [Prerequisites](#Prerequisites)
     - [Deployment](#Deployment)
-    - [Hashicorp Vault with AWS](#Hashicorp-Vault-with-AWS)
-    - [Access to registry](#Access-to-registry)
+    - [Only if using Hashicorp Vault on AWS](#Only-if-using-Hashicorp-Vault-on-AWS)
+    - [Credentials](#Credentials)
   - [Configure Orchestrate](#Configure-Orchestrate)
-      - [Blockchain setting](#Blockchain-setting)
-      - [Hashicorp Vault in AWS](#Hashicorp-Vault-in-AWS)
-      - [Multi-tenancy](#Multi-tenancy)
+    - [Configure access](#Configure-access)
+    - [General configuration](#General-configuration)
+      - [Only when using Hashicorp Vault in AWS](#Only-when-using-Hashicorp-Vault-in-AWS)
+      - [Configure multi-tenancy](#Configure-multi-tenancy)
   - [Set-up Orchestrate](#Set-up-Orchestrate)
-    - [If using Helm version 2 -only- : Set-up tiller](#If-using-Helm-version-2--only---Set-up-tiller)
+    - [Only if you are using Helm version 2, Set-up tiller](#Only-if-you-are-using-Helm-version-2-Set-up-tiller)
   - [Deploy Orchestrate](#Deploy-Orchestrate)
-  - [Delete deployment of Orchestrate](#Delete-deployment-of-Orchestrate)
 
 This repository contains an implementation example on how to deploy Orchestrate and its dependencies using Kubernetes, Helm charts and Helm files.
 This is intended to to help the understanding on how to run and configure Orchestrate using Kubernetes.
@@ -39,67 +39,95 @@ This is intended to to help the understanding on how to run and configure Orches
 - [Helmfile](https://github.com/roboll/helmfile);
 - [Helm diff plugin](https://github.com/databus23/helm-diff).
 
-### Hashicorp Vault with AWS
+### Only if using Hashicorp Vault on AWS
 
-- [DynamoDB](https://aws.amazon.com/dynamodb/) table for state and leader election (used for high availability)
-- [AWS KMS](https://aws.amazon.com/kms/) key for auto-unsealing
-- [AWS Secret](aws.amazon.com/secrets-manager)
-- [IAM](https://aws.amazon.com/iam/) Role allowing access to above resources
+- [Amazon DynamoDB](https://aws.amazon.com/dynamodb/);
+- [AWS Key Management Service (KMS)](https://aws.amazon.com/kms/);
+- [AWS Secrets Manager](aws.amazon.com/secrets-manager);
+- [AWS Identity and Access Management (IAM)](https://aws.amazon.com/iam/).
 
-### Access to registry
-You need to have credentials to pull docker image and helm chart to deploy Orchestrate. If you do not have credentials, please contact support@pegasys.tech
+### Credentials
 
-To set your credentials of Docker registry, you have to fill the following fields in the file `values/tags.yaml`
-- `registry.credentials.username`: Account of the Docker Registry to pull Orchestrate image
-- `registry.credentials.password`: Password of the Docker Registry to pull Orchestrate image
+- Credentials to pull Orchestrate's Docker images;
+- Credentials to pull Orchestrate's Helm charts.
 
-To set your credentials of Hem Chart registry, you have to fill the following fields in the file `helmfile-common.yaml`
-- `repositories.username`: Account of the Helm Registry to pull Orchestrate Helm Chart
-- `repositories.password`: Password of the Helm Registry to pull Orchestrate Helm Chart
+!!! Note
+  If you do not have them yet, please contact [support@pegasys.tech](support@pegasys.tech)
 
-## Configure Orchestrate 
-In `environments` directory, you will find a template file (`template-placeholder.yam`) and an example file (`orchestrate-demo.yaml`) 
+## Configure Orchestrate
 
-First, you need to copy the file `environments/template-placeholder.yam`, then you need to rename it with the name of your kubernetes namesapce and past it in the directory `environments` 
-Then, all configuration will be done in the file you have rename and past. 
-> **Note:** _keep the name of the file and the kubernetes namespace in mind, you will need it to set up Orchestrate for the variable _
+### Configure access
 
-#### Blockchain setting
+Set the following parameters:
+On the file [`values/tags.yaml`](./values/tags.yaml) set your Docker images' credentials:
 
-- `chainRegistry.init`: List of chains including name, URL to communicate with the blockchain 
+- `registry.credentials.username`
+- `registry.credentials.password`
 
-#### Hashicorp Vault in AWS
-- `IAMRole`: ARN of the AWS IAM role (string)
-- `Region`: AWS Region in which the resources are created (string)
-- `KMSKeyId`: The AWS KMS key ID to use for encryption and decryption (string)
-- `SecretId`: Alias / Name of the AWS Secretmanager's secret where the root token is stored (string)
+On the file [`helmfile-common.yaml`](./helmfile-common.yaml) set your Helm Registry' credentials:
 
-#### Multi-tenancy
-- `multitenancy.enabled`: Enable the usage of multi-tenancy (default: false)
-- `AUTH_JWT_CLAIMS_NAMESPACE`: Tenant Namespace to retrieve the tenant id in the OpenId or Access Token (JWT) (default: "http://tenant.info/"). You will find the information in your identity provider
-- `authentication.AUTH_JWT_CERTIFICATE`: Certificate of the authentication service encoded in base64. You will find the information in your identity provider
-- `authentication.AUTH_API_KEY`: Key used for authentication between Orchestrate internal applications. Set this variable to the value you want to use as Key for authentication, we recommend you to use a UUID format
+- `repositories.username`
+- `repositories.password`
 
-## Set-up Orchestrate 
-You need to define the kubernetes namespace where you will deploy Orchestrate.
-Set the env variable `TARGET_NAMESPACE` with the value of kubernetes namespace.
+### General configuration
+
+1. Make a copy of the file ['environments/template-placeholder.yaml'](./environments/template-placeholder.yaml);
+
+2. Rename the file to '<KubernetesNameSpace>.yaml';
+   !!! Note:
+    Keep the name of the file and of the Kubernetes namespace in mind, as you will need them to set up Orchestrate.
+
+3. Save the file on the 'environments' directory.
+
+4. Declare the blockchain networks you want to connect Orchestrate to, separate them by an space.
+
+```
+chainRegistry:
+  init:'{"name":"<ChainName1>","tenantID":"<tenatID1>", "urls":["<list item 1A>","<list item 1B>"]} {"name":"<ChainName2>","tenantID":"<tenatID2>", "urls":["<list item 2A>","<list item 2B>"]}}'
+```
+
+#### Only when using Hashicorp Vault in AWS
+
+- `IAMRole`: Amazon Resource Names (ARN) of AWS IAM role (string).
+- `Region`: AWS Region in which resources are created (string).
+- `KMSKeyId`: AWS KMS key ID to use for encryption and decryption (string).
+- `SecretId`: AWS Secret manager's alias or name where the root token is stored (string).
+
+#### Configure multi-tenancy
+
+- `multitenancy.enabled`: Enables this Orchestrate feature (default: false).
+- `AUTH_JWT_CLAIMS_NAMESPACE`: Tenant namespace to retrieve tenantID in OpenId or Access Token (JWT) (default: "http://tenant.info/"). You will find this information on your identity provider.
+- `authentication.AUTH_JWT_CERTIFICATE`: Certificate of authentication service **encoded in base64**. You will find the information in your identity provider.
+- `authentication.AUTH_API_KEY`: This key is used for authentication internally on Orchestrate, we highly recommend to use a UUID format.
+
+  !!! example
+    The  file [`environments/orchestrate-demo.yaml`](./environments/orchestrate-demo.yaml) is a configuration example for a deployment using HashiCorp Vault on AWs.
+
+## Set-up Orchestrate
+
+Set the variable  `TARGET_NAMESPACE` to the Kubernetes namespace where you will deploy Orchestrate, this was used on [General configuration's point 2](#general-configuration), for doing so:
+
+1. If you do not have the Kubernetes namespace yes, please create it:
+
+```bash
+kubectl create namespace $TARGET_NAMESPACE
+```
+
+2. Initialize the variable:
 
 ```bash
 export TARGET_NAMESPACE=<KUBERNETES_NAMESPACE>
 ```
 
-Create the kubernetes namespace, if it does not exist
-```bash
-kubectl create namespace $TARGET_NAMESPACE
-```
+### Only if you are using Helm version 2, Set-up tiller
 
-### If using Helm version 2 -only- : Set-up tiller
-
-Apply Role Base Access Control to tiller & Deploy tiller
+1. Apply Role Base Access Control to tiller:
 
 ```bash
 cat tiller.yaml | envsubst | kubectl apply -f -
 ```
+
+2. Deploy tiller:
 
 ```bash
 helm init --tiller-namespace $TARGET_NAMESPACE --upgrade --override 'spec.template.spec.containers[0].command'='{/tiller,--storage=secret}' --service-account tiller --wait
@@ -107,14 +135,15 @@ helm init --tiller-namespace $TARGET_NAMESPACE --upgrade --override 'spec.templa
 
 ## Deploy Orchestrate
 
-Deploy Orchestrate and his dependency in namespace set in `TARGET_NAMESPACE` env variable
+To deploy Orchestrate and its dependencies run the following command:
 
 ```bash
 helmfile -f helmfile.yaml -e $TARGET_NAMESPACE apply --suppress-secrets
 ```
 
-## Delete deployment of Orchestrate
+!!!hint
+  to delete Orchestrate's deployment run the following command:
 
-```bash
-helmfile -f helmfile.yaml -e $TARGET_NAMESPACE delete --purge
-```
+  ```bash
+  helmfile -f helmfile.yaml -e $TARGET_NAMESPACE delete --purge
+  ```
