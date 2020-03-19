@@ -1,4 +1,6 @@
-![](./orchestrate-logo.png)
+<p align="center">
+  <img src="static/orchestrate-logo.png" width="300px" alt="Orchestrate Logo"/>
+</p>
 
 PegaSys Orchestrate is a platform that enables enterprises to easily build secure and reliable applications on Ethereum blockchains.
 
