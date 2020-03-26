@@ -30,7 +30,7 @@ For more information please refer to [PegaSys Orchestrate Official Documentation
   - [Deploy Orchestrate](#Deploy-Orchestrate)
 
 This repository contains an implementation example on how to deploy Orchestrate and its dependencies using Kubernetes, Helm charts and Helm files.
-This is intended to to help the understanding on how to run and configure Orchestrate using Kubernetes.
+This is intended to help the understanding on how to run and configure Orchestrate using Kubernetes.
 
 ## Prerequisites
 
@@ -53,7 +53,7 @@ This is intended to to help the understanding on how to run and configure Orches
 - Credentials to pull Orchestrate's Docker images;
 - Credentials to pull Orchestrate's Helm charts.
 
-!!! Note
+!!! Note: 
   If you do not have them yet, please contact [support@pegasys.tech](support@pegasys.tech)
 
 ## Configure Orchestrate
