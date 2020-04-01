@@ -37,7 +37,7 @@ This is intended to help the understanding on how to run and configure Orchestra
 ### Deployment
 
 - [Kubernetes](https://kubernetes.io/) version 1.12 or upper;
-- [Helm](https://helm.sh/) version 2 or upper;
+- [Helm](https://helm.sh/) version 3 or upper;
 - [Helmfile](https://github.com/roboll/helmfile);
 - [Helm diff plugin](https://github.com/databus23/helm-diff).
 
@@ -83,9 +83,18 @@ On the file [`helmfile-common.yaml`](./helmfile-common.yaml) set your Helm Regis
 
 4. Declare the blockchain networks you want to connect Orchestrate to, separate them by an space.
 
-```
+```yaml
 chainRegistry:
   init:'{"name":"<ChainName1>","tenantID":"<tenatID1>", "urls":["<list item 1A>","<list item 1B>"]} {"name":"<ChainName2>","tenantID":"<tenatID2>", "urls":["<list item 2A>","<list item 2B>"]}}'
+```
+
+5. Add the environment '<KubernetesNameSpace>' into the file  `helmfile-common.yaml` 
+```helmyaml
+environments:
+  <KubernetesNameSpace>:
+    values:
+      - environments/<KubernetesNameSpace>.yaml
+      - values/tags.yaml
 ```
 
 #### Only when using Hashicorp Vault in AWS
