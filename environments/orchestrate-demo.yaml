@@ -1,39 +1,33 @@
 ---
 #Transaction signer variables
-  txSigner:
+txSigner:
   environment:
-    SECRET_STORE: "hashicorp"
-    VAULT_VERIFY: "true"
-    VAULT_MOUNT_POINT: "secrets"
-    VAULT_SECRET_PATH: "demo/keys"
-    VAULT_ADDR: https://vault
-    VAULT_CACERT: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-    VAULT_SKIP_VERIFY: true
-
-#Vault AWS KMS variables
-IAMRole: "<aws_iam_role>"
-Region: "<aws_region>"
-KMSKeyId: "<aws_kms_key_id>"
-DynamoDBTable: "orchestrate-vault-demo"
-SecretId: "<aws_secret_id>"
-
-vaultAgent:
-  role: tx-signer-demo
+    SECRET_STORE: "in-memory"
 
 chainRegistry:
-  init: '{"name": "rinkeby", "urls":["https://rinkeby.infura.io/v3/<INFURA_PROJECT_ID>"]}'
+  init: '{"name":"besu","urls":["http://besu-validator1.besu-poa-network:8545"]}'
 
 ## In-memory storage variables 
 ## Default storage class is gp2 for AWS
 kafka:
   persistence:
-    enabled: false
+    enabled: true
     storageClass: "gp2"
 zookeeper:
   persistence:
-    enabled: false
+    enabled: true
     storageClass: "gp2"
 postgresql:
   persistence:
-    enabled: false
+    enabled: true
     storageClass: "gp2"
+
+#Hashicorp Vault AWS KMS variable. Not need to set them if not using Hashicorp Vault in AWS
+IAMRole: "<aws_iam_role>"
+Region: "<aws_region>"
+KMSKeyId: "<aws_kms_key_id>"
+DynamoDBTable: "orchestrate-vault-<TARGET_NAMESPACE>"
+SecretId: "<aws_secret_id>"
+
+vaultAgent:
+  role: tx-signer-demo

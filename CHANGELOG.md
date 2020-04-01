@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## v2.0.1 (2020-04-01)
+
+* Upgrade the deployment to be compatible with Helm v3
+
 ## v2.0.0 (2020-03-12)
 
 * Remove all topics `topic-tx-decoder-{chainID}` for `tx-decoder`

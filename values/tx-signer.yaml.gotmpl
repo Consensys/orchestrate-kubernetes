@@ -16,7 +16,7 @@ environment:
   {{- .Environment.Values.txSigner.environment | toYaml | nindent 2 }}
 
 vaultAgent:
-  enabled: {{ .Values | get "vaultAgent.enabled" true }}
+  enabled: {{ .Values | get "vaultAgent.enabled" false }}
   role: "{{ .Environment.Values.vaultAgent.role }}"
 
 serviceAccount:

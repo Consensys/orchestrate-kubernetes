@@ -1,6 +1,5 @@
 ---
 helmDefaults:
-  tillerNamespace: {{ requiredEnv "TARGET_NAMESPACE" }}
   verify: false
   wait: true
   timeout: 600
@@ -16,3 +15,5 @@ repositories:
     url: https://pegasys.jfrog.io/artifactory/helm-pegasys/
     username: <ACCOUNT_LOGIN>
     password: <ACCOUNT_PASSWORD>
+  - name: bitnami
+    url: https://charts.bitnami.com/bitnami/

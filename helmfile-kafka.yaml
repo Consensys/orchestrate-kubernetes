@@ -4,8 +4,8 @@ bases:
 
 releases:
   - name: kafka
-    chart: incubator/kafka
-    version: 0.15.3
+    chart: bitnami/kafka
+    version: 9.0.4
     namespace: {{ requiredEnv "TARGET_NAMESPACE" }}
     values:
       - values/kafka.yaml.gotmpl
