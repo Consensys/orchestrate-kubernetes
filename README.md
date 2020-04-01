@@ -130,20 +130,6 @@ kubectl create namespace $TARGET_NAMESPACE
 export TARGET_NAMESPACE=<KUBERNETES_NAMESPACE>
 ```
 
-### Only if you are using Helm version 2, Set-up tiller
-
-1. Apply Role Base Access Control to tiller:
-
-```bash
-cat tiller.yaml | envsubst | kubectl apply -f -
-```
-
-2. Deploy tiller:
-
-```bash
-helm init --tiller-namespace $TARGET_NAMESPACE --upgrade --override 'spec.template.spec.containers[0].command'='{/tiller,--storage=secret}' --service-account tiller --wait
-```
-
 ## Deploy Orchestrate
 
 To deploy Orchestrate and its dependencies run the following command:
