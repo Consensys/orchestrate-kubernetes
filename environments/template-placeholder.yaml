@@ -10,6 +10,8 @@ txSigner:
     # Var specific to vault-agent
     VAULT_SKIP_VERIFY: true
 
+vaultEnable: true
+
 #Hashicorp Vault AWS KMS variable
 IAMRole: "<aws_iam_role>"
 Region: "<aws_region>"

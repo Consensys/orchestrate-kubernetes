@@ -4,6 +4,8 @@ txSigner:
   environment:
     SECRET_STORE: "in-memory"
 
+vaultEnable: false
+
 chainRegistry:
   init: '{"name":"besu","urls":["http://besu-validator1.besu-poa-network:8545"]}'
 

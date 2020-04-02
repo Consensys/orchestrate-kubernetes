@@ -32,7 +32,8 @@ releases:
     version: 8.6.12
     values:
       - values/postgresql-chain-registry.yaml.gotmpl
-{{ if eq (.Environment.Values.txSigner.environment.SECRET_STORE "hashicorp") }}
+
+{{ if eq `{{ .Environment.Values.vaultEnable }}` "true" }}
   - name: vault
     namespace: {{ requiredEnv "TARGET_NAMESPACE" }}
     chart: helm-pegasys/vault

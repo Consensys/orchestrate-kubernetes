@@ -1,29 +1,32 @@
 ---
-replicas: {{ .Values | get "kafka.replicas" 3 }}
+replicaCount: {{ .Values | get "kafka.replicas" 3 }}
+defaultReplicationFactor: {{ .Values | get "kafka.replicas" 3 }}
+offsetsTopicReplicationFactor: {{ .Values | get "kafka.replicas" 3 }}
 fullnameOverride: kafka
 topics:
   - name: topic-tx-crafter
     partitions: 5
-    replicationFactor: {{ .Values | get "kafka.replicas" 3 }}
     reassignPartitions: false
   - name: topic-tx-signer
     partitions: 5
-    replicationFactor: {{ .Values | get "kafka.replicas" 3 }}
     reassignPartitions: false
   - name: topic-tx-sender
     partitions: 5
-    replicationFactor: {{ .Values | get "kafka.replicas" 3 }}
     reassignPartitions: false
   - name: topic-tx-decoded
     partitions: 5
-    replicationFactor: {{ .Values | get "kafka.replicas" 3 }}
     reassignPartitions: false
+## Pod Disruption Budget configuration
+## The PDB will only be created if replicaCount is greater than 1
+## ref: https://kubernetes.io/docs/concepts/workloads/pods/disruptions
+pdb:
+  create: true
+  ## Max number of pods that can be unavailable after the eviction
+  maxUnavailable: 1
 persistence:
   enabled: {{ .Values | get "kafka.persistence.enabled" true }}
   size: 4Gi
   storageClass: {{ .Values | get "kafka.persistence.storageClass" "gp2" }}
-configurationOverrides:
-  offsets.topic.replication.factor: {{ .Values | get "kafka.replicas" 3 }}
 prometheus:
   kafka:
     enabled: true
