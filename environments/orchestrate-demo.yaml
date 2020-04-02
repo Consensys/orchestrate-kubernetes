@@ -1,13 +1,15 @@
 ---
-#Transaction signer variables
+# Transaction signer variables
 txSigner:
   environment:
+    # The "in-memory" option is not recommended for production. See '#If you use Hashicorp Vault on AWS' in README.md and VAULT_README.md
     SECRET_STORE: "in-memory"
 
 vaultEnable: false
 
 chainRegistry:
-  init: '{"name":"besu","urls":["http://besu-validator1.besu-poa-network:8545"]}'
+  init: '{"name": "rinkeby", "urls":["https://rinkeby.infura.io/v3/<INFURA_PROJECT_ID>"]}'
+  #init: '{"name":"besu","urls":["http://besu-validator1.besu-poa-network:8545"]}'
 
 ## In-memory storage variables 
 ## Default storage class is gp2 for AWS
@@ -24,12 +26,12 @@ postgresql:
     enabled: true
     storageClass: "gp2"
 
-#Hashicorp Vault AWS KMS variable. Not need to set them if not using Hashicorp Vault in AWS
+# Hashicorp Vault AWS KMS variable. Not need to set them if not using Hashicorp Vault in AWS
 IAMRole: "<aws_iam_role>"
 Region: "<aws_region>"
 KMSKeyId: "<aws_kms_key_id>"
-DynamoDBTable: "orchestrate-vault-<TARGET_NAMESPACE>"
+DynamoDBTable: "orchestrate-vault-orchestrate-demo"
 SecretId: "<aws_secret_id>"
 
 vaultAgent:
-  role: tx-signer-demo
+  role: tx-signer-orchestrate-demo

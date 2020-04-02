@@ -4,7 +4,7 @@ txSigner:
     SECRET_STORE: "hashicorp"
     VAULT_VERIFY: "true"
     VAULT_MOUNT_POINT: "secrets"
-    VAULT_SECRET_PATH: "<TARGET_NAMESPACE>/keys"
+    VAULT_SECRET_PATH: "<KubernetesNameSpace>/keys"
     VAULT_ADDR: https://vault
     VAULT_CACERT: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
     # Var specific to vault-agent
@@ -16,7 +16,7 @@ vaultEnable: true
 IAMRole: "<aws_iam_role>"
 Region: "<aws_region>"
 KMSKeyId: "<aws_kms_key_id>"
-DynamoDBTable: "orchestrate-vault-<TARGET_NAMESPACE>"
+DynamoDBTable: "orchestrate-vault-<KubernetesNameSpace>"
 SecretId: "<aws_secret_id>"
 
 vaultAgent:

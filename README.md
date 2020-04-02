@@ -18,7 +18,7 @@ For more information please refer to [PegaSys Orchestrate Official Documentation
 - [Orchestrate-Kubernetes](#Orchestrate-Kubernetes)
   - [Prerequisites](#Prerequisites)
     - [Deployment](#Deployment)
-    - [Only if using Hashicorp Vault on AWS](#Only-if-using-Hashicorp-Vault-on-AWS)
+    - [If you use Hashicorp Vault on AWS](#If-you-use-Hashicorp-Vault-on-AWS)
     - [Credentials](#Credentials)
   - [Configure Orchestrate](#Configure-Orchestrate)
     - [Configure access](#Configure-access)
@@ -97,7 +97,19 @@ environments:
       - values/tags.yaml
 ```
 
-#### Only when using Hashicorp Vault in AWS
+#### If you use Hashicorp Vault in AWS
+
+```helmyaml
+txSigner:
+  environment:
+    SECRET_STORE: "hashicorp"
+    VAULT_VERIFY: "true"
+    VAULT_MOUNT_POINT: "secrets"
+    VAULT_SECRET_PATH: "<KubernetesNameSpace>/keys"
+    VAULT_ADDR: https://vault
+    VAULT_CACERT: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+    VAULT_SKIP_VERIFY: true
+```
 
 - `IAMRole`: Amazon Resource Names (ARN) of AWS IAM role (string).
 - `Region`: AWS Region in which resources are created (string).
