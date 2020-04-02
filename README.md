@@ -18,7 +18,7 @@ For more information please refer to [PegaSys Orchestrate Official Documentation
 - [Orchestrate-Kubernetes](#Orchestrate-Kubernetes)
   - [Prerequisites](#Prerequisites)
     - [Deployment](#Deployment)
-    - [Only if using Hashicorp Vault on AWS](#Only-if-using-Hashicorp-Vault-on-AWS)
+    - [If you use Hashicorp Vault on AWS](#If-you-use-Hashicorp-Vault-on-AWS)
     - [Credentials](#Credentials)
   - [Configure Orchestrate](#Configure-Orchestrate)
     - [Configure access](#Configure-access)
@@ -37,7 +37,7 @@ This is intended to help the understanding on how to run and configure Orchestra
 ### Deployment
 
 - [Kubernetes](https://kubernetes.io/) version 1.12 or upper;
-- [Helm](https://helm.sh/) version 2 or upper;
+- [Helm](https://helm.sh/) version 3 or upper;
 - [Helmfile](https://github.com/roboll/helmfile);
 - [Helm diff plugin](https://github.com/databus23/helm-diff).
 
@@ -83,12 +83,33 @@ On the file [`helmfile-common.yaml`](./helmfile-common.yaml) set your Helm Regis
 
 4. Declare the blockchain networks you want to connect Orchestrate to, separate them by an space.
 
-```
+```yaml
 chainRegistry:
   init:'{"name":"<ChainName1>","tenantID":"<tenatID1>", "urls":["<list item 1A>","<list item 1B>"]} {"name":"<ChainName2>","tenantID":"<tenatID2>", "urls":["<list item 2A>","<list item 2B>"]}}'
 ```
 
-#### Only when using Hashicorp Vault in AWS
+5. Add the environment '<KubernetesNameSpace>' into the file  `helmfile-common.yaml` 
+```helmyaml
+environments:
+  <KubernetesNameSpace>:
+    values:
+      - environments/<KubernetesNameSpace>.yaml
+      - values/tags.yaml
+```
+
+#### If you use Hashicorp Vault in AWS
+
+```helmyaml
+txSigner:
+  environment:
+    SECRET_STORE: "hashicorp"
+    VAULT_VERIFY: "true"
+    VAULT_MOUNT_POINT: "secrets"
+    VAULT_SECRET_PATH: "<KubernetesNameSpace>/keys"
+    VAULT_ADDR: https://vault
+    VAULT_CACERT: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+    VAULT_SKIP_VERIFY: true
+```
 
 - `IAMRole`: Amazon Resource Names (ARN) of AWS IAM role (string).
 - `Region`: AWS Region in which resources are created (string).
@@ -119,20 +140,6 @@ kubectl create namespace $TARGET_NAMESPACE
 
 ```bash
 export TARGET_NAMESPACE=<KUBERNETES_NAMESPACE>
-```
-
-### Only if you are using Helm version 2, Set-up tiller
-
-1. Apply Role Base Access Control to tiller:
-
-```bash
-cat tiller.yaml | envsubst | kubectl apply -f -
-```
-
-2. Deploy tiller:
-
-```bash
-helm init --tiller-namespace $TARGET_NAMESPACE --upgrade --override 'spec.template.spec.containers[0].command'='{/tiller,--storage=secret}' --service-account tiller --wait
 ```
 
 ## Deploy Orchestrate
