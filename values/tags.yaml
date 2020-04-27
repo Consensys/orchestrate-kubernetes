@@ -10,5 +10,5 @@ repositories:
 registry:
   url: consensys-docker-pegasys-orchestrate.bintray.io
   credentials:
-    username: <ACCOUNT_LOGIN>
-    password: <ACCOUNT_PASSWORD>
+    username: covantis@consensys
+    password: fe67fd2465e8a98b9ce27f567e8d92956b202ec5
