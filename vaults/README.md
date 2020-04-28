@@ -47,7 +47,7 @@ helm upgrade --namespace <OperatorKubernetesNameSpace> --install vault-operator 
 
 To deploy Harshicorps Vault in your environment, you have to set configuration in `operator-deploy/vault-k8s-sample.yaml` 
 
-Change the <VaultKubernetesNameSpace> by the namespace where you want to deploy your Vault instance
+Change the `<VaultKubernetesNameSpace>` by the namespace where you want to deploy your Vault instance
 ```helmyaml
   unsealConfig:
     options:
@@ -88,7 +88,7 @@ Define and specify the rules for your [Vault authentication](https://www.vaultpr
 Define and specify the rules for your [Vault Secrets Engines](https://www.vaultproject.io/docs/secrets)
 
    !!! Note:
-    The Secrets Engines for Orchestrate is Key/Value version 2_
+    The Secrets Engines for Orchestrate is Key/Value version 2
 
 ```helmyaml
     secrets:
@@ -101,7 +101,7 @@ Define and specify the rules for your [Vault Secrets Engines](https://www.vaultp
 
 #### Orchestrate environment
 
-In the 'environments' directory, you need to set variables to connect the `tx-signer` to the harshicorp vault
+In the `environments` directory, you need to set variables to connect the `tx-signer` to the harshicorp vault
 
 - `SECRET_STORE`: Value have to be `hashicorp` to connect to Harshicorp Vault instance.
 - `VAULT_MOUNT_POINT`: Root name of the secret engine. Value is the name of the `path` variable in `secrets` structure in Harshicorp Vault configuration.
