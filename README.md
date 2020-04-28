@@ -99,24 +99,7 @@ environments:
 
 #### If you use Hashicorp Vault
 
-```helmyaml
-txSigner:
-  environment:
-    SECRET_STORE: "hashicorp"
-    VAULT_VERIFY: "true"
-    VAULT_MOUNT_POINT: "secret"
-    VAULT_SECRET_PATH: "<KubernetesNameSpace>/keys"
-    VAULT_ADDR: http://vault.<VaultKubernetesNameSpace>:8200
-    VAULT_CACERT: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-    VAULT_SKIP_VERIFY: true
-```
-
-If you need to initialize private key in the Vault (Not recommended ofr Production)
-```helmyaml
-txSigner:
-  environment:
-    SECRET_PKEY: "<PRIVATE_KEY_1> <PRIVATE_KEY_2> etc..."
-```
+Apply the `vaults/REAMDE.md` to deploy Harshicorp Vault and configure Orchestrate
 
 #### Configure multi-tenancy
 

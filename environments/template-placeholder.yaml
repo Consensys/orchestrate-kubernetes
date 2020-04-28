@@ -1,8 +1,14 @@
 ---
+chainRegistry:
+  init: '{"name":"<ETHEREUM_NODE_ID>","urls":["<ETHEREUM_NODE_URL>"]}'
+
+authentication:
+  AUTH_JWT_CERTIFICATE: "<CERTIFICATE_IDENTITY_PROVIDER>"
+
 txSigner:
   environment:
+    # The "in-memory" option is not recommended for production. See '#If you use Hashicorp Vault' in README.md and vaults/README.md
     SECRET_STORE: "hashicorp"
-    VAULT_VERIFY: "true"
     VAULT_MOUNT_POINT: "secrets"
     VAULT_SECRET_PATH: "<KubernetesNameSpace>/keys"
     VAULT_ADDR: https://vault
@@ -10,21 +16,6 @@ txSigner:
     # Var specific to vault-agent
     VAULT_SKIP_VERIFY: true
 
-vaultEnable: true
-
-#Hashicorp Vault AWS KMS variable
-IAMRole: "<aws_iam_role>"
-Region: "<aws_region>"
-KMSKeyId: "<aws_kms_key_id>"
-DynamoDBTable: "orchestrate-vault-<KubernetesNameSpace>"
-SecretId: "<aws_secret_id>"
-
 vaultAgent:
   enabled: true
   role: tx-signer-<TARGET_NAMESPACE>
-
-chainRegistry:
-  init: '{"name":"<ETHEREUM_NODE_ID>","urls":["<ETHEREUM_NODE_URL>"]}'
-
-authentication:
-  AUTH_JWT_CERTIFICATE: "<CERTIFICATE_IDENTITY_PROVIDER>"

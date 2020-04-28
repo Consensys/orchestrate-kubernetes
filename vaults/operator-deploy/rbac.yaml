@@ -46,4 +46,4 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: vault
-    namespace: vault-sandbox
+    namespace: ${ .Namespace }
