@@ -32,13 +32,3 @@ releases:
     version: 8.6.12
     values:
       - values/postgresql-chain-registry.yaml.gotmpl
-
-{{ if eq `{{ .Environment.Values.vaultEnable }}` "true" }}
-  - name: vault
-    namespace: {{ requiredEnv "TARGET_NAMESPACE" }}
-    chart: helm-pegasys/vault
-    version: 0.1.0
-    atomic: true
-    values:
-      - values/vault.yaml.gotmpl
-{{ end }}

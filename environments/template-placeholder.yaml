@@ -1,30 +1,21 @@
 ---
-txSigner:
-  environment:
-    SECRET_STORE: "hashicorp"
-    VAULT_VERIFY: "true"
-    VAULT_MOUNT_POINT: "secrets"
-    VAULT_SECRET_PATH: "<KubernetesNameSpace>/keys"
-    VAULT_ADDR: https://vault
-    VAULT_CACERT: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-    # Var specific to vault-agent
-    VAULT_SKIP_VERIFY: true
-
-vaultEnable: true
-
-#Hashicorp Vault AWS KMS variable
-IAMRole: "<aws_iam_role>"
-Region: "<aws_region>"
-KMSKeyId: "<aws_kms_key_id>"
-DynamoDBTable: "orchestrate-vault-<KubernetesNameSpace>"
-SecretId: "<aws_secret_id>"
-
-vaultAgent:
-  enabled: true
-  role: tx-signer-<TARGET_NAMESPACE>
-
 chainRegistry:
   init: '{"name":"<ETHEREUM_NODE_ID>","urls":["<ETHEREUM_NODE_URL>"]}'
 
 authentication:
   AUTH_JWT_CERTIFICATE: "<CERTIFICATE_IDENTITY_PROVIDER>"
+
+txSigner:
+  environment:
+    # The "in-memory" option is not recommended for production. See vaults/README.md
+    SECRET_STORE: "hashicorp"
+    VAULT_MOUNT_POINT: "secret"
+    VAULT_SECRET_PATH: "<KubernetesNameSpace>/keys"
+    VAULT_ADDR: http://vault.<VaultKubernetesNameSpace>:8200
+    VAULT_CACERT: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+    # Var specific to vault-agent
+    VAULT_SKIP_VERIFY: true
+
+vaultAgent:
+  enabled: true
+  role: tx-signer

@@ -16,14 +16,14 @@ For more information please refer to [PegaSys Orchestrate Official Documentation
 # Orchestrate-Kubernetes
 
 - [Orchestrate-Kubernetes](#Orchestrate-Kubernetes)
-  - [Prerequisites](#Prerequisites)
+  - [Requirements](#Requirements)
     - [Deployment](#Deployment)
-    - [If you use Hashicorp Vault on AWS](#If-you-use-Hashicorp-Vault-on-AWS)
+    - [If you use Hashicorp Vault](#If-you-use-Hashicorp-Vault)
     - [Credentials](#Credentials)
   - [Configure Orchestrate](#Configure-Orchestrate)
     - [Configure access](#Configure-access)
     - [General configuration](#General-configuration)
-      - [Only when using Hashicorp Vault in AWS](#Only-when-using-Hashicorp-Vault-in-AWS)
+      - [If you use Hashicorp Vault](#If-you-use-Hashicorp-Vault)
       - [Configure multi-tenancy](#Configure-multi-tenancy)
   - [Set-up Orchestrate](#Set-up-Orchestrate)
     - [Only if you are using Helm version 2, Set-up tiller](#Only-if-you-are-using-Helm-version-2-Set-up-tiller)
@@ -32,7 +32,7 @@ For more information please refer to [PegaSys Orchestrate Official Documentation
 This repository contains an implementation example on how to deploy Orchestrate and its dependencies using Kubernetes, Helm charts and Helm files.
 This is intended to help the understanding on how to run and configure Orchestrate using Kubernetes.
 
-## Prerequisites
+## Requirements
 
 ### Deployment
 
@@ -97,24 +97,9 @@ environments:
       - values/tags.yaml
 ```
 
-#### If you use Hashicorp Vault in AWS
+#### If you use Hashicorp Vault
 
-```helmyaml
-txSigner:
-  environment:
-    SECRET_STORE: "hashicorp"
-    VAULT_VERIFY: "true"
-    VAULT_MOUNT_POINT: "secrets"
-    VAULT_SECRET_PATH: "<KubernetesNameSpace>/keys"
-    VAULT_ADDR: https://vault
-    VAULT_CACERT: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-    VAULT_SKIP_VERIFY: true
-```
-
-- `IAMRole`: Amazon Resource Names (ARN) of AWS IAM role (string).
-- `Region`: AWS Region in which resources are created (string).
-- `KMSKeyId`: AWS KMS key ID to use for encryption and decryption (string).
-- `SecretId`: AWS Secret manager's alias or name where the root token is stored (string).
+Apply the [`vaults/README.md`](vaults/) to deploy Harshicorp Vault and configure Orchestrate
 
 #### Configure multi-tenancy
 
