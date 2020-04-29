@@ -144,6 +144,7 @@ First, you need to delete all deployed Vault server and RBAC
 
 ```shell
 kubectl delete --namespace <VaultKubernetesNameSpace> -f operator-deploy/vault-k8s-sample.yaml
+kubectl delete --namespace <VaultKubernetesNameSpace> secret vault-unseal-keys
 kubectl delete --namespace <VaultKubernetesNameSpace> -f operator-deploy/rbac.yaml
 ```
 
