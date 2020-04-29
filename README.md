@@ -23,7 +23,7 @@ For more information please refer to [PegaSys Orchestrate Official Documentation
   - [Configure Orchestrate](#Configure-Orchestrate)
     - [Configure access](#Configure-access)
     - [General configuration](#General-configuration)
-      - [Only when using Hashicorp Vault in AWS](#Only-when-using-Hashicorp-Vault-in-AWS)
+      - [If you use Hashicorp Vault](#If-you-use-Hashicorp-Vault)
       - [Configure multi-tenancy](#Configure-multi-tenancy)
   - [Set-up Orchestrate](#Set-up-Orchestrate)
     - [Only if you are using Helm version 2, Set-up tiller](#Only-if-you-are-using-Helm-version-2-Set-up-tiller)
@@ -99,7 +99,7 @@ environments:
 
 #### If you use Hashicorp Vault
 
-Apply the `vaults/REAMDE.md` to deploy Harshicorp Vault and configure Orchestrate
+Apply the [`vaults/REAMDE.md`](vaults/REAMDE.md) to deploy Harshicorp Vault and configure Orchestrate
 
 #### Configure multi-tenancy
 
