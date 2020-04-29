@@ -103,7 +103,7 @@ Define and specify the rules for your [Vault Secrets Engines](https://www.vaultp
 
 In the `environments` directory, you need to set variables to connect the `tx-signer` to the harshicorp vault
 
-- `SECRET_STORE`: Value have to be `hashicorp` to connect to Harshicorp Vault instance.
+- `SECRET_STORE`: Secret storage type. Use `hashicorp` to connect use Harshicorp Vault instance.
 - `VAULT_MOUNT_POINT`: Root name of the secret engine. Value is the name of the `path` variable in `secrets` structure in Harshicorp Vault configuration.
 - `VAULT_SECRET_PATH`: Path of secret key store of ethereum wallet. Value is the `rules: path` variable in `policies` structure in Harshicorp Vault configuration.
 - `VAULT_ADDR`: Hostname and port of Harshicorp Vault instance.
