@@ -99,7 +99,7 @@ environments:
 
 #### If you use Hashicorp Vault
 
-Apply the [`vaults/REAMDE.md`](vaults/REAMDE.md) to deploy Harshicorp Vault and configure Orchestrate
+Apply the [`vaults/REAMDE.md`](vaults/) to deploy Harshicorp Vault and configure Orchestrate
 
 #### Configure multi-tenancy
 
