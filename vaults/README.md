@@ -6,7 +6,7 @@ This repository aims to deploy a prod-worthy [Hashicorp's Vault](https://www.vau
 
 ## Requirements
 
-This deployment assumes that the following tools and infra exist:
+This deployment assumes that the following tools and infra exist and are up to date:
 
 - [Kubernetes](https://kubernetes.io/) version 1.12 or upper
 - [Helm](https://helm.sh/) version 3 or upper
