@@ -4,4 +4,5 @@ bases:
 
 helmfiles:
   - helmfile-stateful.yaml
+  - helmfile-kafka.yaml
   - helmfile-core.yaml
