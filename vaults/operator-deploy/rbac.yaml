@@ -46,4 +46,7 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: vault
-    namespace: ${ .Namespace }
+    namespace: <VaultKubernetesNameSpace>
+  - kind: ServiceAccount
+    name: vault
+    namespace: <OrchestrateKubernetesNameSpace>

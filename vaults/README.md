@@ -45,6 +45,29 @@ helm upgrade --namespace <OperatorKubernetesNameSpace> --install vault-operator 
 ### Configuration
 #### Vault instances
 
+To deploy Harshicorps Vault in your environment, you have to set configuration in `operator-deploy/rbac.yaml` 
+
+Change the `<VaultKubernetesNameSpace>` and `<OrchestrateKubernetesNameSpace>` by the namespace where you want to deploy your Orchestrate instance
+```helmyaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: vault-auth-delegator-orchestrate
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:auth-delegator-orchestrate
+subjects:
+subjects:
+  - kind: ServiceAccount
+    name: vault
+    namespace: <VaultKubernetesNameSpace>
+  - kind: ServiceAccount
+    name: vault
+    namespace: <OrchestrateKubernetesNameSpace>
+``` 
+
+
 To deploy Harshicorps Vault in your environment, you have to set configuration in `operator-deploy/vault-k8s-sample.yaml` 
 
 Change the `<VaultKubernetesNameSpace>` by the namespace where you want to deploy your Vault instance
