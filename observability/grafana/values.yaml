@@ -1,0 +1,25 @@
+---
+plugins:
+  - grafana-piechart-panel
+  - grafana-clock-panel
+  - grafana-kubernetes-app
+persistence:
+  enabled: false
+  size: 5Gi
+  storageClassName: gp2
+  accessModes:
+    - ReadWriteOnce
+grafana.ini:
+  auth.basic:
+    enabled: false
+  auth.gitlab:
+    enabled: true
+    allow_sign_up: true
+    client_id: 1688bcf21c79abbb38598c13dccfffa30420ea4ed2987de0371cff83f94f48a9
+    client_secret: 6bac62bb527647173b57e9f9af61f5d76deecc4686be2f7fc9272196acb16192
+    scopes: api
+    auth_url: https://gitlab.com/oauth/authorize
+    token_url: https://gitlab.com/oauth/token
+    api_url: https://gitlab.com/api/v4
+    allowed_groups: ConsenSys/client/fr/dauriel
+adminPassword: frenchfries

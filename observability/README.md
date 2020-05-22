@@ -43,11 +43,9 @@ The following Kubernetes features are also expected:
 ## Prerequisites
 
 To segregate responsibilities, we would create two distinguished namesapces 
-- `<OperatorKubernetesNameSpace>` Kubernetes namespace which will receive the operator
 - `<ObservabilityKubernetesNameSpace>` Kubernetes namespace which will receive instance for Oberservability tools (Prometheus, Grafana, etc....)
 
 ```shell
-kubectl create namespace <OperatorKubernetesNameSpace>
 kubectl create namespace <ObservabilityKubernetesNameSpace>
 ```
 
@@ -69,9 +67,6 @@ export TARGET_NAMESPACE=<KUBERNETES_NAMESPACE>
 
 ## Deploy Observability
 
-### Set-up Prometheus
-
-
 ### Deploy Prometheus
 
 To deploy Prometheus and its dependencies run the following command:
@@ -84,7 +79,11 @@ helmfile -f helmfile.yaml -e $TARGET_NAMESPACE apply --suppress-secrets
 
 The documentation for [Running Exporter or ServiceMonitor](https://github.com/coreos/prometheus-operator/blob/master/Documentation/user-guides/running-exporters.md)
 
+Deploy the ServiceMonitor to scrap metrics from Orchestrate app 
 
+```shell
+kubectl apply --namespace <ObservabilityKubernetesNameSpace> -f prometheus/orchestrate-ServiceMonitor.yaml
+```
 
 ## Delete
 First, you need to delete the Helm Chart

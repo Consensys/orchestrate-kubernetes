@@ -21,3 +21,10 @@ releases:
     atomic: true
     values:
       - prometheus/values.yaml
+  - name: grafana
+    namespace: {{ requiredEnv "TARGET_NAMESPACE" }}
+    chart: stable/grafana
+    version: 5.0.26
+    atomic: true
+    values:
+      - grafana/values.yaml
