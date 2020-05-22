@@ -85,7 +85,13 @@ Deploy the ServiceMonitor to scrap metrics from Orchestrate app
 kubectl apply --namespace <ObservabilityKubernetesNameSpace> -f prometheus/orchestrate-ServiceMonitor.yaml
 ```
 
-## Delete
+### Deploy Grafana
+
+```shell
+helm install -f grafana/values.yaml grafana stable/grafana --namespace <ObservabilityKubernetesNameSpace>
+```
+
+## Delete Prometheus
 First, you need to delete the Helm Chart
 
 ```shell
