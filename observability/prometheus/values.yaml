@@ -1,0 +1,19 @@
+---
+prometheusOperator:
+  namespaces:
+    releaseNamespace: true
+    additional:
+      - kube-system
+      - observability
+
+prometheusSpec:
+  ruleNamespaceSelector:
+    matchNames:
+      - kube-system
+      - orchestrate-demo
+
+prometheus:
+  persistence:
+    enabled: false
+    storageClass: gp2
+    size: 40G
