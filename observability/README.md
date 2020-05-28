@@ -91,7 +91,21 @@ kubectl apply --namespace <ObservabilityKubernetesNameSpace> -f prometheus/orche
 helm install -f grafana/values.yaml grafana stable/grafana --namespace <ObservabilityKubernetesNameSpace>
 ```
 
-## Delete Prometheus
+## Access Observability
+
+### Access Prometheus
+
+```shell
+kubectl port-forward --namespace observability svc/prometheus-prometheus-oper-prometheus 9090:9090
+```
+
+### Access Grafana
+
+```shell
+kubectl port-forward --namespace observability svc/grafana 3000:80
+```
+
+## Delete Observability
 First, you need to delete the Helm Chart
 
 ```shell
