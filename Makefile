@@ -1,6 +1,5 @@
 TARGET_NAMESPACE=orchestrate-demo
 
-
 .PHONY: init
 init:
 	helm init --client-only
