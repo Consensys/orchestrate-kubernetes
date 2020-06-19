@@ -2,7 +2,7 @@
 chainRegistry:
   init: '{"name":"besu","urls":["http://besu-validator1.besu-poa-network:8545"]}'
 
-## In-memory storage variables 
+## In-memory storage variables
 ## Default storage class is gp2 for AWS
 kafka:
   persistence:
