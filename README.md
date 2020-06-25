@@ -138,6 +138,6 @@ helmfile -f helmfile.yaml -e $TARGET_NAMESPACE apply --suppress-secrets
 !!!hint
   to delete Orchestrate's deployment run the following command:
 
-  ```bash
-  helmfile -f helmfile.yaml -e $TARGET_NAMESPACE delete --purge
-  ```
+```bash
+helmfile -f helmfile.yaml -e $TARGET_NAMESPACE delete --purge
+```
