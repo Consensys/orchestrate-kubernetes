@@ -1,5 +1,5 @@
 ---
-fullnameOverride: "postgresql-envelope-store"
+fullnameOverride: "postgresql-transaction-scheduler"
 replication:
   enabled: false
 persistence:
@@ -11,6 +11,6 @@ readinessProbe:
   enabled: true
 metrics:
   enabled: false
-postgresqlDatabase: envelope-store
-postgresqlUsername: envelope-store
+postgresqlDatabase: transaction-scheduler
+postgresqlUsername: transaction-scheduler
 postgresqlPassword: such-secret

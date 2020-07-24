@@ -13,15 +13,9 @@ cmd:
   name: tx-listener
 
 environment:
-  LISTENER_BLOCK_BACKOFF: "1s"
-  LISTENER_BLOCK_LIMIT: 40
-  LISTENER_DEPTH: 2
-  LISTENER_START: "3:oldest"
-  LISTENER_START_DEFAULT: "oldest"
-  ENVELOPE_STORE_URL: "api-envelope-store:8080"
+  TRANSACTION_SCHEDULER_URL: "http://api-transaction-scheduler:8081"
   CONTRACT_REGISTRY_URL:  "api-contract-registry:8080"
   CHAIN_REGISTRY_URL: "http://api-chain-registry:8081"
-
 
 affinity:
   podAntiAffinity:

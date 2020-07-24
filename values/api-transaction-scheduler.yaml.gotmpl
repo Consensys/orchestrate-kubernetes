@@ -1,0 +1,23 @@
+---
+fullnameOverride: "api-transaction-scheduler"
+image:
+  repository: "{{ .Environment.Values.repositories.orchestrate }}"
+  tag: "{{ .Environment.Values.tags.orchestrate }}"
+imageCredentials:
+  create: true
+  registry: {{ .Environment.Values.registry.url }}
+  username: {{ .Environment.Values.registry.credentials.username }}
+  password: {{ .Environment.Values.registry.credentials.password }}
+
+cmd:
+  name: transaction-scheduler
+
+environment:
+  CONTRACT_REGISTRY_URL: "api-contract-registry:8080"
+  CHAIN_REGISTRY_URL: "http://api-chain-registry:8081"
+  DB_DATABASE: transaction-scheduler
+  DB_HOST: postgresql-transaction-scheduler
+  DB_USER: transaction-scheduler
+  KAFKA_URL: "kafka:9092"
+  TOPIC_TX_CRAFTER: "topic-tx-crafter"
+  TOPIC_TX_SENDER: "topic-tx-sender"

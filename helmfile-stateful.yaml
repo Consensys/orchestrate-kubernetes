@@ -11,13 +11,13 @@ releases:
     values:
       - values/redis.yaml
       - values/redis-nonce.yaml
-  - name: postgresql-envelope-store
+  - name: postgresql-transaction-scheduler
     namespace: {{ requiredEnv "TARGET_NAMESPACE" }}
     chart: bitnami/postgresql
     atomic: true
     version: 8.6.12
     values:
-      - values/postgresql-envelope-store.yaml.gotmpl
+      - values/postgresql-transaction-scheduler.yaml.gotmpl
   - name: postgresql-contract-registry
     namespace: {{ requiredEnv "TARGET_NAMESPACE" }}
     chart: bitnami/postgresql

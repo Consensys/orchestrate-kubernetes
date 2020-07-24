@@ -39,7 +39,7 @@ releases:
       - values/tx-worker-common.yaml.gotmpl
       - values/tx-common-multitenancy.yaml.gotmpl
       - values/tx-listener.yaml.gotmpl
-  - name: api-envelope-store
+  - name: api-transaction-scheduler
     namespace: {{ requiredEnv "TARGET_NAMESPACE" }}
     chart: helm-pegasys/core-stack-api
     atomic: true
@@ -47,7 +47,7 @@ releases:
     values:
       - values/api-common.yaml.gotmpl
       - values/tx-common-multitenancy.yaml.gotmpl
-      - values/api-envelope-store.yaml.gotmpl
+      - values/api-transaction-scheduler.yaml.gotmpl
   - name: api-contract-registry
     namespace: {{ requiredEnv "TARGET_NAMESPACE" }}
     chart: helm-pegasys/core-stack-api
