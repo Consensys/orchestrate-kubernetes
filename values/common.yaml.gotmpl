@@ -2,7 +2,11 @@
 environment:
   LOG_LEVEL: info
   LOG_FORMAT: json
+  TRANSACTION_SCHEDULER_URL: "http://api-transaction-scheduler:8081"
+  CONTRACT_REGISTRY_URL:  "api-contract-registry:8080"
+  CHAIN_REGISTRY_URL: "http://api-chain-registry:8081"
   KAFKA_URL: "kafka:9092"
+  REDIS_URL: "redis-nonce-master:6379"
   TOPIC_TX_RECOVER: "topic-tx-recover"
   TOPIC_TX_CRAFTER: "topic-tx-crafter"
   TOPIC_TX_SIGNER: "topic-tx-signer"
@@ -10,11 +14,3 @@ environment:
   KAFKA_GROUP_TX_CRAFTER: "tx-crafter-group"
   KAFKA_GROUP_TX_SENDER: "tx-sender-group"
   KAFKA_GROUP_TX_SIGNER: "tx-signer-group"
-
-resources:
-  requests:
-    cpu: "100m"
-    memory: 16Mi
-  limits:
-    cpu: "300m"
-    memory: 64Mi

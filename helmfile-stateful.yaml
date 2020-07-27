@@ -10,7 +10,6 @@ releases:
     atomic: true
     values:
       - values/redis.yaml
-      - values/redis-nonce.yaml
   - name: postgresql-transaction-scheduler
     namespace: {{ requiredEnv "TARGET_NAMESPACE" }}
     chart: bitnami/postgresql

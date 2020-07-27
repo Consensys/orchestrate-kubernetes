@@ -12,11 +12,6 @@ imageCredentials:
 cmd:
   name: tx-listener
 
-environment:
-  TRANSACTION_SCHEDULER_URL: "http://api-transaction-scheduler:8081"
-  CONTRACT_REGISTRY_URL:  "api-contract-registry:8080"
-  CHAIN_REGISTRY_URL: "http://api-chain-registry:8081"
-
 affinity:
   podAntiAffinity:
     preferredDuringSchedulingIgnoredDuringExecution:

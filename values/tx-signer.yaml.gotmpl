@@ -13,7 +13,6 @@ cmd:
   name: tx-signer
 
 environment:
-  TRANSACTION_SCHEDULER_URL: "http://api-transaction-scheduler:8081"
   {{- .Environment.Values.txSigner.environment | toYaml | nindent 2 }}
 
 vaultAgent:

@@ -1,5 +1,9 @@
 ---
+fullnameOverride: redis-nonce
 usePassword: false
+master:
+  persistence:
+    enabled: false
 configmap: |-
   notify-keyspace-events Kg
   maxmemory 100mb

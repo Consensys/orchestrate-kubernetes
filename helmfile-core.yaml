@@ -9,8 +9,9 @@ releases:
     atomic: true
     version: 0.5.2
     values:
-      - values/tx-worker-common.yaml.gotmpl
-      - values/tx-common-multitenancy.yaml.gotmpl
+      - values/common.yaml.gotmpl
+      - values/common-worker.yaml.gotmpl
+      - values/common-multitenancy.yaml.gotmpl
       - values/tx-crafter.yaml.gotmpl
   - name: tx-signer
     namespace: {{ requiredEnv "TARGET_NAMESPACE" }}
@@ -18,8 +19,9 @@ releases:
     atomic: true
     version: 0.5.2
     values:
-      - values/tx-worker-common.yaml.gotmpl
-      - values/tx-common-multitenancy.yaml.gotmpl
+      - values/common.yaml.gotmpl
+      - values/common-worker.yaml.gotmpl
+      - values/common-multitenancy.yaml.gotmpl
       - values/tx-signer.yaml.gotmpl
   - name: tx-sender
     namespace: {{ requiredEnv "TARGET_NAMESPACE" }}
@@ -27,8 +29,9 @@ releases:
     atomic: true
     version: 0.5.2
     values:
-      - values/tx-worker-common.yaml.gotmpl
-      - values/tx-common-multitenancy.yaml.gotmpl
+      - values/common.yaml.gotmpl
+      - values/common-worker.yaml.gotmpl
+      - values/common-multitenancy.yaml.gotmpl
       - values/tx-sender.yaml.gotmpl
   - name: tx-listener
     namespace: {{ requiredEnv "TARGET_NAMESPACE" }}
@@ -36,8 +39,9 @@ releases:
     atomic: true
     version: 0.5.2
     values:
-      - values/tx-worker-common.yaml.gotmpl
-      - values/tx-common-multitenancy.yaml.gotmpl
+      - values/common.yaml.gotmpl
+      - values/common-worker.yaml.gotmpl
+      - values/common-multitenancy.yaml.gotmpl
       - values/tx-listener.yaml.gotmpl
   - name: api-transaction-scheduler
     namespace: {{ requiredEnv "TARGET_NAMESPACE" }}
@@ -45,8 +49,9 @@ releases:
     atomic: true
     version: 0.5.3
     values:
-      - values/api-common.yaml.gotmpl
-      - values/tx-common-multitenancy.yaml.gotmpl
+      - values/common.yaml.gotmpl
+      - values/common-api.yaml.gotmpl
+      - values/common-multitenancy.yaml.gotmpl
       - values/api-transaction-scheduler.yaml.gotmpl
   - name: api-contract-registry
     namespace: {{ requiredEnv "TARGET_NAMESPACE" }}
@@ -54,8 +59,9 @@ releases:
     atomic: true
     version: 0.5.3
     values:
-      - values/api-common.yaml.gotmpl
-      - values/tx-common-multitenancy.yaml.gotmpl
+      - values/common.yaml.gotmpl
+      - values/common-api.yaml.gotmpl
+      - values/common-multitenancy.yaml.gotmpl
       - values/api-contract-registry.yaml.gotmpl
   - name: api-chain-registry
     namespace: {{ requiredEnv "TARGET_NAMESPACE" }}
@@ -63,6 +69,7 @@ releases:
     atomic: true
     version: 0.5.3
     values:
-      - values/api-common.yaml.gotmpl
-      - values/tx-common-multitenancy.yaml.gotmpl
+      - values/common.yaml.gotmpl
+      - values/common-api.yaml.gotmpl
+      - values/common-multitenancy.yaml.gotmpl
       - values/api-chain-registry.yaml.gotmpl
