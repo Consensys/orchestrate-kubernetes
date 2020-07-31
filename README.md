@@ -141,3 +141,5 @@ helmfile -f helmfile.yaml -e $TARGET_NAMESPACE apply --suppress-secrets
 ```bash
 helmfile -f helmfile.yaml -e $TARGET_NAMESPACE delete --purge
 ```
+
+> Notes: Update `values/tags.yaml` with valid bintray credentials before executing above command
