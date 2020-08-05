@@ -1,5 +1,5 @@
 ---
-fullnameOverride: "api-envelope-store"
+fullnameOverride: "api-transaction-scheduler"
 image:
   repository: "{{ .Environment.Values.repositories.orchestrate }}"
   tag: "{{ .Environment.Values.tags.orchestrate }}"
@@ -10,9 +10,9 @@ imageCredentials:
   password: {{ .Environment.Values.registry.credentials.password }}
 
 cmd:
-  name: envelope-store
+  name: transaction-scheduler
 
 environment:
-  DB_DATABASE: envelope-store
-  DB_HOST: postgresql-envelope-store
-  DB_USER: envelope-store
+  DB_DATABASE: transaction-scheduler
+  DB_HOST: postgresql-transaction-scheduler
+  DB_USER: transaction-scheduler

@@ -1,4 +1,5 @@
-TARGET_NAMESPACE=orchestrate-demo
+TARGET_NAMESPACE := orchestrate-demo
+export TARGET_NAMESPACE
 
 .PHONY: init
 init:
@@ -6,6 +7,7 @@ init:
 
 .PHONY: lint
 lint:
+	echo ${TARGET_NAMESPACE}
 	@yamllint -c test/yamllint_rules.yaml values/ environments/ helmfile.yaml
 	@helmfile -f helmfile.yaml -e ${TARGET_NAMESPACE} lint
 
