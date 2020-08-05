@@ -1,7 +1,7 @@
 ---
 tags:
-  orchestrate: v2.3.0-rc1
-  e2e: v2.3.0-rc1
+  orchestrate: v2.3.0-rc2
+  e2e: v2.3.0-rc2
 
 repositories:
   orchestrate: consensys-docker-pegasys-orchestrate.bintray.io/orchestrate
