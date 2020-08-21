@@ -1,6 +1,6 @@
 ---
 chainRegistry:
-  init: '{"name":"<ETHEREUM_NODE_ID>","urls":["<ETHEREUM_NODE_URL>"]}'
+  init: '{"name":"<ETHEREUM_NODE_NAME>","urls":["<ETHEREUM_NODE_URL>"]}'
 
 authentication:
   AUTH_JWT_CERTIFICATE: "<CERTIFICATE_IDENTITY_PROVIDER>"

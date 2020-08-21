@@ -2,8 +2,19 @@
 chainRegistry:
   init: '{"name":"besu","urls":["http://besu-validator1.besu-poa-network:8545"]}'
 
-## In-memory storage variables
-## Default storage class is gp2 for AWS
+# Transaction signer variables
+txSigner:
+  environment:
+    # The "in-memory" option is not recommended for production. See '#If you use Hashicorp Vault' in README.md and vaults/README.md
+    SECRET_STORE: "in-memory"
+
+vaultAgent:
+  role: tx-signer
+
+testEnvironment:
+  CUCUMBER_CONCURRENCY: 10
+  # CUCUMBER_TAGS: "@besu"
+
 kafka:
   persistence:
     enabled: true
@@ -16,12 +27,3 @@ postgresql:
   persistence:
     enabled: true
     storageClass: "gp2"
-
-# Transaction signer variables
-txSigner:
-  environment:
-    # The "in-memory" option is not recommended for production. See '#If you use Hashicorp Vault' in README.md and vaults/README.md
-    SECRET_STORE: "in-memory"
-
-vaultAgent:
-  role: tx-signer
