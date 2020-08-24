@@ -1,17 +1,16 @@
-<p align="center">
-  <img src="./orchestrate-logo.png" width="300px" alt="Orchestrate Logo"/>
-</p>
+# Codefi Orchestrate
 
-PegaSys Orchestrate is a platform that enables enterprises to easily build secure and reliable applications on Ethereum blockchains.
+[Orchestrate](https://codefi.consensys.net) is a platform that enables enterprises to easily build
+secure and reliable applications on Ethereum blockchains.
 
 It provides extensive features to connect to blockchain networks:
 
-- Transaction management (transaction crafting, gas management, nonce management, transaction listening...)
+- Transaction management (transaction crafting, gas management, nonce management, transaction listening)
 - Account management with private key storage in Hashicorp Vault
 - Smart Contract Registry
 - Multi-chain & Multi-protocol (public or private)
 
-For more information please refer to [PegaSys Orchestrate Official Documentation](https://docs.orchestrate.pegasys.tech/).
+For more information, refer to the [Orchestrate documentation](https://docs.orchestrate.consensys.net/).
 
 # Orchestrate-Kubernetes
 
@@ -54,7 +53,7 @@ This is intended to help the understanding on how to run and configure Orchestra
 - Credentials to pull Orchestrate's Helm charts.
 
 !!! Note: 
-  If you do not have them yet, please contact [support@pegasys.tech](support@pegasys.tech)
+  If you do not have them yet, please contact [orchestrate@consensys.net](mailto:orchestrate@consensys.net).
 
 ## Configure Orchestrate
 
