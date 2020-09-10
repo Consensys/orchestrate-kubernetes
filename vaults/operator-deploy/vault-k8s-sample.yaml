@@ -68,7 +68,7 @@ spec:
       # This is true by default
       preFlightChecks: true
     kubernetes:
-      secretNamespace: <VaultKubernetesNameSpace>
+      secretNamespace: <VaultNamespace>
 
   # A YAML representation of a final vault config file.
   # See https://www.vaultproject.io/docs/configuration/ for more information.
@@ -95,7 +95,7 @@ spec:
           capabilities = ["create", "read", "update", "delete", "list"]
           }
       - name: tx_signer_demo
-        rules: path "secret/data/orchestrate-demo/keys/*" {
+        rules: path "secret/data/<OrchestrateNamespace>/keys/*" {
           capabilities = ["create", "read", "update", "delete", "list"]
           }
     auth:
@@ -104,7 +104,7 @@ spec:
           # Allow every pod in the default namespace to use the secret kv store
           - name: tx-signer
             bound_service_account_names: ["tx-signer", "vault-secrets-webhook", "vault"]
-            bound_service_account_namespaces: ["operator", "vault-sandbox", "orchestrate-demo"]
+            bound_service_account_namespaces: ["<VaultOperatorNamespace>", "<VaultNamespace>", "<OrchestrateNamespace>"]
             policies: ["allow_secrets", "tx_signer_demo"]
 
     secrets:

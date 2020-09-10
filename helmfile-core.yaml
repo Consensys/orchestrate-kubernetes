@@ -13,6 +13,7 @@ releases:
       - values/common-worker.yaml.gotmpl
       - values/common-multitenancy.yaml.gotmpl
       - values/tx-crafter.yaml.gotmpl
+      - values/e2e.yaml.gotmpl
   - name: tx-signer
     namespace: {{ requiredEnv "TARGET_NAMESPACE" }}
     chart: helm-pegasys/core-stack-worker

@@ -10,6 +10,10 @@ environments:
     values:
       - environments/orchestrate-demo.yaml
       - values/tags.yaml
+  orchestrate-minikube:
+    values:
+      - environments/orchestrate-minikube.yaml
+      - values/tags.yaml
 repositories:
   - name: helm-pegasys
     url: https://pegasys.jfrog.io/artifactory/helm-pegasys/
