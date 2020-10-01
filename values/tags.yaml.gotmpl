@@ -1,0 +1,14 @@
+---
+tags:
+  orchestrate: {{ env "ORCHESTRATE_TAG" | default "v2.4.0-rc1" }}
+  e2e: {{ env "E2E_TAG" | default "v2.4.0-rc1" }}
+
+repositories:
+  orchestrate: {{ env "ORCHESTRATE_REPOSITORY" | default "consensys-docker-pegasys-orchestrate.bintray.io/orchestrate" }}
+  e2e: {{ env "E2E_REPOSITORY" | default "consensys-docker-pegasys-orchestrate.bintray.io/e2e" }}
+
+registry:
+  url: {{ env "REGISTRY_URL" | default "consensys-docker-pegasys-orchestrate.bintray.io" }}
+  credentials:
+    username: {{ requiredEnv "REGISTRY_USERNAME" }}
+    password: {{ requiredEnv "REGISTRY_PASSWORD" }}

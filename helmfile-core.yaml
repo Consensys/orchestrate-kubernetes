@@ -3,6 +3,36 @@ bases:
   - helmfile-common.yaml
 
 releases:
+  - name: api-transaction-scheduler
+    namespace: {{ requiredEnv "TARGET_NAMESPACE" }}
+    chart: helm-pegasys/core-stack-api
+    atomic: true
+    version: 0.5.6
+    values:
+      - values/common.yaml.gotmpl
+      - values/common-api.yaml.gotmpl
+      - values/common-multitenancy.yaml.gotmpl
+      - values/api-transaction-scheduler.yaml.gotmpl
+  - name: api-contract-registry
+    namespace: {{ requiredEnv "TARGET_NAMESPACE" }}
+    chart: helm-pegasys/core-stack-api
+    atomic: true
+    version: 0.5.6
+    values:
+      - values/common.yaml.gotmpl
+      - values/common-api.yaml.gotmpl
+      - values/common-multitenancy.yaml.gotmpl
+      - values/api-contract-registry.yaml.gotmpl
+  - name: api-chain-registry
+    namespace: {{ requiredEnv "TARGET_NAMESPACE" }}
+    chart: helm-pegasys/core-stack-api
+    atomic: true
+    version: 0.5.6
+    values:
+      - values/common.yaml.gotmpl
+      - values/common-api.yaml.gotmpl
+      - values/common-multitenancy.yaml.gotmpl
+      - values/api-chain-registry.yaml.gotmpl
   - name: tx-crafter
     namespace: {{ requiredEnv "TARGET_NAMESPACE" }}
     chart: helm-pegasys/core-stack-worker
@@ -44,33 +74,3 @@ releases:
       - values/common-worker.yaml.gotmpl
       - values/common-multitenancy.yaml.gotmpl
       - values/tx-listener.yaml.gotmpl
-  - name: api-transaction-scheduler
-    namespace: {{ requiredEnv "TARGET_NAMESPACE" }}
-    chart: helm-pegasys/core-stack-api
-    atomic: true
-    version: 0.5.6
-    values:
-      - values/common.yaml.gotmpl
-      - values/common-api.yaml.gotmpl
-      - values/common-multitenancy.yaml.gotmpl
-      - values/api-transaction-scheduler.yaml.gotmpl
-  - name: api-contract-registry
-    namespace: {{ requiredEnv "TARGET_NAMESPACE" }}
-    chart: helm-pegasys/core-stack-api
-    atomic: true
-    version: 0.5.6
-    values:
-      - values/common.yaml.gotmpl
-      - values/common-api.yaml.gotmpl
-      - values/common-multitenancy.yaml.gotmpl
-      - values/api-contract-registry.yaml.gotmpl
-  - name: api-chain-registry
-    namespace: {{ requiredEnv "TARGET_NAMESPACE" }}
-    chart: helm-pegasys/core-stack-api
-    atomic: true
-    version: 0.5.6
-    values:
-      - values/common.yaml.gotmpl
-      - values/common-api.yaml.gotmpl
-      - values/common-multitenancy.yaml.gotmpl
-      - values/api-chain-registry.yaml.gotmpl
