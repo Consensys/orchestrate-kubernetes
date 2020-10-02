@@ -1,26 +1,82 @@
-jobs:
-  test-cluster:
-    executor: aws-eks/python3
-    parameters:
-      cluster-name:
-        description: |
-          Name of the EKS cluster
-        type: string
+
+commands:
+  init:
+    description: "Install"
     steps:
       - kubernetes/install
       - aws-eks/update-kubeconfig-with-authenticator:
-          cluster-name: << parameters.cluster-name >>
+          cluster-name: ${AWS_EKS_CLUSTER_NAME}
           cluster-authentication-role-arn: ${AWS_EKS_ROLE_ARN}
+      - helm/install-helm-client:
+          version: v3.3.4
       - run:
+          name: Install helmfile
           command: |
-            kubectl get services
-          name: Test cluster
+            curl -L --fail --retry 3 -o ./helmfile https://github.com/roboll/helmfile/releases/download/v0.130.0/helmfile_linux_amd64 
+            chmod +x ./helmfile
+            sudo mv ./helmfile /usr/local/bin/helmfile 
+      - run:
+          name: Install helm plugins
+          command: |
+            helm plugin install https://github.com/databus23/helm-diff
+      - checkout:
+          path: ./helmfile
+
+jobs:
+  lint:
+    executor: aws-eks/python3
+    steps:
+      - init
+      - run:
+          name: helmfile lint
+          working_directory: ./helmfile
+          command: |
+            helmfile -e ${TARGET_NAMESPACE} lint
+  validate:
+    executor: aws-eks/python3
+    steps:
+      - init
+      - run:
+          name: helmfile diff and dry-run
+          working_directory: ./helmfile
+          command: |
+            helmfile -e ${TARGET_NAMESPACE} apply --args --dry-run --suppress-secrets --detailed-exitcode=false
+  deploy:
+    executor: aws-eks/python3
+    steps:
+      - init
+      - run:
+          name: helmfile apply
+          working_directory: ./helmfile
+          command: |
+            helmfile -e ${TARGET_NAMESPACE} apply --suppress-secrets --detailed-exitcode=false
+  test:
+    executor: aws-eks/python3
+    steps:
+      - init
+      - run:
+          name: helm test
+          command: |
+            kubectl delete pod tx-crafter-test -n ${TARGET_NAMESPACE} || true
+            helm test tx-crafter -n ${TARGET_NAMESPACE}
+
 orbs:
   aws-eks: circleci/aws-eks@1.0.0
   kubernetes: circleci/kubernetes@0.11.1
+  helm: circleci/helm@1.0.0
+
 version: 2.1
+
 workflows:
-  deployment:
+  master:
     jobs:
-      - test-cluster:
-          cluster-name: ${AWS_EKS_CLUSTER_NAME}
+      - lint
+      - validate:
+          requires: 
+            - lint
+      - deploy:
+          requires: 
+            - validate
+      - test:
+          requires: 
+            - deploy

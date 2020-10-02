@@ -1,14 +1,14 @@
 ---
 tags:
-  orchestrate: {{ env "ORCHESTRATE_TAG" | default "v2.4.0-rc1" }}
-  e2e: {{ env "E2E_TAG" | default "v2.4.0-rc1" }}
+  orchestrate: {{ env "ORCHESTRATE_TAG" | default "v2.4.0-rc2" }}
+  e2e: {{ env "E2E_TAG" | default "v2.4.0-rc2" }}
 
 repositories:
-  orchestrate: {{ env "ORCHESTRATE_REPOSITORY" | default "consensys-docker-pegasys-orchestrate.bintray.io/orchestrate" }}
-  e2e: {{ env "E2E_REPOSITORY" | default "consensys-docker-pegasys-orchestrate.bintray.io/e2e" }}
+  orchestrate: {{ env "ORCHESTRATE_REPOSITORY" | default "docker.cloudsmith.io/consensys/docker/orchestrate" }}
+  e2e: {{ env "E2E_REPOSITORY" | default "docker.cloudsmith.io/consensys/docker/orchestrate-e2e" }}
 
 registry:
-  url: {{ env "REGISTRY_URL" | default "consensys-docker-pegasys-orchestrate.bintray.io" }}
+  url: {{ env "REGISTRY_URL" | default "docker.cloudsmith.io" }}
   credentials:
     username: {{ requiredEnv "REGISTRY_USERNAME" }}
     password: {{ requiredEnv "REGISTRY_PASSWORD" }}

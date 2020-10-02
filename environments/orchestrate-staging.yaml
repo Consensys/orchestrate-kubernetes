@@ -39,8 +39,8 @@ testEnvironment:
   ARTIFACTS_PATH: "/artifacts"
   CUCUMBER_CONCURRENCY: 10
   CUCUMBER_STEPS_TIMEOUT: '30s'
-  CUCUMBER_OUTPUTPATH: "/report/output/report.json"
   CUCUMBER_FORMAT: "cucumber"
+  CUCUMBER_OUTPUTPATH: "/report/output/report.json"
 
 
 ## Default storage class is standard for minikube
