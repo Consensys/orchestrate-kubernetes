@@ -20,6 +20,6 @@ environments:
       - values/tags.yaml.gotmpl
 repositories:
   - name: helm-pegasys
-    url: https://pegasys.jfrog.io/artifactory/helm-pegasys/
+    url: https://artifacts.consensys.net/public/helm/helm/charts/
   - name: bitnami
     url: https://charts.bitnami.com/bitnami/
