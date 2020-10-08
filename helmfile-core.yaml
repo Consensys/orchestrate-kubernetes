@@ -3,47 +3,6 @@ bases:
   - helmfile-common.yaml
 
 releases:
-  - name: tx-crafter
-    namespace: {{ requiredEnv "TARGET_NAMESPACE" }}
-    chart: helm-pegasys/core-stack-worker
-    atomic: true
-    version: 0.5.3
-    values:
-      - values/common.yaml.gotmpl
-      - values/common-worker.yaml.gotmpl
-      - values/common-multitenancy.yaml.gotmpl
-      - values/tx-crafter.yaml.gotmpl
-      - values/e2e.yaml.gotmpl
-  - name: tx-signer
-    namespace: {{ requiredEnv "TARGET_NAMESPACE" }}
-    chart: helm-pegasys/core-stack-worker
-    atomic: true
-    version: 0.5.3
-    values:
-      - values/common.yaml.gotmpl
-      - values/common-worker.yaml.gotmpl
-      - values/common-multitenancy.yaml.gotmpl
-      - values/tx-signer.yaml.gotmpl
-  - name: tx-sender
-    namespace: {{ requiredEnv "TARGET_NAMESPACE" }}
-    chart: helm-pegasys/core-stack-worker
-    atomic: true
-    version: 0.5.3
-    values:
-      - values/common.yaml.gotmpl
-      - values/common-worker.yaml.gotmpl
-      - values/common-multitenancy.yaml.gotmpl
-      - values/tx-sender.yaml.gotmpl
-  - name: tx-listener
-    namespace: {{ requiredEnv "TARGET_NAMESPACE" }}
-    chart: helm-pegasys/core-stack-worker
-    atomic: true
-    version: 0.5.3
-    values:
-      - values/common.yaml.gotmpl
-      - values/common-worker.yaml.gotmpl
-      - values/common-multitenancy.yaml.gotmpl
-      - values/tx-listener.yaml.gotmpl
   - name: api-transaction-scheduler
     namespace: {{ requiredEnv "TARGET_NAMESPACE" }}
     chart: helm-pegasys/core-stack-api
@@ -74,3 +33,44 @@ releases:
       - values/common-api.yaml.gotmpl
       - values/common-multitenancy.yaml.gotmpl
       - values/api-chain-registry.yaml.gotmpl
+  - name: tx-crafter
+    namespace: {{ requiredEnv "TARGET_NAMESPACE" }}
+    chart: helm-pegasys/core-stack-worker
+    atomic: true
+    version: 0.5.4
+    values:
+      - values/common.yaml.gotmpl
+      - values/common-worker.yaml.gotmpl
+      - values/common-multitenancy.yaml.gotmpl
+      - values/tx-crafter.yaml.gotmpl
+      - values/e2e.yaml.gotmpl
+  - name: tx-signer
+    namespace: {{ requiredEnv "TARGET_NAMESPACE" }}
+    chart: helm-pegasys/core-stack-worker
+    atomic: true
+    version: 0.5.4
+    values:
+      - values/common.yaml.gotmpl
+      - values/common-worker.yaml.gotmpl
+      - values/common-multitenancy.yaml.gotmpl
+      - values/tx-signer.yaml.gotmpl
+  - name: tx-sender
+    namespace: {{ requiredEnv "TARGET_NAMESPACE" }}
+    chart: helm-pegasys/core-stack-worker
+    atomic: true
+    version: 0.5.4
+    values:
+      - values/common.yaml.gotmpl
+      - values/common-worker.yaml.gotmpl
+      - values/common-multitenancy.yaml.gotmpl
+      - values/tx-sender.yaml.gotmpl
+  - name: tx-listener
+    namespace: {{ requiredEnv "TARGET_NAMESPACE" }}
+    chart: helm-pegasys/core-stack-worker
+    atomic: true
+    version: 0.5.4
+    values:
+      - values/common.yaml.gotmpl
+      - values/common-worker.yaml.gotmpl
+      - values/common-multitenancy.yaml.gotmpl
+      - values/tx-listener.yaml.gotmpl

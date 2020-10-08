@@ -1,6 +1,7 @@
 ---
 chainRegistry:
-  init: '{"name":"besu","urls":["http://besu-validator1.besu-poa-network:8545"]}'
+  init: ''
+  cache: '1s'
 
 # Transaction signer variables
 txSigner:

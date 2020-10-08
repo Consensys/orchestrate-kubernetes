@@ -9,13 +9,17 @@ environments:
   orchestrate-demo:
     values:
       - environments/orchestrate-demo.yaml
-      - values/tags.yaml
+      - values/tags.yaml.gotmpl
+  orchestrate-staging:
+    values:
+      - environments/orchestrate-staging.yaml
+      - values/tags.yaml.gotmpl
   orchestrate-minikube:
     values:
       - environments/orchestrate-minikube.yaml
-      - values/tags.yaml
+      - values/tags.yaml.gotmpl
 repositories:
   - name: helm-pegasys
-    url: https://pegasys.jfrog.io/artifactory/helm-pegasys/
+    url: https://artifacts.consensys.net/public/helm/helm/charts/
   - name: bitnami
     url: https://charts.bitnami.com/bitnami/
