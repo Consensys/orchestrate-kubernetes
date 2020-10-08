@@ -110,7 +110,7 @@ workflows:
               only:
                 - master
           requires: 
-            - validate
+            - lint
       - test:
           filters:
             branches:
