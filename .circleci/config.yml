@@ -3,6 +3,19 @@ commands:
   init:
     description: "Install"
     steps:
+      - run:
+          name: Import parameters
+          # Inspired by https://circleci.com/docs/2.0/env-vars/#setting-an-environment-variable-in-a-shell-command
+          command: |
+            [ "<< pipeline.parameters.target_namespace >>" ] && echo 'export TARGET_NAMESPACE=<< pipeline.parameters.target_namespace >>' >> $BASH_ENV
+            [ "<< pipeline.parameters.orchestrate_tag >>" ] && echo 'export ORCHESTRATE_TAG=<< pipeline.parameters.orchestrate_tag >>' >> $BASH_ENV
+            [ "<< pipeline.parameters.e2e_tag >>" ] && echo 'export E2E_TAG=<< pipeline.parameters.e2e_tag >>' >> $BASH_ENV
+            [ "<< pipeline.parameters.orchestrate_repository >>" ] && echo 'export ORCHESTRATE_REPOSITORY=<< pipeline.parameters.orchestrate_repository >>' >> $BASH_ENV
+            [ "<< pipeline.parameters.e2e_repository >>" ] && echo 'export E2E_REPOSITORY=<< pipeline.parameters.e2e_repository >>' >> $BASH_ENV
+            [ "<< pipeline.parameters.registry_url >>" ] && echo 'export REGISTRY_URL=<< pipeline.parameters.registry_url >>' >> $BASH_ENV
+            [ "<< pipeline.parameters.registry_username >>" ] && echo 'export REGISTRY_USERNAME=<< pipeline.parameters.registry_username >>' >> $BASH_ENV
+            [ "<< pipeline.parameters.registry_password >>" ] && echo 'export REGISTRY_PASSWORD=<< pipeline.parameters.registry_password >>' >> $BASH_ENV
+            source $BASH_ENV || true
       - checkout
       - kubernetes/install
       - aws-eks/update-kubeconfig-with-authenticator:
@@ -24,75 +37,51 @@ commands:
 parameters:
   target_namespace:
     type: string
-    default: ${TARGET_NAMESPACE}
+    default: ""
   orchestrate_tag:
     type: string
-    default: ${ORCHESTRATE_TAG}
+    default: ""
   e2e_tag:
     type: string
-    default: ${E2E_TAG}
+    default: ""
   orchestrate_repository:
     type: string
-    default: ${ORCHESTRATE_REPOSITORY}
+    default: ""
   e2e_repository:
     type: string
-    default: ${E2E_REPOSITORY}
+    default: ""
   registry_url:
     type: string
-    default: ${REGISTRY_URL}
+    default: ""
   registry_username:
     type: string
-    default: ${REGISTRY_USERNAME}
+    default: ""
   registry_password:
     type: string
-    default: ${REGISTRY_PASSWORD}
+    default: ""
 
 jobs:
   lint:
     executor: aws-eks/python3
-    environment:
-      ORCHESTRATE_TAG: << pipeline.parameters.orchestrate_tag >>
-      E2E_TAG: << pipeline.parameters.e2e_tag >>
-      ORCHESTRATE_REPOSITORY: << pipeline.parameters.orchestrate_repository >>
-      E2E_REPOSITORY: << pipeline.parameters.e2e_repository >>
-      REGISTRY_URL: << pipeline.parameters.registry_url >>
-      REGISTRY_USERNAME: << pipeline.parameters.registry_username >>
-      REGISTRY_PASSWORD: << pipeline.parameters.registry_password >>
     steps:
       - init
       - run:
           name: helmfile lint
-          command: helmfile -e << pipeline.parameters.target_namespace >> lint
+          command: helmfile -e ${TARGET_NAMESPACE} lint
   validate:
     executor: aws-eks/python3
-    environment:
-      ORCHESTRATE_TAG: << pipeline.parameters.orchestrate_tag >>
-      E2E_TAG: << pipeline.parameters.e2e_tag >>
-      ORCHESTRATE_REPOSITORY: << pipeline.parameters.orchestrate_repository >>
-      E2E_REPOSITORY: << pipeline.parameters.e2e_repository >>
-      REGISTRY_URL: << pipeline.parameters.registry_url >>
-      REGISTRY_USERNAME: << pipeline.parameters.registry_username >>
-      REGISTRY_PASSWORD: << pipeline.parameters.registry_password >>
     steps:
       - init
       - run:
           name: helmfile dry-run
-          command: helmfile -e << pipeline.parameters.target_namespace >> apply --args --dry-run --suppress-secrets --detailed-exitcode=false
+          command: helmfile -e ${TARGET_NAMESPACE} apply --args --dry-run --suppress-secrets --detailed-exitcode=false
   deploy:
     executor: aws-eks/python3
-    environment:
-      ORCHESTRATE_TAG: << pipeline.parameters.orchestrate_tag >>
-      E2E_TAG: << pipeline.parameters.e2e_tag >>
-      ORCHESTRATE_REPOSITORY: << pipeline.parameters.orchestrate_repository >>
-      E2E_REPOSITORY: << pipeline.parameters.e2e_repository >>
-      REGISTRY_URL: << pipeline.parameters.registry_url >>
-      REGISTRY_USERNAME: << pipeline.parameters.registry_username >>
-      REGISTRY_PASSWORD: << pipeline.parameters.registry_password >>
     steps:
       - init
       - run:
           name: helmfile apply
-          command: helmfile -e << pipeline.parameters.target_namespace >> apply --suppress-secrets --detailed-exitcode=false
+          command: helmfile -e ${TARGET_NAMESPACE} apply --suppress-secrets --detailed-exitcode=false
   test:
     executor: aws-eks/python3
     steps:
@@ -102,21 +91,21 @@ jobs:
           docker_layer_caching: true
       - run:
           name: helm test
-          command: helm test tx-crafter -n << pipeline.parameters.target_namespace >>
+          command: helm test tx-crafter -n ${TARGET_NAMESPACE}
       - run:
           name: Extract report from volume
           when: always
           command: |
-            kubectl run -n << pipeline.parameters.target_namespace >> tmp --image=alpine:3.12.0  --overrides='{ "kind": "Pod", "apiVersion": "v1", "spec": { "containers": [{ "name": "alpine", "image": "alpine:3.12.0", "stdin":true, "volumeMounts": [{ "mountPath": "/report/output", "name": "output" }] }], "volumes": [{ "name":"output", "persistentVolumeClaim":{ "claimName": "tx-crafter-output-pvc" } }], "restartPolicy": "Never" } }'
-            for i in {1..10}; do kubectl cp << pipeline.parameters.target_namespace >>/tmp:/report/output/report.json $PWD/report.json && break; sleep 3; done
+            kubectl run -n ${TARGET_NAMESPACE} tmp --image=alpine:3.12.0  --overrides='{ "kind": "Pod", "apiVersion": "v1", "spec": { "containers": [{ "name": "alpine", "image": "alpine:3.12.0", "stdin":true, "volumeMounts": [{ "mountPath": "/report/output", "name": "output" }] }], "volumes": [{ "name":"output", "persistentVolumeClaim":{ "claimName": "tx-crafter-output-pvc" } }], "restartPolicy": "Never" } }'
+            for i in {1..20}; do kubectl cp ${TARGET_NAMESPACE}/tmp:/report/output/report.json $PWD/report.json && break; sleep 3; done
       - store_artifacts:
           path: report.json
       - run: 
           name: Cleanup helm test
           when: always
           command: |
-            kubectl delete pod tx-crafter-test -n << pipeline.parameters.target_namespace >>  --force=true
-            kubectl delete pod tmp -n << pipeline.parameters.target_namespace >> --force=true
+            kubectl delete pod tx-crafter-test -n ${TARGET_NAMESPACE}  --force=true
+            kubectl delete pod tmp -n ${TARGET_NAMESPACE} --force=true
       - run: 
           name: Prepare docker for build report
           when: always
