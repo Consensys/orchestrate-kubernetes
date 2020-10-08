@@ -63,25 +63,49 @@ parameters:
 jobs:
   lint:
     executor: aws-eks/python3
+    environment:
+      ORCHESTRATE_TAG: << pipeline.parameters.orchestrate_tag >>
+      E2E_TAG: << pipeline.parameters.e2e_tag >>
+      ORCHESTRATE_REPOSITORY: << pipeline.parameters.orchestrate_repository >>
+      E2E_REPOSITORY: << pipeline.parameters.e2e_repository >>
+      REGISTRY_URL: << pipeline.parameters.registry_url >>
+      REGISTRY_USERNAME: << pipeline.parameters.registry_username >>
+      REGISTRY_PASSWORD: << pipeline.parameters.registry_password >>
     steps:
       - init
       - run:
           name: helmfile lint
-          command: helmfile -e ${TARGET_NAMESPACE} lint
+          command: helmfile -e << pipeline.parameters.target_namespace >> lint
   validate:
     executor: aws-eks/python3
+    environment:
+      ORCHESTRATE_TAG: << pipeline.parameters.orchestrate_tag >>
+      E2E_TAG: << pipeline.parameters.e2e_tag >>
+      ORCHESTRATE_REPOSITORY: << pipeline.parameters.orchestrate_repository >>
+      E2E_REPOSITORY: << pipeline.parameters.e2e_repository >>
+      REGISTRY_URL: << pipeline.parameters.registry_url >>
+      REGISTRY_USERNAME: << pipeline.parameters.registry_username >>
+      REGISTRY_PASSWORD: << pipeline.parameters.registry_password >>
     steps:
       - init
       - run:
           name: helmfile dry-run
-          command: helmfile -e ${TARGET_NAMESPACE} apply --args --dry-run --suppress-secrets --detailed-exitcode=false
+          command: helmfile -e << pipeline.parameters.target_namespace >> apply --args --dry-run --suppress-secrets --detailed-exitcode=false
   deploy:
     executor: aws-eks/python3
+    environment:
+      ORCHESTRATE_TAG: << pipeline.parameters.orchestrate_tag >>
+      E2E_TAG: << pipeline.parameters.e2e_tag >>
+      ORCHESTRATE_REPOSITORY: << pipeline.parameters.orchestrate_repository >>
+      E2E_REPOSITORY: << pipeline.parameters.e2e_repository >>
+      REGISTRY_URL: << pipeline.parameters.registry_url >>
+      REGISTRY_USERNAME: << pipeline.parameters.registry_username >>
+      REGISTRY_PASSWORD: << pipeline.parameters.registry_password >>
     steps:
       - init
       - run:
           name: helmfile apply
-          command: helmfile -e ${TARGET_NAMESPACE} apply --suppress-secrets --detailed-exitcode=false
+          command: helmfile -e << pipeline.parameters.target_namespace >> apply --suppress-secrets --detailed-exitcode=false
   test:
     executor: aws-eks/python3
     steps:
@@ -91,7 +115,7 @@ jobs:
           docker_layer_caching: true
       - run:
           name: helm test
-          command: helm test tx-crafter -n ${TARGET_NAMESPACE}
+          command: helm test tx-crafter -n << pipeline.parameters.target_namespace >>
       - run:
           name: Extract report from volume
           when: always
@@ -104,8 +128,8 @@ jobs:
           name: Cleanup helm test
           when: always
           command: |
-            kubectl delete pod tx-crafter-test -n ${TARGET_NAMESPACE}  --force=true
-            kubectl delete pod tmp -n ${TARGET_NAMESPACE} --force=true
+            kubectl delete pod tx-crafter-test -n << pipeline.parameters.target_namespace >>  --force=true
+            kubectl delete pod tmp -n << pipeline.parameters.target_namespace >> --force=true
       - run: 
           name: Prepare docker for build report
           when: always
