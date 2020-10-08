@@ -33,7 +33,7 @@ testEnvironment:
   CUCUMBER_PATHS: "/features"
   ARTIFACTS_PATH: "/artifacts"
   CUCUMBER_CONCURRENCY: 10
-  CUCUMBER_STEPS_TIMEOUT: '30s'
+  CUCUMBER_STEPS_TIMEOUT: '45s'
   CUCUMBER_FORMAT: "cucumber"
   CUCUMBER_OUTPUTPATH: "/report/output/report.json"
 
