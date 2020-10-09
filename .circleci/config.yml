@@ -63,49 +63,25 @@ parameters:
 jobs:
   lint:
     executor: aws-eks/python3
-    environment:
-      ORCHESTRATE_TAG: << pipeline.parameters.orchestrate_tag >>
-      E2E_TAG: << pipeline.parameters.e2e_tag >>
-      ORCHESTRATE_REPOSITORY: << pipeline.parameters.orchestrate_repository >>
-      E2E_REPOSITORY: << pipeline.parameters.e2e_repository >>
-      REGISTRY_URL: << pipeline.parameters.registry_url >>
-      REGISTRY_USERNAME: << pipeline.parameters.registry_username >>
-      REGISTRY_PASSWORD: << pipeline.parameters.registry_password >>
     steps:
       - init
       - run:
           name: helmfile lint
-          command: helmfile -e << pipeline.parameters.target_namespace >> lint
+          command: helmfile -e ${TARGET_NAMESPACE} lint
   validate:
     executor: aws-eks/python3
-    environment:
-      ORCHESTRATE_TAG: << pipeline.parameters.orchestrate_tag >>
-      E2E_TAG: << pipeline.parameters.e2e_tag >>
-      ORCHESTRATE_REPOSITORY: << pipeline.parameters.orchestrate_repository >>
-      E2E_REPOSITORY: << pipeline.parameters.e2e_repository >>
-      REGISTRY_URL: << pipeline.parameters.registry_url >>
-      REGISTRY_USERNAME: << pipeline.parameters.registry_username >>
-      REGISTRY_PASSWORD: << pipeline.parameters.registry_password >>
     steps:
       - init
       - run:
           name: helmfile dry-run
-          command: helmfile -e << pipeline.parameters.target_namespace >> apply --args --dry-run --suppress-secrets --detailed-exitcode=false
+          command: helmfile -e ${TARGET_NAMESPACE} apply --args --dry-run --suppress-secrets --detailed-exitcode=false
   deploy:
     executor: aws-eks/python3
-    environment:
-      ORCHESTRATE_TAG: << pipeline.parameters.orchestrate_tag >>
-      E2E_TAG: << pipeline.parameters.e2e_tag >>
-      ORCHESTRATE_REPOSITORY: << pipeline.parameters.orchestrate_repository >>
-      E2E_REPOSITORY: << pipeline.parameters.e2e_repository >>
-      REGISTRY_URL: << pipeline.parameters.registry_url >>
-      REGISTRY_USERNAME: << pipeline.parameters.registry_username >>
-      REGISTRY_PASSWORD: << pipeline.parameters.registry_password >>
     steps:
       - init
       - run:
           name: helmfile apply
-          command: helmfile -e << pipeline.parameters.target_namespace >> apply --suppress-secrets --detailed-exitcode=false
+          command: helmfile -e ${TARGET_NAMESPACE} apply --suppress-secrets --detailed-exitcode=false
   test:
     executor: aws-eks/python3
     steps:
@@ -115,21 +91,21 @@ jobs:
           docker_layer_caching: true
       - run:
           name: helm test
-          command: helm test tx-crafter -n << pipeline.parameters.target_namespace >>
+          command: helm test tx-crafter -n ${TARGET_NAMESPACE}
       - run:
           name: Extract report from volume
           when: always
           command: |
             kubectl run -n ${TARGET_NAMESPACE} tmp --image=alpine:3.12.0  --overrides='{ "kind": "Pod", "apiVersion": "v1", "spec": { "containers": [{ "name": "alpine", "image": "alpine:3.12.0", "stdin":true, "volumeMounts": [{ "mountPath": "/report/output", "name": "output" }] }], "volumes": [{ "name":"output", "persistentVolumeClaim":{ "claimName": "tx-crafter-output-pvc" } }], "restartPolicy": "Never" } }'
-            for i in {1..20}; do kubectl cp ${TARGET_NAMESPACE}/tmp:/report/output/report.json $PWD/report.json && break; sleep 3; done
+            for i in {1..100}; do kubectl cp ${TARGET_NAMESPACE}/tmp:/report/output/report.json $PWD/report.json && break; sleep 3; done
       - store_artifacts:
           path: report.json
       - run: 
           name: Cleanup helm test
           when: always
           command: |
-            kubectl delete pod tx-crafter-test -n << pipeline.parameters.target_namespace >>  --force=true
-            kubectl delete pod tmp -n << pipeline.parameters.target_namespace >> --force=true
+            kubectl delete pod tx-crafter-test -n ${TARGET_NAMESPACE}  --force=true
+            kubectl delete pod tmp -n ${TARGET_NAMESPACE} --force=true
       - run: 
           name: Prepare docker for build report
           when: always
