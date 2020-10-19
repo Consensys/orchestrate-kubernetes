@@ -34,8 +34,8 @@ This is intended to help the understanding on how to run and configure Orchestra
 
 | Orchestrate-kubernetes versions | Orchestrate versions |
 |---------------------------------|----------------------|
-| master/HEAD                     | Orchestrate v2.4     |
-| v0.1.0                          | Orchestrate v2.4     |
+| master/HEAD                     | Orchestrate v2.4.x   |
+| v3.0.0                          | Orchestrate v2.4.x   |
 
 # 1. Requirements
 
