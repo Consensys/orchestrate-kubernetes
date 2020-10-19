@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## v3.1.0 (2020-10-20)
+
+### 🛠 Bug fixes
+ * Split `REDIS_URL` into `REDIS_HOST` and `REDIS_PORT` to support Orchestrate v2.5.x
+
 ## v3.0.0 (2020-10-19)
 
 ### 🆕 Features
