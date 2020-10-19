@@ -15,6 +15,7 @@ For more information, refer to the [Orchestrate documentation](https://docs.orch
 <H1>Orchestrate-Kubernetes</H1>
 
 - [Codefi Orchestrate](#codefi-orchestrate)
+- [Compatibility](#compatibility)
 - [1. Requirements](#1-requirements)
   - [1.1. Credentials](#11-credentials)
   - [1.2. CLI tools](#12-cli-tools)
@@ -28,6 +29,13 @@ For more information, refer to the [Orchestrate documentation](https://docs.orch
 
 This repository contains an implementation example on how to deploy Orchestrate and its dependencies using Kubernetes, Helm charts and Helm files.
 This is intended to help the understanding on how to run and configure Orchestrate using Kubernetes.
+
+# Compatibility
+
+| Orchestrate-kubernetes versions | Orchestrate versions |
+|---------------------------------|----------------------|
+| master/HEAD                     | Orchestrate v2.4     |
+| v0.1.0                          | Orchestrate v2.4     |
 
 # 1. Requirements
 
@@ -56,14 +64,14 @@ This is intended to help the understanding on how to run and configure Orchestra
 
 ## 2.1. Docker registry credentials
 
-Set your Orchestrate Docker images' credentials by replacing `<ACCOUNT_LOGIN>` and `<ACCOUNT_PASSWORD>` in [`values/tags.yaml`](./values/tags.yaml) 
+Set your Orchestrate Docker images' credentials setting the following environment variable `$REGISTRY_USERNAME`, `$REGISTRY_PASSWORD` and optionally `$REGISTRY_URL`, see [`values/tags.yaml`](./values/tags.yaml) 
 
 ```helmyaml
 registry:
-  url: consensys-docker-pegasys-orchestrate.bintray.io
+  url: {{ env "REGISTRY_URL" | default "docker.cloudsmith.io" }}
   credentials:
-    username: <ACCOUNT_LOGIN>
-    password: <ACCOUNT_PASSWORD>
+    username: {{ requiredEnv "REGISTRY_USERNAME" }}
+    password: {{ requiredEnv "REGISTRY_PASSWORD" }}
 ```
 
 ## 2.2. Namespace environement values

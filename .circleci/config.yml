@@ -91,7 +91,7 @@ jobs:
           docker_layer_caching: true
       - run:
           name: helm test
-          command: helm test tx-crafter -n ${TARGET_NAMESPACE}
+          command: helm test tx-crafter -n ${TARGET_NAMESPACE} --logs --timeout 30m
       - run:
           name: Extract report from volume
           when: always
@@ -104,21 +104,21 @@ jobs:
           name: Cleanup helm test
           when: always
           command: |
-            kubectl delete pod tx-crafter-test -n ${TARGET_NAMESPACE}  --force=true
-            kubectl delete pod tmp -n ${TARGET_NAMESPACE} --force=true
+            kubectl delete pod tx-crafter-test -n ${TARGET_NAMESPACE} --force=true || true
+            kubectl delete pod tmp -n ${TARGET_NAMESPACE} --force=true || true
       - run: 
           name: Prepare docker for build report
           when: always
           command: |
-            echo ${REGISTRY_PASSWORD} | docker login docker.cloudsmith.io --username ${REGISTRY_USERNAME} --password-stdin
-            docker pull docker.cloudsmith.io/consensys/docker-private/orchestrate-e2e-report:v0.0.2
+            echo ${REGISTRY_PASSWORD} | docker login ${REGISTRY_URL} --username ${REGISTRY_USERNAME} --password-stdin
+            docker pull ${REPORT_REPOSITORY}
       - run: 
           name: Build report
           when: always
           # Impossible to mount volumes with docker run (see https://circleci.com/docs/2.0/building-docker-images/)
           # Use docker cp instead
           command: |
-            docker run --name tmp -it -d docker.cloudsmith.io/consensys/docker-private/orchestrate-e2e-report:v0.0.2 sh
+            docker run --name tmp -it -d ${REPORT_REPOSITORY} sh
             docker cp $PWD/report.json tmp:/usr/src/app/report.json 
             docker exec tmp npm start 
             docker cp tmp:/usr/src/app/report.html ./report.html 
