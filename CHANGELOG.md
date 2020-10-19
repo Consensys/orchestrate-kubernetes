@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## v3.0.0 (2020-10-19)
+
+### 🆕 Features
+
+* Add optional environment variables `ORCHESTRATE_TAG`, `E2E_TAG`, `ORCHESTRATE_REPOSITORY`, `E2E_REPOSITORY`, `REGISTRY_URL` (`/values/tags.yaml.gotmpl`) 
+* Add CircleCI configuration
+* Update values and Helm Charts to be able to run an end-to-end test
+* Add Helmfile environment values sets to deploy Orchestrate in minikube
+
+### ⚠ BREAKING CHANGES
+ * Use Bank-Vaults as vault operator (`/vaults`) and remove the vault deployment in the main helmfile scripts
+ * Add two required environment variables: `REGISTRY_USERNAME` and `REGISTRY_PASSWORD` as credentials of the docker registry of Orchestrate (`/values/tags.yaml.gotmpl`)
+
 ## v2.0.0 (2020-04-01)
 
 * Upgrade the deployment to Helm v3
