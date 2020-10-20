@@ -157,3 +157,13 @@ workflows:
                 - master
           requires: 
             - deploy
+  schedule:
+    triggers:
+        - schedule:
+            cron: "0 * * * *"
+            filters:
+              branches:
+                only:
+                  - master
+    jobs:
+      - test
