@@ -1,0 +1,6 @@
+---
+prometheus:
+  persistence:
+    enabled: false
+    storageClass: standard
+    size: 40G

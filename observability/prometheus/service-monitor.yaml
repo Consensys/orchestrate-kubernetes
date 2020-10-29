@@ -1,0 +1,16 @@
+templates:
+- |
+  apiVersion: monitoring.coreos.com/v1
+  kind: ServiceMonitor
+  metadata:
+    name: orchestrate
+    labels:
+      team: pegasys
+  spec:
+    selector:
+      matchLabels:
+        app.metrics: orchestrate
+    namespaceSelector:
+      any: true
+    endpoints:
+      - port: http-metrics 

@@ -1,0 +1,9 @@
+---
+plugins: 'grafana-piechart-panel,grafana-clock-panel,grafana-kubernetes-app'
+
+config:
+  useGrafanaIniFile: true
+  grafanaIniConfigMap: grafana-ini
+
+admin:
+  password: frenchfries
