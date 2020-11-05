@@ -11,6 +11,7 @@ templates:
       matchLabels:
         app.metrics: orchestrate
     namespaceSelector:
-      any: true
+      matchNames:
+        - {{ .Values.orchestrate.namespace }}
     endpoints:
       - port: http-metrics 

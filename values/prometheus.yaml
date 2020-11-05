@@ -2,5 +2,5 @@
 prometheus:
   persistence:
     enabled: false
-    storageClass: standard
+    storageClass: gp2
     size: 40G

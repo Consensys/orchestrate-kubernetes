@@ -3,19 +3,6 @@ replicaCount: {{ .Values | get "kafka.replicas" 3 }}
 defaultReplicationFactor: {{ .Values | get "kafka.replicas" 3 }}
 offsetsTopicReplicationFactor: {{ .Values | get "kafka.replicas" 3 }}
 fullnameOverride: kafka
-topics:
-  - name: topic-tx-crafter
-    partitions: 5
-    reassignPartitions: false
-  - name: topic-tx-signer
-    partitions: 5
-    reassignPartitions: false
-  - name: topic-tx-sender
-    partitions: 5
-    reassignPartitions: false
-  - name: topic-tx-decoded
-    partitions: 5
-    reassignPartitions: false
 ## Pod Disruption Budget configuration
 ## The PDB will only be created if replicaCount is greater than 1
 ## ref: https://kubernetes.io/docs/concepts/workloads/pods/disruptions
@@ -27,11 +14,12 @@ persistence:
   enabled: {{ .Values | get "kafka.persistence.enabled" true }}
   size: 4Gi
   storageClass: {{ .Values | get "kafka.persistence.storageClass" "gp2" }}
-prometheus:
+metrics:
   kafka:
-    enabled: true
-  jmx:
-    enabled: true
+    enabled: {{ .Values | get "metrics.enabled" false }}
+  serviceMonitor:
+    enabled: {{ .Values | get "metrics.enabled" false }}
+    namespace: {{ .Values | get "metrics.namespace" }}
 resources:
   requests:
     memory: "1Gi"
@@ -75,6 +63,8 @@ zookeeper:
     enabled: {{ .Values | get "zookeeper.persistence.enabled" true }}
     size: 2Gi
     storageClass: {{ .Values | get "zookeeper.persistence.storageClass" "gp2" }}
+  metrics:
+    enabled: {{ .Values | get "metrics.enabled" false }}
   affinity:
     podAntiAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:

@@ -10,7 +10,10 @@ livenessProbe:
 readinessProbe:
   enabled: true
 metrics:
-  enabled: false
+  enabled: {{ .Values | get "metrics.enabled" false }}
+  serviceMonitor:
+    enabled: {{ .Values | get "metrics.enabled" false }}
+    namespace: {{ .Values | get "metrics.namespace" }}
 postgresqlDatabase: chain-registry
 postgresqlUsername: chain-registry
 postgresqlPassword: such-secret

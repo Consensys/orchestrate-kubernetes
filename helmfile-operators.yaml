@@ -1,0 +1,20 @@
+---
+bases:
+  - helmfile-common.yaml
+    
+releases:
+  - name: vault-operator
+    namespace: {{ requiredEnv "VAULT_OPERATOR_NAMESPACE" }}
+    chart: banzaicloud-stable/vault-operator
+    version: 1.7.0
+    wait: true
+    atomic: true
+  - name: prometheus
+    namespace: {{ requiredEnv "OBSERVABILITY_NAMESPACE" }}
+    chart: bitnami/kube-prometheus
+    version: 2.2.2
+    condition: metrics.enabled 
+    atomic: true
+    disableValidation: true
+    values:
+      - values/prometheus.yaml

@@ -1,0 +1,23 @@
+---
+bases:
+  - helmfile-common.yaml
+    
+releases:
+  - name: grafana
+    namespace: {{ requiredEnv "OBSERVABILITY_NAMESPACE" }}
+    chart: bitnami/grafana
+    version: 3.4.5
+    condition: metrics.enabled 
+    needs:
+      - {{ requiredEnv "OBSERVABILITY_NAMESPACE" }}/grafana-config
+    atomic: true
+    values:
+      - values/grafana.yaml 
+  - name: grafana-config
+    namespace: {{ requiredEnv "OBSERVABILITY_NAMESPACE" }}
+    chart: incubator/raw
+    version: 0.2.3
+    condition: metrics.enabled 
+    atomic: true
+    values:
+      - values/grafana-config.yaml
