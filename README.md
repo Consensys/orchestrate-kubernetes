@@ -143,6 +143,16 @@ helmfile -f helmfile.yaml -e $ORCHESTRATE_NAMESPACE delete --purge
 kubectl delete --namespace $VAULT_NAMESPACE secret vault-unseal-keys
 ```
 
+If you have deployed the observability stack, you have to delete the following
+```bash
+kubectl delete crd prometheuses.monitoring.coreos.com
+kubectl delete crd prometheusrules.monitoring.coreos.com
+kubectl delete crd servicemonitors.monitoring.coreos.com
+kubectl delete crd podmonitors.monitoring.coreos.com
+kubectl delete crd alertmanagers.monitoring.coreos.com
+kubectl delete crd thanosrulers.monitoring.coreos.com
+```
+
 # 3. Multi-tenancy
 
 - `multitenancy.enabled`: Enables this Orchestrate feature (default: false).

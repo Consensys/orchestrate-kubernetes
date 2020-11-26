@@ -15,8 +15,8 @@ commands:
             [ "<< pipeline.parameters.registry_url >>" ] && echo 'export REGISTRY_URL=<< pipeline.parameters.registry_url >>' >> $BASH_ENV
             [ "<< pipeline.parameters.registry_username >>" ] && echo 'export REGISTRY_USERNAME=<< pipeline.parameters.registry_username >>' >> $BASH_ENV
             [ "<< pipeline.parameters.registry_password >>" ] && echo 'export REGISTRY_PASSWORD=<< pipeline.parameters.registry_password >>' >> $BASH_ENV
-            echo 'export VAULT_OPERATOR_NAMESPACE=vault-operator' >> $BASH_ENV
-            echo 'export VAULT_NAMESPACE=vault-sandbox' >> $BASH_ENV
+            echo 'export VAULT_OPERATOR_NAMESPACE=hashicorp-vault' >> $BASH_ENV
+            echo 'export VAULT_NAMESPACE=hashicorp-vault' >> $BASH_ENV
             echo 'export OBSERVABILITY_NAMESPACE=observability' >> $BASH_ENV
             source $BASH_ENV || true
       - checkout
@@ -160,13 +160,13 @@ workflows:
                 - master
           requires: 
             - deploy
-  schedule:
-    triggers:
-        - schedule:
-            cron: "0 * * * *"
-            filters:
-              branches:
-                only:
-                  - master
-    jobs:
-      - test
+  # schedule:
+  #   triggers:
+  #       - schedule:
+  #           cron: "0 * * * *"
+  #           filters:
+  #             branches:
+  #               only:
+  #                 - master
+  #   jobs:
+  #     - test

@@ -1,5 +1,5 @@
 ---
-plugins: 'grafana-piechart-panel,grafana-clock-panel,grafana-kubernetes-app'
+plugins: 'grafana-piechart-panel,grafana-clock-panel,grafana-kubernetes-app,grafana-polystat-panel'
 
 config:
   useGrafanaIniFile: true
@@ -19,6 +19,8 @@ dashboardsConfigMaps:
     fileName: postgres-dashboard.json
   - configMapName: redis-dashboard
     fileName: redis-dashboard.json
+  - configMapName: orchestrate-dashboard
+    fileName: orchestrate-dashboard.json
 
 datasources:
   secretName: datasource-secret
