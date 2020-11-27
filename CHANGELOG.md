@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## v4.0.0 (2020-11-27)
+
+### 🆕 Features
+ * Add Prometheus and Grafana stack in the deployment, including standard dashboards.
+ * Reorganized folder structure and group helmfiles to deploy Observability, Vault and Orchestrate stack in a single command
+
+### 🛠 Bug fixes
+ * For a better stability of Kafka we updated the following values:
+   * `logRetentionHours` from 168 to 24
+   * `resources.requests.memory` 1Gi from to 4Gi
+   * `resources.limits.memory` 1.5Gi from to 8Gi
+   * `resources.limits.cpu` 300m from to 500m
+
+### ⚠ BREAKING CHANGES
+ * New helmfile structure where Observability and Vault deployments are part of a single root Helmfile. Vault folder and its manual deployment has been deleted.
+ * `TARGET_NAMESPACE` environment variable is deprecated for the following environment variables:
+   * `ORCHESTRATE_NAMESPACE` namespace where Orchestrate stack will be deployed
+   * `VAULT_OPERATOR_NAMESPACE` namespace where the Vault Operator will be deployed
+   * `VAULT_NAMESPACE` namespace where Vault servers will be deployed
+   * `OBSERVABILITY_NAMESPACE` namespace where Prometheus and Grafana stack will be deployed (optional)
+
 ## v3.1.0 (2020-10-20)
 
 ### 🛠 Bug fixes
