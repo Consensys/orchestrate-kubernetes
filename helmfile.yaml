@@ -3,6 +3,9 @@ bases:
   - helmfile-common.yaml
 
 helmfiles:
+  - helmfile-operators.yaml
+  - helmfile-crds.yaml
+  - helmfile-observability.yaml
   - helmfile-stateful.yaml
   - helmfile-kafka.yaml
   - helmfile-core.yaml

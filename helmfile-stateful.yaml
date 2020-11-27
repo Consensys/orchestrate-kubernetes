@@ -4,28 +4,28 @@ bases:
 
 releases:
   - name: redis-nonce
-    namespace: {{ requiredEnv "TARGET_NAMESPACE" }}
+    namespace: {{ requiredEnv "ORCHESTRATE_NAMESPACE" }}
     chart: bitnami/redis
     version: 10.6.0
     atomic: true
     values:
-      - values/redis.yaml
+      - values/redis.yaml.gotmpl
   - name: postgresql-transaction-scheduler
-    namespace: {{ requiredEnv "TARGET_NAMESPACE" }}
+    namespace: {{ requiredEnv "ORCHESTRATE_NAMESPACE" }}
     chart: bitnami/postgresql
     atomic: true
     version: 8.6.12
     values:
       - values/postgresql-transaction-scheduler.yaml.gotmpl
   - name: postgresql-contract-registry
-    namespace: {{ requiredEnv "TARGET_NAMESPACE" }}
+    namespace: {{ requiredEnv "ORCHESTRATE_NAMESPACE" }}
     chart: bitnami/postgresql
     atomic: true
     version: 8.6.12
     values:
       - values/postgresql-contract-registry.yaml.gotmpl
   - name: postgresql-chain-registry
-    namespace: {{ requiredEnv "TARGET_NAMESPACE" }}
+    namespace: {{ requiredEnv "ORCHESTRATE_NAMESPACE" }}
     chart: bitnami/postgresql
     atomic: true
     version: 8.6.12

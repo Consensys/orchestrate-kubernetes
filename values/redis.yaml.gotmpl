@@ -11,4 +11,7 @@ configmap: |-
 cluster:
   enabled: false
 metrics:
-  enabled: false
+  enabled: {{ .Values | get "metrics.enabled" false }}
+  serviceMonitor:
+    enabled: {{ .Values | get "metrics.enabled" false }}
+    namespace: {{ .Values | get "metrics.namespace" }}

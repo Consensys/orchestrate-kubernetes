@@ -1,0 +1,37 @@
+---
+plugins: 'grafana-piechart-panel,grafana-clock-panel,grafana-kubernetes-app,grafana-polystat-panel'
+
+config:
+  useGrafanaIniFile: true
+  grafanaIniConfigMap: grafana-ini
+
+dashboardsProvider:
+  enabled: true
+
+dashboardsConfigMaps:
+  - configMapName: k8s-dashboard
+    fileName: k8s-dashboard.json
+  - configMapName: kafka-dashboard
+    fileName: kafka-dashboard.json
+  - configMapName: go-dashboard
+    fileName: go-dashboard.json
+  - configMapName: postgres-dashboard
+    fileName: postgres-dashboard.json
+  - configMapName: redis-dashboard
+    fileName: redis-dashboard.json
+  - configMapName: orchestrate-dashboard
+    fileName: orchestrate-dashboard.json
+
+datasources:
+  secretName: datasource-secret
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+      - name: Prometheus
+        type: prometheus
+        url: http://prometheus-prometheus-kube-prometheus-prometheus-0.prometheus-operated:9090
+        access: proxy
+        isDefault: true
+
+admin:
+  password: frenchfries

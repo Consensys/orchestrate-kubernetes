@@ -4,7 +4,7 @@ bases:
 
 releases:
   - name: api-transaction-scheduler
-    namespace: {{ requiredEnv "TARGET_NAMESPACE" }}
+    namespace: {{ requiredEnv "ORCHESTRATE_NAMESPACE" }}
     chart: helm-pegasys/core-stack-api
     atomic: true
     version: 0.5.6
@@ -14,7 +14,7 @@ releases:
       - values/common-multitenancy.yaml.gotmpl
       - values/api-transaction-scheduler.yaml.gotmpl
   - name: api-contract-registry
-    namespace: {{ requiredEnv "TARGET_NAMESPACE" }}
+    namespace: {{ requiredEnv "ORCHESTRATE_NAMESPACE" }}
     chart: helm-pegasys/core-stack-api
     atomic: true
     version: 0.5.6
@@ -24,7 +24,7 @@ releases:
       - values/common-multitenancy.yaml.gotmpl
       - values/api-contract-registry.yaml.gotmpl
   - name: api-chain-registry
-    namespace: {{ requiredEnv "TARGET_NAMESPACE" }}
+    namespace: {{ requiredEnv "ORCHESTRATE_NAMESPACE" }}
     chart: helm-pegasys/core-stack-api
     atomic: true
     version: 0.5.6
@@ -34,7 +34,7 @@ releases:
       - values/common-multitenancy.yaml.gotmpl
       - values/api-chain-registry.yaml.gotmpl
   - name: tx-crafter
-    namespace: {{ requiredEnv "TARGET_NAMESPACE" }}
+    namespace: {{ requiredEnv "ORCHESTRATE_NAMESPACE" }}
     chart: helm-pegasys/core-stack-worker
     atomic: true
     version: 0.5.4
@@ -45,7 +45,7 @@ releases:
       - values/tx-crafter.yaml.gotmpl
       - values/e2e.yaml.gotmpl
   - name: tx-signer
-    namespace: {{ requiredEnv "TARGET_NAMESPACE" }}
+    namespace: {{ requiredEnv "ORCHESTRATE_NAMESPACE" }}
     chart: helm-pegasys/core-stack-worker
     atomic: true
     version: 0.5.4
@@ -55,7 +55,7 @@ releases:
       - values/common-multitenancy.yaml.gotmpl
       - values/tx-signer.yaml.gotmpl
   - name: tx-sender
-    namespace: {{ requiredEnv "TARGET_NAMESPACE" }}
+    namespace: {{ requiredEnv "ORCHESTRATE_NAMESPACE" }}
     chart: helm-pegasys/core-stack-worker
     atomic: true
     version: 0.5.4
@@ -65,7 +65,7 @@ releases:
       - values/common-multitenancy.yaml.gotmpl
       - values/tx-sender.yaml.gotmpl
   - name: tx-listener
-    namespace: {{ requiredEnv "TARGET_NAMESPACE" }}
+    namespace: {{ requiredEnv "ORCHESTRATE_NAMESPACE" }}
     chart: helm-pegasys/core-stack-worker
     atomic: true
     version: 0.5.4
@@ -74,3 +74,13 @@ releases:
       - values/common-worker.yaml.gotmpl
       - values/common-multitenancy.yaml.gotmpl
       - values/tx-listener.yaml.gotmpl
+  - name: orchestrate-service-monitor
+    namespace: {{ requiredEnv "OBSERVABILITY_NAMESPACE" }}
+    chart: incubator/raw
+    version: 0.2.3
+    condition: metrics.enabled 
+    atomic: true
+    values:
+      - orchestrate:
+          namespace: {{ requiredEnv "ORCHESTRATE_NAMESPACE" }}
+      - values/service-monitor.yaml 

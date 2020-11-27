@@ -5,7 +5,7 @@ bases:
 releases:
   - name: kafka
     chart: bitnami/kafka
-    version: 9.0.4
-    namespace: {{ requiredEnv "TARGET_NAMESPACE" }}
+    version: 11.8.8
+    namespace: {{ requiredEnv "ORCHESTRATE_NAMESPACE" }}
     values:
       - values/kafka.yaml.gotmpl
