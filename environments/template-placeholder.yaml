@@ -5,17 +5,6 @@ chainRegistry:
 authentication:
   AUTH_JWT_CERTIFICATE: "<CERTIFICATE_IDENTITY_PROVIDER>"
 
-txSigner:
-  environment:
-    # The "in-memory" option is not recommended for production. See vaults/README.md
-    SECRET_STORE: "hashicorp"
-    VAULT_MOUNT_POINT: "secret"
-    VAULT_SECRET_PATH: "<KubernetesNameSpace>/keys"
-    VAULT_ADDR: http://vault.<VaultKubernetesNameSpace>:8200
-    VAULT_CACERT: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-    # Var specific to vault-agent
-    VAULT_SKIP_VERIFY: true
-
-vaultAgent:
-  enabled: true
-  role: tx-signer
+keyManager:
+  VAULT_CACERT: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+  VAULT_SKIP_VERIFY: true

@@ -6,9 +6,17 @@ releases:
   - name: vault-operator
     namespace: {{ requiredEnv "VAULT_OPERATOR_NAMESPACE" }}
     chart: banzaicloud-stable/vault-operator
-    version: 1.7.0
+    version: 1.8.1
     wait: true
     atomic: true
+  - name: prometheus-vault-agent
+    namespace:  {{ requiredEnv "OBSERVABILITY_NAMESPACE" }}
+    chart: incubator/raw
+    version: 0.2.3
+    condition: metrics.enabled 
+    atomic: true
+    values:
+      - values/prometheus-vault-agent.yaml
   - name: prometheus
     namespace: {{ requiredEnv "OBSERVABILITY_NAMESPACE" }}
     chart: bitnami/kube-prometheus
@@ -17,4 +25,4 @@ releases:
     atomic: true
     disableValidation: true
     values:
-      - values/prometheus.yaml
+      - values/prometheus.yaml.gotmpl

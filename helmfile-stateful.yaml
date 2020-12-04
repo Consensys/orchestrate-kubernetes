@@ -10,6 +10,13 @@ releases:
     atomic: true
     values:
       - values/redis.yaml.gotmpl
+  - name: postgresql-identity-manager
+    namespace: {{ requiredEnv "ORCHESTRATE_NAMESPACE" }}
+    chart: bitnami/postgresql
+    atomic: true
+    version: 8.6.12
+    values:
+      - values/postgresql-identity-manager.yaml.gotmpl
   - name: postgresql-transaction-scheduler
     namespace: {{ requiredEnv "ORCHESTRATE_NAMESPACE" }}
     chart: bitnami/postgresql

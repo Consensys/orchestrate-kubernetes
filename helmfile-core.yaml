@@ -3,13 +3,32 @@ bases:
   - helmfile-common.yaml
 
 releases:
+  - name: api-key-manager
+    namespace: {{ requiredEnv "ORCHESTRATE_NAMESPACE" }}
+    chart: helm-pegasys/core-stack-api
+    version: 0.6.0
+    values:
+      - values/common-orchestrate.yaml.gotmpl
+      - values/common-api.yaml.gotmpl
+      - values/common-multitenancy.yaml.gotmpl
+      - values/api-key-manager.yaml.gotmpl
+  - name: api-identity-manager
+    namespace: {{ requiredEnv "ORCHESTRATE_NAMESPACE" }}
+    chart: helm-pegasys/core-stack-api
+    atomic: true
+    version: 0.6.0
+    values:
+      - values/common-orchestrate.yaml.gotmpl
+      - values/common-api.yaml.gotmpl
+      - values/common-multitenancy.yaml.gotmpl
+      - values/api-identity-manager.yaml.gotmpl
   - name: api-transaction-scheduler
     namespace: {{ requiredEnv "ORCHESTRATE_NAMESPACE" }}
     chart: helm-pegasys/core-stack-api
     atomic: true
-    version: 0.5.6
+    version: 0.6.0
     values:
-      - values/common.yaml.gotmpl
+      - values/common-orchestrate.yaml.gotmpl
       - values/common-api.yaml.gotmpl
       - values/common-multitenancy.yaml.gotmpl
       - values/api-transaction-scheduler.yaml.gotmpl
@@ -17,9 +36,9 @@ releases:
     namespace: {{ requiredEnv "ORCHESTRATE_NAMESPACE" }}
     chart: helm-pegasys/core-stack-api
     atomic: true
-    version: 0.5.6
+    version: 0.6.0
     values:
-      - values/common.yaml.gotmpl
+      - values/common-orchestrate.yaml.gotmpl
       - values/common-api.yaml.gotmpl
       - values/common-multitenancy.yaml.gotmpl
       - values/api-contract-registry.yaml.gotmpl
@@ -27,9 +46,9 @@ releases:
     namespace: {{ requiredEnv "ORCHESTRATE_NAMESPACE" }}
     chart: helm-pegasys/core-stack-api
     atomic: true
-    version: 0.5.6
+    version: 0.6.0
     values:
-      - values/common.yaml.gotmpl
+      - values/common-orchestrate.yaml.gotmpl
       - values/common-api.yaml.gotmpl
       - values/common-multitenancy.yaml.gotmpl
       - values/api-chain-registry.yaml.gotmpl
@@ -37,9 +56,9 @@ releases:
     namespace: {{ requiredEnv "ORCHESTRATE_NAMESPACE" }}
     chart: helm-pegasys/core-stack-worker
     atomic: true
-    version: 0.5.4
+    version: 0.6.0
     values:
-      - values/common.yaml.gotmpl
+      - values/common-orchestrate.yaml.gotmpl
       - values/common-worker.yaml.gotmpl
       - values/common-multitenancy.yaml.gotmpl
       - values/tx-crafter.yaml.gotmpl
@@ -48,9 +67,9 @@ releases:
     namespace: {{ requiredEnv "ORCHESTRATE_NAMESPACE" }}
     chart: helm-pegasys/core-stack-worker
     atomic: true
-    version: 0.5.4
+    version: 0.6.0
     values:
-      - values/common.yaml.gotmpl
+      - values/common-orchestrate.yaml.gotmpl
       - values/common-worker.yaml.gotmpl
       - values/common-multitenancy.yaml.gotmpl
       - values/tx-signer.yaml.gotmpl
@@ -58,9 +77,9 @@ releases:
     namespace: {{ requiredEnv "ORCHESTRATE_NAMESPACE" }}
     chart: helm-pegasys/core-stack-worker
     atomic: true
-    version: 0.5.4
+    version: 0.6.0
     values:
-      - values/common.yaml.gotmpl
+      - values/common-orchestrate.yaml.gotmpl
       - values/common-worker.yaml.gotmpl
       - values/common-multitenancy.yaml.gotmpl
       - values/tx-sender.yaml.gotmpl
@@ -68,14 +87,14 @@ releases:
     namespace: {{ requiredEnv "ORCHESTRATE_NAMESPACE" }}
     chart: helm-pegasys/core-stack-worker
     atomic: true
-    version: 0.5.4
+    version: 0.6.0
     values:
-      - values/common.yaml.gotmpl
+      - values/common-orchestrate.yaml.gotmpl
       - values/common-worker.yaml.gotmpl
       - values/common-multitenancy.yaml.gotmpl
       - values/tx-listener.yaml.gotmpl
   - name: orchestrate-service-monitor
-    namespace: {{ requiredEnv "OBSERVABILITY_NAMESPACE" }}
+    namespace: {{ requiredEnv "ORCHESTRATE_NAMESPACE" }}
     chart: incubator/raw
     version: 0.2.3
     condition: metrics.enabled 

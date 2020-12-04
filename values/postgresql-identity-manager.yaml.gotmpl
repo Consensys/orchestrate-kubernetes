@@ -1,5 +1,5 @@
 ---
-fullnameOverride: "postgresql-transaction-scheduler"
+fullnameOverride: "postgresql-identity-manager"
 replication:
   enabled: false
 persistence:
@@ -14,6 +14,6 @@ metrics:
   serviceMonitor:
     enabled: {{ .Values | get "metrics.enabled" false }}
     namespace: {{ .Values | get "observabilityNamespace" }}
-postgresqlDatabase: transaction-scheduler
-postgresqlUsername: transaction-scheduler
+postgresqlDatabase: identity-manager
+postgresqlUsername: identity-manager
 postgresqlPassword: such-secret

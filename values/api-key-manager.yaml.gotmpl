@@ -1,0 +1,25 @@
+---
+fullnameOverride: "api-key-manager"
+image:
+  repository: "{{ .Environment.Values.repositories.orchestrate }}"
+  tag: "{{ .Environment.Values.tags.orchestrate }}"
+imageCredentials:
+  create: true
+  registry: {{ .Environment.Values.registry.url }}
+  username: {{ .Environment.Values.registry.credentials.username }}
+  password: {{ .Environment.Values.registry.credentials.password }}
+
+environment:
+  VAULT_SECRET_PATH: "{{ .Environment.Values.orchestrateNamespace }}/keys"
+  VAULT_ADDR: http://vault.{{ .Environment.Values.vaultNamespace }}:8200
+  {{- .Environment.Values.keyManager | toYaml | nindent 2 }}
+
+initContainers: false
+initDBHook: false
+
+cmd:
+  name: key-manager
+
+vaultAgent:
+  enabled: {{ .Values | get "vaultAgent.enabled" true }}
+  role: {{ .Values | get "vaultAgent.role" "api-key-manager" }}

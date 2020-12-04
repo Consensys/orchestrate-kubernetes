@@ -1,0 +1,5 @@
+---
+orchestrateNamespace: {{ requiredEnv "ORCHESTRATE_NAMESPACE" }}
+vaultOperatorNamespace: {{ env "VAULT_OPERATOR_NAMESPACE" | default "vault" }}
+vaultNamespace: {{ env "VAULT_NAMESPACE" | default "vault" }}
+observabilityNamespace: {{ env "OBSERVABILITY_NAMESPACE" | default "observability" }}

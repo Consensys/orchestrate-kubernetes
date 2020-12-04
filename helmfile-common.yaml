@@ -8,15 +8,18 @@ helmDefaults:
 environments:
   orchestrate-demo:
     values:
+      - environments/common.yaml.gotmpl
       - environments/orchestrate-demo.yaml.gotmpl
       - values/tags.yaml.gotmpl
   orchestrate-staging:
     values:
+      - environments/common.yaml.gotmpl
       - environments/orchestrate-staging.yaml.gotmpl
       - values/tags.yaml.gotmpl
   orchestrate-minikube:
     values:
       - environments/orchestrate-minikube.yaml.gotmpl
+      - environments/common.yaml.gotmpl
       - values/tags.yaml.gotmpl
 repositories:
   - name: helm-pegasys

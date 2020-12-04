@@ -19,6 +19,8 @@ dashboardsConfigMaps:
     fileName: postgres-dashboard.json
   - configMapName: redis-dashboard
     fileName: redis-dashboard.json
+  - configMapName: vault-dashboard
+    fileName: vault-dashboard.json
   - configMapName: orchestrate-dashboard
     fileName: orchestrate-dashboard.json
 

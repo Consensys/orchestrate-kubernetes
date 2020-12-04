@@ -1,0 +1,32 @@
+---
+prometheus:
+  {{ if .Values.metrics.enabled }}
+  serviceAccount:
+    name: prometheus
+  configMaps:
+    - vault-agent-config
+  containers:
+  - name: vault-agent-auth
+    image: vault
+    securityContext:
+      runAsUser: 65534
+    volumeMounts:
+      - name: configmap-vault-agent-config
+        mountPath: /etc/vault
+      - name: config-out
+        mountPath: /home/vault/config-out
+    env:
+      - name: VAULT_ADDR
+        value: http://vault.{{ .Environment.Values.vaultNamespace }}:8200
+    command: ["vault"]
+    args:
+      [
+        "agent",
+        "-config=/etc/vault/vault-agent-config.hcl",
+        "-log-level=debug",
+      ]
+  {{ end }}
+  persistence:
+    enabled: false
+    storageClass: gp2
+    size: 40G

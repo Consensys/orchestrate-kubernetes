@@ -9,10 +9,4 @@ releases:
     version: 0.2.3
     atomic: true
     values:
-      - vaultOperator:
-          namespace: {{ requiredEnv "VAULT_OPERATOR_NAMESPACE" }}
-      - vault:
-          namespace: {{ requiredEnv "VAULT_NAMESPACE" }}
-      - orchestrate:
-          namespace: {{ requiredEnv "ORCHESTRATE_NAMESPACE" }}
-      - values/vault.yaml 
+      - values/vault.yaml.gotmpl
