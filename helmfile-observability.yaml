@@ -12,7 +12,7 @@ releases:
       - {{ requiredEnv "OBSERVABILITY_NAMESPACE" }}/grafana-config
     atomic: true
     values:
-      - values/grafana.yaml 
+      - values/grafana.yaml.gotmpl
   - name: grafana-config
     namespace: {{ requiredEnv "OBSERVABILITY_NAMESPACE" }}
     chart: incubator/raw

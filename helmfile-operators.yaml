@@ -9,6 +9,8 @@ releases:
     version: 1.8.1
     wait: true
     atomic: true
+    values:
+      - values/vault-operator.yaml
   - name: prometheus-vault-agent
     namespace:  {{ requiredEnv "OBSERVABILITY_NAMESPACE" }}
     chart: incubator/raw
