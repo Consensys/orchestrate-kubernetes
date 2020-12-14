@@ -4,7 +4,7 @@ bases:
     
 releases:
   - name: vault-operator
-    namespace: {{ requiredEnv "VAULT_OPERATOR_NAMESPACE" }}
+    namespace: {{ requiredEnv "VAULT_NAMESPACE" }}
     chart: banzaicloud-stable/vault-operator
     version: 1.8.1
     wait: true

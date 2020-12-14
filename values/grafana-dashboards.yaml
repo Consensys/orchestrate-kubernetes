@@ -1,27 +1,4 @@
----
 resources:
-- apiVersion: v1
-  kind: ConfigMap
-  metadata:
-    name: grafana-ini
-  data:
-    grafana.ini: |-
-      [auth.basic]
-      enabled = false
-- apiVersion: v1
-  kind: Secret
-  metadata:
-    name: datasource-secret
-  type: Opaque
-  stringData:
-    datasources.yaml: |-
-      apiVersion: 1
-      datasources:
-        - name: Prometheus
-          type: prometheus
-          url: http://prometheus-prometheus-kube-prometheus-prometheus-0.prometheus-operated:9090
-          access: proxy
-          isDefault: true
 - apiVersion: v1
   kind: ConfigMap
   metadata:

@@ -2,7 +2,7 @@
 helmDefaults:
   verify: false
   wait: true
-  timeout: 600
+  timeout: 300
   recreatePods: false
   force: false
 environments:

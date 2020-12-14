@@ -26,7 +26,25 @@ prometheus:
         "-log-level=debug",
       ]
   {{ end }}
+  {{ if .Environment.Values.domainName }}
+  ingress:
+    enabled: true
+    annotations:
+      {{- if env "AUTH_ALLOWED_DOMAINS" }}
+      ingress.pomerium.io/allowed_domains: '["{{ env "AUTH_ALLOWED_DOMAINS"}}"]'
+      nginx.ingress.kubernetes.io/auth-url: 'https://forwardauth.{{ .Environment.Values.domainName }}/verify?uri=$scheme://$host$request_uri'
+      nginx.ingress.kubernetes.io/auth-signin: 'https://forwardauth.{{ .Environment.Values.domainName }}?uri=$scheme://$host$request_uri'
+      {{- end }}
+      kubernetes.io/ingress.class: "nginx"
+    hosts:
+      - name: prometheus.{{ .Environment.Values.domainName }}
+        path: /
+    tls:
+      - hosts:
+        - prometheus.{{ .Environment.Values.domainName }}
+  {{ end }}
+
   persistence:
-    enabled: false
+    enabled: true
     storageClass: gp2
-    size: 40G
+    size: 20G

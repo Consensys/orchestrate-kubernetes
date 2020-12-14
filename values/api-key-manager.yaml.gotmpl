@@ -10,7 +10,6 @@ imageCredentials:
   password: {{ .Environment.Values.registry.credentials.password }}
 
 environment:
-  VAULT_SECRET_PATH: "{{ .Environment.Values.orchestrateNamespace }}/keys"
   VAULT_ADDR: http://vault.{{ .Environment.Values.vaultNamespace }}:8200
   {{- .Environment.Values.keyManager | toYaml | nindent 2 }}
 

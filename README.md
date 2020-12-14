@@ -21,7 +21,7 @@ For more information, refer to the [Orchestrate documentation](https://docs.orch
   - [1.2. CLI tools](#12-cli-tools)
 - [2. Installing Orchestrate](#2-installing-orchestrate)
   - [2.1. Docker registry credentials](#21-docker-registry-credentials)
-  - [2.2. Namespaces](#22-namespaces)
+  - [2.2. Namespaces and environment variables](#22-namespaces-and-environment-variables)
   - [2.3. Environement values](#23-environement-values)
   - [2.4. Deploy Orchestrate](#24-deploy-orchestrate)
   - [2.5. Delete Orchestrate](#25-delete-orchestrate)
@@ -76,7 +76,7 @@ You also need to fill the github token to retrieve the Hashicorp plugin
 export GITHUB_TOKEN=<TOKEN>
 ```
 
-## 2.2. Namespaces
+## 2.2. Namespaces and environment variables
 
 Set environment variables to specify what namespace Orchesrate and its dependencies will be deployed. Note: all the releases could be deployed in the same namespace. Example:
 
@@ -86,7 +86,6 @@ export ORCHESTRATE_NAMESPACE=orchestrate-demo
 
 Optionally, specifiy the namespace where Vault Operator, Vault, Prometheus and Grafana stack will be deployed
 ```
-export VAULT_OPERATOR_NAMESPACE=vault
 export VAULT_NAMESPACE=vault
 export OBSERVABILITY_NAMESPACE=observability
 ```
@@ -94,6 +93,19 @@ In that case you also have to add the value `metrics.enabled=true`. Example like
 ```yaml
 metrics:
   enabled: true
+```
+
+If you use Nginx Ingress Controller and you want to expose Orchestrate and Observability APIs you can set the following environment variable:
+```bash
+export DOMAIN_NAME=orchestrate.net
+```
+It will create ingress with the following hosts:
+```
+${ORCHESTRATE_NAMESPACE}.${DOMAIN_NAME}/chain-registry
+${ORCHESTRATE_NAMESPACE}.${DOMAIN_NAME}/transaction-scheduler
+${ORCHESTRATE_NAMESPACE}.${DOMAIN_NAME}/contract-registry
+grafana.${DOMAIN_NAME}
+prometheus.${DOMAIN_NAME}
 ```
 
 ## 2.3. Environement values
@@ -193,13 +205,9 @@ This helmfiles deploys [Hashicorp's Vault](https://www.vaultproject.io/) based o
             capabilities = ["list", "read"]
             }
         {{ end }}
-      - name: allow_secrets
+      - name: api_key_manager
         rules: path "orchestrate/*" {
-          capabilities = ["create", "read", "update", "delete", "list"]
-          }
-      - name: api_key_manager_demo
-        rules: path "orchestrate/data/{{ .Environment.Values.orchestrateNamespace }}/keys/*" {
-          capabilities = ["create", "read", "update", "delete", "list"]
+          capabilities = ["create", "read", "update", "list"]
           }
 ```
 
@@ -209,10 +217,10 @@ This helmfiles deploys [Hashicorp's Vault](https://www.vaultproject.io/) based o
     auth:
       - type: kubernetes
         roles:
-          - name: api-key-manage
+          - name: api-key-manager
             bound_service_account_names: ["api-key-manage", "vault-secrets-webhook", "vault"]
-            bound_service_account_namespaces: ["{{ .Environment.Values.vaultNamespace }}", "{{ .Environment.Values.vaultOperatorNamespace }}", "{{ .Environment.Values.orchestrateNamespace }}"]
-            policies: ["allow_secrets", "api_key_manager_demo"]
+            bound_service_account_namespaces: ["{{ .Environment.Values.vaultNamespace }}", "{{ .Environment.Values.orchestrateNamespace }}"]
+            policies: api_key_manager
       {{ if .Environment.Values.metrics.enabled }}
       - type: kubernetes
         roles:
@@ -226,14 +234,10 @@ This helmfiles deploys [Hashicorp's Vault](https://www.vaultproject.io/) based o
 - Service Account
 - RBAC configuration
 
-Warning (Temporary): As of today the Orchestrate Vault Plugin is mounted to Hashicorp Vault with `mLock` disabled which is not recommended in production. A fix of the Vault Operator to be compatible with third-party plugins will come later. 
-
-
-As set in the existing envinonment configurations in the `environments` directory, the `tx-signer` has to be connected to the harshicorp vault with the following values:
+As set in the existing envinonment configurations in the `environments` directory, the `api-key-manager` has to be connected to the hashicorp vault with the following values:
 
 - `SECRET_STORE`: Secret storage type (default: hashicorp)
 - `VAULT_MOUNT_POINT`: Root name of the secret engine (default: orchestrate)
-- `VAULT_SECRET_PATH`: Path of secret key store of ethereum wallet (default: {{ .Environment.Values.orchestrateNamespace }}/keys)
 - `VAULT_ADDR`: Hostname and port of Harshicorp Vault instance. (default: http://vault.{{ .Environment.Values.vaultNamespace }}:8200)
 - `VAULT_CACERT`: Path to a PEM-encoded CA certificate file on the local disk. This file is used to verify the Vault server's SSL certificate
 - `VAULT_SKIP_VERIFY`: Skip verifying Vault's certificate before communicating with it (default: false)

@@ -143,21 +143,17 @@ templates:
             capabilities = ["list", "read"]
             }
         {{ end }}
-        - name: allow_secrets
+        - name: api_key_manager
           rules: path "orchestrate/*" {
-            capabilities = ["create", "read", "update", "delete", "list"]
-            }
-        - name: api_key_manager_demo
-          rules: path "orchestrate/data/{{ .Environment.Values.orchestrateNamespace }}/keys/*" {
-            capabilities = ["create", "read", "update", "delete", "list"]
+            capabilities = ["create", "read", "update", "list"]
             }
       auth:
         - type: kubernetes
           roles:
             - name: api-key-manager
               bound_service_account_names: ["api-key-manager", "vault-secrets-webhook", "vault"]
-              bound_service_account_namespaces: ["{{ .Environment.Values.vaultNamespace }}", "{{ .Environment.Values.vaultOperatorNamespace }}", "{{ .Environment.Values.orchestrateNamespace }}"]
-              policies: ["allow_secrets", "api_key_manager_demo"]
+              bound_service_account_namespaces: ["{{ .Environment.Values.vaultNamespace }}", "{{ .Environment.Values.orchestrateNamespace }}"]
+              policies: api_key_manager
         {{ if .Environment.Values.metrics.enabled }}
         - type: kubernetes
           roles:

@@ -1,0 +1,39 @@
+templates:
+- |
+  apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    name: grafana-ini
+  data:
+    grafana.ini: |-
+      [server]
+      {{- if .Environment.Values.domainName }}
+      root_url: "https://grafana.{{ .Environment.Values.domainName }}"
+      {{- end }}
+
+      {{- if env "AUTH_ALLOWED_DOMAINS" }}
+      [auth.google]
+      enabled = true
+      allow_sign_up = false
+      client_id = {{ env "AUTH_GOOGLE_CLIENT_ID" }}
+      client_secret = {{ env "AUTH_GOOGLE_CLIENT_SECRET" }}
+      scopes = https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email
+      auth_url = https://accounts.google.com/o/oauth2/auth
+      token_url = https://accounts.google.com/o/oauth2/token
+      allowed_domains = {{ env "AUTH_ALLOWED_DOMAINS" }}
+      {{- end }}
+- |
+  apiVersion: v1
+  kind: Secret
+  metadata:
+    name: datasource-secret
+  type: Opaque
+  stringData:
+    datasources.yaml: |-
+      apiVersion: 1
+      datasources:
+        - name: Prometheus
+          type: prometheus
+          url: http://prometheus-prometheus-kube-prometheus-prometheus-0.prometheus-operated:9090
+          access: proxy
+          isDefault: true

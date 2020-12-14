@@ -6,10 +6,11 @@ releases:
   - name: grafana
     namespace: {{ requiredEnv "OBSERVABILITY_NAMESPACE" }}
     chart: bitnami/grafana
-    version: 3.4.5
+    version: 4.2.3
     condition: metrics.enabled 
     needs:
       - {{ requiredEnv "OBSERVABILITY_NAMESPACE" }}/grafana-config
+      - {{ requiredEnv "OBSERVABILITY_NAMESPACE" }}/grafana-dashboards
     atomic: true
     values:
       - values/grafana.yaml.gotmpl
@@ -20,4 +21,12 @@ releases:
     condition: metrics.enabled 
     atomic: true
     values:
-      - values/grafana-config.yaml
+      - values/grafana-config.yaml.gotmpl
+  - name: grafana-dashboards
+    namespace: {{ requiredEnv "OBSERVABILITY_NAMESPACE" }}
+    chart: incubator/raw
+    version: 0.2.3
+    condition: metrics.enabled 
+    atomic: true
+    values:
+      - values/grafana-dashboards.yaml
