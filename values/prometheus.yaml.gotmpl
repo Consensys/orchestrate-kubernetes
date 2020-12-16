@@ -1,0 +1,50 @@
+---
+prometheus:
+  {{ if .Values.metrics.enabled }}
+  serviceAccount:
+    name: prometheus
+  configMaps:
+    - vault-agent-config
+  containers:
+  - name: vault-agent-auth
+    image: vault
+    securityContext:
+      runAsUser: 65534
+    volumeMounts:
+      - name: configmap-vault-agent-config
+        mountPath: /etc/vault
+      - name: config-out
+        mountPath: /home/vault/config-out
+    env:
+      - name: VAULT_ADDR
+        value: http://vault.{{ .Environment.Values.vaultNamespace }}:8200
+    command: ["vault"]
+    args:
+      [
+        "agent",
+        "-config=/etc/vault/vault-agent-config.hcl",
+        "-log-level=debug",
+      ]
+  {{ end }}
+  {{ if .Environment.Values.domainName }}
+  ingress:
+    enabled: true
+    annotations:
+      {{- if env "AUTH_ALLOWED_DOMAINS" }}
+      ingress.pomerium.io/allowed_domains: '["{{ env "AUTH_ALLOWED_DOMAINS"}}"]'
+      nginx.ingress.kubernetes.io/auth-url: 'https://forwardauth.{{ .Environment.Values.domainName }}/verify?uri=$scheme://$host$request_uri'
+      nginx.ingress.kubernetes.io/auth-signin: 'https://forwardauth.{{ .Environment.Values.domainName }}?uri=$scheme://$host$request_uri'
+      {{- end }}
+      kubernetes.io/ingress.class: "nginx"
+    hosts:
+      - name: prometheus.{{ .Environment.Values.domainName }}
+        path: /
+    tls:
+      - hosts:
+        - prometheus.{{ .Environment.Values.domainName }}
+  {{ end }}
+
+  persistence:
+    enabled: true
+    storageClass: gp2
+    size: 20G

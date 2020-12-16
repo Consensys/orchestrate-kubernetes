@@ -19,7 +19,6 @@ All notable changes to this project will be documented in this file.
  * New helmfile structure where Observability and Vault deployments are part of a single root Helmfile. Vault folder and its manual deployment has been deleted.
  * `TARGET_NAMESPACE` environment variable is deprecated for the following environment variables:
    * `ORCHESTRATE_NAMESPACE` namespace where Orchestrate stack will be deployed
-   * `VAULT_OPERATOR_NAMESPACE` namespace where the Vault Operator will be deployed
    * `VAULT_NAMESPACE` namespace where Vault servers will be deployed
    * `OBSERVABILITY_NAMESPACE` namespace where Prometheus and Grafana stack will be deployed (optional)
 

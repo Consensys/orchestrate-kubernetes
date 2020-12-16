@@ -1,3 +1,6 @@
+test:
+  enabled: true
+
 testImage:
   repository: "{{ .Environment.Values.repositories.e2e }}"
   tag: "{{ .Environment.Values.tags.e2e }}"
@@ -8,10 +11,4 @@ testImageCredentials:
   password: {{ .Environment.Values.registry.credentials.password }}
 
 testEnvironment:
-  CHAIN_REGISTRY_URL: http://api-chain-registry:8081
-  CHAIN_REGISTRY_METRICS_URL: http://api-chain-registry:8082
-  CONTRACT_REGISTRY_HTTP_URL: http://api-contract-registry:8081
-  CONTRACT_REGISTRY_METRICS_URL: http://api-contract-registry:8082
-  TRANSACTION_SCHEDULER_URL: http://api-transaction-scheduler:8081
-  TRANSACTION_SCHEDULER_METRICS_URL: http://api-transaction-scheduler:8082
   {{- .Environment.Values.testEnvironment | toYaml | nindent 2 }}

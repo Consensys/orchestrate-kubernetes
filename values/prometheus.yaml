@@ -1,6 +1,0 @@
----
-prometheus:
-  persistence:
-    enabled: false
-    storageClass: gp2
-    size: 40G

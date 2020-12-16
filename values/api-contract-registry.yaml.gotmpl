@@ -12,6 +12,20 @@ imageCredentials:
 cmd:
   name: contract-registry
 
+{{ if .Environment.Values.domainName }}
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+  hosts:
+    - host: {{ .Environment.Values.orchestrateNamespace }}.{{ .Environment.Values.domainName }}
+      http:
+        paths:
+          - path: /contract-registry
+            backend:
+              servicePort: http-svc
+{{ end }}
+
 environment:
   DB_DATABASE: contract-registry
   DB_HOST: postgresql-contract-registry

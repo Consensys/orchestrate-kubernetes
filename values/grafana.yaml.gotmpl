@@ -8,6 +8,22 @@ config:
 dashboardsProvider:
   enabled: true
 
+updateStrategy:
+  type: RollingUpdate
+
+{{ if .Environment.Values.domainName }}
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+  hosts:
+    - name: grafana.{{ .Environment.Values.domainName }}
+      paths: ["/"]
+      tls: true
+      tlsHosts:
+        - grafana.{{ .Environment.Values.domainName }}
+{{ end }}
+
 dashboardsConfigMaps:
   - configMapName: k8s-dashboard
     fileName: k8s-dashboard.json
@@ -19,6 +35,8 @@ dashboardsConfigMaps:
     fileName: postgres-dashboard.json
   - configMapName: redis-dashboard
     fileName: redis-dashboard.json
+  - configMapName: vault-dashboard
+    fileName: vault-dashboard.json
   - configMapName: orchestrate-dashboard
     fileName: orchestrate-dashboard.json
 

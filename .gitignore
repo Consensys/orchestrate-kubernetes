@@ -26,6 +26,7 @@
 
 # Environment file
 .env
+env.sh
 
 .helm/
 .kube/

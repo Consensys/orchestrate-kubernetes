@@ -14,4 +14,4 @@ metrics:
   enabled: {{ .Values | get "metrics.enabled" false }}
   serviceMonitor:
     enabled: {{ .Values | get "metrics.enabled" false }}
-    namespace: {{ .Values | get "metrics.namespace" }}
+    namespace: {{ .Values | get "observabilityNamespace" }}

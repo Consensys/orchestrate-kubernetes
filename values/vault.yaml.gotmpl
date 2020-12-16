@@ -1,0 +1,261 @@
+templates:
+- |
+  apiVersion: vault.banzaicloud.com/v1alpha1
+  kind: "Vault"
+  metadata:
+    name: "vault"
+  spec:
+    size: 1
+    image: vault:1.6.0
+    bankVaultsImage: banzaicloud/bank-vaults:1.8.0
+
+    # Common annotations for all created resources
+    annotations:
+      common/annotation: "true"
+
+    # Vault Pods , Services and TLS Secret annotations
+    vaultAnnotations:
+      type/instance: "vault"
+
+    # Vault Configurer Pods and Services annotations
+    vaultConfigurerAnnotations:
+      type/instance: "vaultconfigurer"
+
+    # Vault Pods , Services and TLS Secret labels
+    vaultLabels:
+      example.com/log-format: "json"
+
+    # Vault Configurer Pods and Services labels
+    vaultConfigurerLabels:
+      example.com/log-format: "string"
+
+    # Specify the ServiceAccount where the Vault Pod and the Bank-Vaults configurer/unsealer is running
+    serviceAccount: vault
+
+    # Specify the Service's type where the Vault Service is exposed
+    # Please note that some Ingress controllers like https://github.com/kubernetes/ingress-gce
+    # forces you to expose your Service on a NodePort
+    serviceType: ClusterIP
+
+    vaultInitContainers:
+      - name: orchestrate-plugin
+        image: alpine:3.12
+        command:
+          - /bin/sh
+          - -c
+          - |
+            apk add --no-cache jq wget
+            echo "Installing orchestrate-hashicorp-vault-plugin version '$PLUGIN_VERSION'"
+            parser=". | map(select(.tag_name == \"$PLUGIN_VERSION\"))[0].assets | map(select(.name == \"$PLUGIN_FILE\"))[0].id"
+
+            echo "Obtaining asset_id of $PLUGIN_FILE..."
+            asset_id=`wget -q --auth-no-challenge --proxy off --header="Authorization: token $GITHUB_TOKEN" --header="Accept: application/vnd.github.v3.raw" https://api.github.com/repos/$PLUGIN_REPO/releases -O - | jq "$parser"`
+            if [ -z "$asset_id" ]; then
+              echo "ERROR: version $PLUGIN_VERSION not found asset $PLUGIN_FILE"
+              exit 1
+            fi;
+
+            echo "Downloading $FILE(ID:$asset_id)..."
+            wget -q --auth-no-challenge --proxy off --header='Accept:application/octet-stream' \
+              https://$GITHUB_TOKEN:@api.github.com/repos/$PLUGIN_REPO/releases/assets/$asset_id \
+              -O "${PLUGINS_PATH}/orchestrate"
+
+            echo "File at ${PLUGINS_PATH}/orchestrate"
+            chmod +x ${PLUGINS_PATH}/orchestrate
+        env: 
+          - name: GITHUB_TOKEN
+            value: {{ .Environment.Values.vaultPlugin.token }}
+          - name: PLUGIN_VERSION
+            value: {{ .Environment.Values.vaultPlugin.tag }}
+          - name: PLUGIN_FILE
+            value: {{ .Environment.Values.vaultPlugin.file }}
+          - name: PLUGIN_REPO
+            value: {{ .Environment.Values.vaultPlugin.repo }}
+          - name: PLUGINS_PATH
+            value: /vault/plugins
+        volumeMounts:
+          - name: vault-plugin
+            mountPath: /vault/plugins
+
+    # Use local disk to store Vault file data, see config section.
+    volumes:
+      - name: vault-plugin
+        persistentVolumeClaim:
+          claimName: vault-plugin
+      - name: vault-file
+        persistentVolumeClaim:
+          claimName: vault-file
+
+    volumeMounts:
+      - name: vault-plugin
+        mountPath: /vault/plugins
+      - name: vault-file
+        mountPath: /vault/file
+
+    vaultContainerSpec:
+      lifecycle:
+        postStart:
+          exec:
+            command: ["/bin/sh", "-c", "setcap cap_ipc_lock=+ep /vault/plugins/orchestrate"]
+  
+    # Support for distributing the generated CA certificate Secret to other namespaces.
+    # Define a list of namespaces or use ["*"] for all namespaces.
+    caNamespaces:
+      - "*"
+
+    # Describe where you would like to store the Vault unseal keys and root token.
+    unsealConfig:
+      options:
+        # The preFlightChecks flag enables unseal and root token storage tests
+        # This is true by default
+        preFlightChecks: true
+      kubernetes:
+        secretNamespace: {{ .Environment.Values.vaultNamespace }}
+
+    # A YAML representation of a final vault config file.
+    # See https://www.vaultproject.io/docs/configuration/ for more information.
+    config:
+      storage:
+        file:
+          path: "${ .Env.VAULT_STORAGE_FILE }" # An example how Vault config environment interpolation can be used
+      listener:
+        tcp:
+          address: "0.0.0.0:8200"
+          # Uncommenting the following line and deleting tls_cert_file and tls_key_file disables TLS
+          tls_disable: true
+          #tls_cert_file: /vault/tls/server.crt
+          #tls_key_file: /vault/tls/server.key
+      plugin_directory: /vault/plugins
+      api_addr: http://localhost:8200
+      {{ if .Environment.Values.metrics.enabled }}
+      telemetry:
+        statsd_address: localhost:9125
+      {{ end }}
+
+    serviceMonitorEnabled: {{ .Environment.Values.metrics.enabled }}
+
+    # See: https://github.com/banzaicloud/bank-vaults#example-external-vault-configuration for more details.
+    externalConfig:
+      policies:
+        {{ if .Environment.Values.metrics.enabled }}
+        - name: prometheus
+          rules: path "sys/metrics" {
+            capabilities = ["list", "read"]
+            }
+        {{ end }}
+        - name: api_key_manager
+          rules: path "orchestrate/*" {
+            capabilities = ["create", "read", "update", "list"]
+            }
+      auth:
+        - type: kubernetes
+          roles:
+            - name: api-key-manager
+              bound_service_account_names: ["api-key-manager", "vault-secrets-webhook", "vault"]
+              bound_service_account_namespaces: ["{{ .Environment.Values.vaultNamespace }}", "{{ .Environment.Values.orchestrateNamespace }}"]
+              policies: api_key_manager
+        {{ if .Environment.Values.metrics.enabled }}
+        - type: kubernetes
+          roles:
+            - name: prometheus
+              bound_service_account_names: prometheus
+              bound_service_account_namespaces: {{ .Environment.Values.observabilityNamespace }}
+              policies: prometheus
+        {{ end }}
+
+      secrets:
+        - path: orchestrate
+          type: plugin
+          plugin_name: orchestrate
+          description: Orchestrate key storage gateway
+          config:
+            force_no_cache: true
+            passthrough_request_headers: ["X-Vault-Namespace"]
+
+      plugins:
+        - plugin_name: orchestrate
+          command: orchestrate
+          sha256: {{ .Environment.Values.vaultPlugin.sha256 }}
+          type: secret
+
+    vaultEnvsConfig:
+      - name: VAULT_LOG_LEVEL
+        value: debug
+      - name: VAULT_STORAGE_FILE
+        value: "/vault/file"
+
+    # Marks presence of Istio, which influences things like port namings
+    istioEnabled: false
+- |
+  apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: vault-file
+  spec:
+    # https://kubernetes.io/docs/concepts/storage/persistent-volumes/#class-1
+    # storageClassName: ""
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 1Gi
+- |
+  apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: vault-plugin
+  spec:
+    # https://kubernetes.io/docs/concepts/storage/persistent-volumes/#class-1
+    # storageClassName: ""
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 1Gi
+- |
+  kind: ServiceAccount
+  apiVersion: v1
+  metadata:
+    name: vault
+- |
+  kind: Role
+  apiVersion: rbac.authorization.k8s.io/v1
+  metadata:
+    name: vault-secrets
+  rules:
+    - apiGroups:
+        - ""
+      resources:
+        - secrets
+      verbs:
+        - "*"
+- |
+  kind: RoleBinding
+  apiVersion: rbac.authorization.k8s.io/v1
+  metadata:
+    name: vault-secrets
+  roleRef:
+    kind: Role
+    name: vault-secrets
+    apiGroup: rbac.authorization.k8s.io
+  subjects:
+    - kind: ServiceAccount
+      name: vault
+- |
+  # This binding allows the deployed Vault instance to authenticate clients
+  # through Kubernetes ServiceAccounts (if configured so).
+  apiVersion: rbac.authorization.k8s.io/v1
+  kind: ClusterRoleBinding
+  metadata:
+    name: vault-auth-delegator
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: ClusterRole
+    name: system:auth-delegator
+  subjects:
+    - kind: ServiceAccount
+      name: vault
+      namespace: {{ .Environment.Values.vaultNamespace }}
+    - kind: ServiceAccount
+      name: vault
+      namespace: {{ .Environment.Values.orchestrateNamespace }}

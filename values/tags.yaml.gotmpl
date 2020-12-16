@@ -1,7 +1,7 @@
 ---
 tags:
-  orchestrate: {{ env "ORCHESTRATE_TAG" | default "v2.5.3" }}
-  e2e: {{ env "E2E_TAG" | default "v2.5.3" }}
+  orchestrate: {{ env "ORCHESTRATE_TAG" | default "v2.5.6" }}
+  e2e: {{ env "E2E_TAG" | default "v2.5.6" }}
 
 repositories:
   orchestrate: {{ env "ORCHESTRATE_REPOSITORY" | default "docker.cloudsmith.io/consensys/docker-private/orchestrate" }}
@@ -12,3 +12,10 @@ registry:
   credentials:
     username: {{ requiredEnv "REGISTRY_USERNAME" }}
     password: {{ requiredEnv "REGISTRY_PASSWORD" }}
+
+vaultPlugin:
+  tag: {{ env "VAULT_PLUGIN_TAG" | default "v0.0.5" }}
+  sha256: {{ env "VAULT_PLUGIN_SHA256SUM" | default "5d63d9891463c8b7dc281759c105b45835bc8e91cde019a9bde74d858f795740" }}
+  repo: ConsenSys/orchestrate-hashicorp-vault-plugin
+  file: orchestrate-hashicorp-vault-plugin
+  token: {{ requiredEnv "GITHUB_TOKEN" }}

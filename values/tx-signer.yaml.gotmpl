@@ -12,17 +12,6 @@ imageCredentials:
 cmd:
   name: tx-signer
 
-environment:
-  {{- .Environment.Values.txSigner.environment | toYaml | nindent 2 }}
-
-vaultAgent:
-  enabled: {{ .Values | get "vaultAgent.enabled" false }}
-  role: "{{ .Environment.Values.vaultAgent.role }}"
-
-serviceAccount:
-  create: true
-  name: "tx-signer"
-
 affinity:
   podAntiAffinity:
     preferredDuringSchedulingIgnoredDuringExecution:

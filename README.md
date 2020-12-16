@@ -19,12 +19,12 @@ For more information, refer to the [Orchestrate documentation](https://docs.orch
 - [1. Requirements](#1-requirements)
   - [1.1. Credentials](#11-credentials)
   - [1.2. CLI tools](#12-cli-tools)
-  - [1.3. Hashicorp Vault on AWS (optionnal)](#13-hashicorp-vault-on-aws-optionnal)
 - [2. Installing Orchestrate](#2-installing-orchestrate)
   - [2.1. Docker registry credentials](#21-docker-registry-credentials)
-  - [2.2. Namespaces](#22-namespaces)
+  - [2.2. Namespaces and environment variables](#22-namespaces-and-environment-variables)
   - [2.3. Environement values](#23-environement-values)
   - [2.4. Deploy Orchestrate](#24-deploy-orchestrate)
+  - [2.5. Delete Orchestrate](#25-delete-orchestrate)
 - [3. Multi-tenancy](#3-multi-tenancy)
 - [4. Hashicorp Vault](#4-hashicorp-vault)
 - [5. Observability](#5-observability)
@@ -38,7 +38,8 @@ This is intended to help the understanding on how to run and configure Orchestra
 
 | Orchestrate-kubernetes versions | Orchestrate versions         |
 |---------------------------------|------------------------------|
-| master/HEAD                     | Orchestrate v2.5.x or higher |
+| master/HEAD                     | Orchestrate v2.6.x or higher |
+| v4.1.0                          | Orchestrate v2.6.x or higher |
 | v4.0.0                          | Orchestrate v2.5.x or higher |
 | v3.1.0                          | Orchestrate v2.5.x or higher |
 | v3.0.0                          | Orchestrate v2.4.x           |
@@ -59,13 +60,6 @@ This is intended to help the understanding on how to run and configure Orchestra
 - [Helmfile](https://github.com/roboll/helmfile);
 - [Helm diff plugin](https://github.com/databus23/helm-diff).
 
-## 1.3. Hashicorp Vault on AWS (optionnal)
-
-- [Amazon DynamoDB](https://aws.amazon.com/dynamodb/);
-- [AWS Key Management Service (KMS)](https://aws.amazon.com/kms/);
-- [AWS Secrets Manager](aws.amazon.com/secrets-manager);
-- [AWS Identity and Access Management (IAM)](https://aws.amazon.com/iam/).
-
 # 2. Installing Orchestrate
 
 ## 2.1. Docker registry credentials
@@ -77,32 +71,48 @@ export REGISTRY_USERNAME=<USER>
 export REGISTRY_PASSWORD=<PASSWORD>
 ```
 
-## 2.2. Namespaces
+You also need to fill the github token to retrieve the Hashicorp plugin
+```bash
+export GITHUB_TOKEN=<TOKEN>
+```
 
-Set environment variables to specify what namespace Orchesrate, its dependencies, and tools will be deployed. Note: all the releases could be deployed in the same namespace. Example:
+## 2.2. Namespaces and environment variables
+
+Set environment variables to specify what namespace Orchesrate and its dependencies will be deployed. Note: all the releases could be deployed in the same namespace. Example:
 
 ```bash
 export ORCHESTRATE_NAMESPACE=orchestrate-demo
-export VAULT_OPERATOR_NAMESPACE=hashicorp-vault
-export VAULT_NAMESPACE=hashicorp-vault
 ```
 
-Optionally, specifiy the namespace where the Prometheus and grafana stack will be deployed
+Optionally, specifiy the namespace where Vault Operator, Vault, Prometheus and Grafana stack will be deployed
 ```
+export VAULT_NAMESPACE=vault
 export OBSERVABILITY_NAMESPACE=observability
 ```
 In that case you also have to add the value `metrics.enabled=true`. Example like `envinronments/orchestrate-demo.yaml`
 ```yaml
 metrics:
   enabled: true
-  namespace: {{ requiredEnv "OBSERVABILITY_NAMESPACE" }}
+```
+
+If you use Nginx Ingress Controller and you want to expose Orchestrate and Observability APIs you can set the following environment variable:
+```bash
+export DOMAIN_NAME=orchestrate.net
+```
+It will create ingress with the following hosts:
+```
+${ORCHESTRATE_NAMESPACE}.${DOMAIN_NAME}/chain-registry
+${ORCHESTRATE_NAMESPACE}.${DOMAIN_NAME}/transaction-scheduler
+${ORCHESTRATE_NAMESPACE}.${DOMAIN_NAME}/contract-registry
+grafana.${DOMAIN_NAME}
+prometheus.${DOMAIN_NAME}
 ```
 
 ## 2.3. Environement values
 
 The repository provides two examples of environment values set:
 - `envinronments/orchestrate-minikube.yaml` for a deployment in minikube using the default storageClass
-- `envinronments/orchestrate-demo.yaml` for a deployment in AWS using the default "gp2" storageClass
+- `envinronments/orchestrate-staging.yaml` for a deployment in AWS using the default "gp2" storageClass
 
 Feel free to create your own environment values with the following:
 
@@ -116,6 +126,7 @@ Feel free to create your own environment values with the following:
 environments:
   <OrchestrateNamespace>:
     values:
+      - environments/common.yaml.gotmpl
       - environments/<OrchestrateNamespace>.yaml
       - values/tags.yaml
 ```
@@ -135,6 +146,24 @@ chainRegistry:
 helmfile -f helmfile.yaml -e $ORCHESTRATE_NAMESPACE apply --suppress-secrets
 ```
 
+2. Once deployed you could easily test Orchestrate APIs:
+
+```
+kubectl port-forward --namespace $ORCHESTRATE_NAMESPACE svc/api-chain-registry 8081:8081
+```
+```
+kubectl port-forward --namespace $ORCHESTRATE_NAMESPACE svc/api-contract-registry 8081:8081
+```
+```
+kubectl port-forward --namespace $ORCHESTRATE_NAMESPACE svc/api-identity-manager 8081:8081
+```
+```
+kubectl port-forward --namespace $ORCHESTRATE_NAMESPACE svc/api-transaction-scheduler 8081:8081
+```
+
+[See Orchestrate APIs documentation](https://consensys.gitlab.io/client/fr/core-stack/orchestrate/latest/)
+
+## 2.5. Delete Orchestrate
 !!!hint
   to delete Orchestrate's deployment and its ressources run the following command:
 
@@ -164,19 +193,21 @@ kubectl delete crd thanosrulers.monitoring.coreos.com
 
 This helmfiles deploys [Hashicorp's Vault](https://www.vaultproject.io/) based on [Bank-Vaults](https://github.com/banzaicloud/bank-vaults). We deploy first the Vault operator, then the following ressources `values/vault.yaml`:
 
-- Vault CRD's, including [Vault policy](https://www.vaultproject.io/docs/concepts/policies) and [Vault authentication](https://www.vaultproject.io/docs/concepts/auth)
+- Vault CRD's, including [Vault policy](https://www.vaultproject.io/docs/concepts/policies), [Vault authentication](https://www.vaultproject.io/docs/concepts/auth), and [Orchestrate Hashicorp Vault Plugin](https://github.com/ConsenSys/orchestrate-hashicorp-vault-plugin)
 
 [Vault policy](https://www.vaultproject.io/docs/concepts/policies)
 ```yaml
   externalConfig:
     policies:
-      - name: allow_secrets
-        rules: path "secret/*" {
-          capabilities = ["create", "read", "update", "delete", "list"]
-          }
-      - name: tx_signer_demo
-        rules: path "secret/data/{{ .Values.orchestrate.namespace }}/keys/*" {
-          capabilities = ["create", "read", "update", "delete", "list"]
+        {{ if .Environment.Values.metrics.enabled }}
+        - name: prometheus
+          rules: path "sys/metrics" {
+            capabilities = ["list", "read"]
+            }
+        {{ end }}
+      - name: api_key_manager
+        rules: path "orchestrate/*" {
+          capabilities = ["create", "read", "update", "list"]
           }
 ```
 
@@ -186,35 +217,36 @@ This helmfiles deploys [Hashicorp's Vault](https://www.vaultproject.io/) based o
     auth:
       - type: kubernetes
         roles:
-          - name: tx-signer
-            bound_service_account_names: ["tx-signer", "vault-secrets-webhook", "vault"]
-            bound_service_account_namespaces: ["{{ .Values.vaultOperator.namespace }}", "{{ .Values.vault.namespace }}", "{{ .Values.orchestrate.namespace }}"]
-            policies: ["allow_secrets", "tx_signer_demo"]
+          - name: api-key-manager
+            bound_service_account_names: ["api-key-manage", "vault-secrets-webhook", "vault"]
+            bound_service_account_namespaces: ["{{ .Environment.Values.vaultNamespace }}", "{{ .Environment.Values.orchestrateNamespace }}"]
+            policies: api_key_manager
+      {{ if .Environment.Values.metrics.enabled }}
+      - type: kubernetes
+        roles:
+          - name: prometheus
+            bound_service_account_names: prometheus
+            bound_service_account_namespaces: {{ .Environment.Values.observabilityNamespace }}
+            policies: prometheus
+      {{ end }}
 ```
 - PVC
 - Service Account
 - RBAC configuration
 
+As set in the existing envinonment configurations in the `environments` directory, the `api-key-manager` has to be connected to the hashicorp vault with the following values:
 
-As set in the existing envinonment configurations in the `environments` directory, the `tx-signer` has to be connected to the harshicorp vault with the following values:
-
-- `SECRET_STORE`: Secret storage type. Use `hashicorp` to connect use Harshicorp Vault instance.
-- `VAULT_MOUNT_POINT`: Root name of the secret engine. Value is the name of the `path` variable in `secrets` structure in Harshicorp Vault configuration.
-- `VAULT_SECRET_PATH`: Path of secret key store of ethereum wallet. Value is the `rules: path` variable in `policies` structure in Harshicorp Vault configuration.
-- `VAULT_ADDR`: Hostname and port of Harshicorp Vault instance.
-- `VAULT_CACERT`: Path to a PEM-encoded CA certificate file on the local disk. This file is used to verify the Vault server's SSL certificate.
-- `VAULT_SKIP_VERIFY`: Do not verify Vault's presented certificate before communicating with it.
+- `SECRET_STORE`: Secret storage type (default: hashicorp)
+- `VAULT_MOUNT_POINT`: Root name of the secret engine (default: orchestrate)
+- `VAULT_ADDR`: Hostname and port of Harshicorp Vault instance. (default: http://vault.{{ .Environment.Values.vaultNamespace }}:8200)
+- `VAULT_CACERT`: Path to a PEM-encoded CA certificate file on the local disk. This file is used to verify the Vault server's SSL certificate
+- `VAULT_SKIP_VERIFY`: Skip verifying Vault's certificate before communicating with it (default: false)
 
 A sample of configuration:
 ```yaml
-txSigner:
-  environment:
-    SECRET_STORE: "hashicorp"
-    VAULT_MOUNT_POINT: "secret"
-    VAULT_SECRET_PATH: "{{ requiredEnv "ORCHESTRATE_NAMESPACE" }}/keys"
-    VAULT_ADDR: http://vault.{{ requiredEnv "VAULT_NAMESPACE" }}:8200
-    VAULT_CACERT: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-    VAULT_SKIP_VERIFY: true
+keyManager:
+  VAULT_CACERT: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+  VAULT_SKIP_VERIFY: true
 ```
 
 # 5. Observability
