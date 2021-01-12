@@ -1,5 +1,71 @@
 ---
-orchestrateNamespace: {{ requiredEnv "ORCHESTRATE_NAMESPACE" }}
-vaultNamespace: {{ env "VAULT_NAMESPACE" | default "vault" }}
-observabilityNamespace: {{ env "OBSERVABILITY_NAMESPACE" | default "observability" }}
+{{ $defaultNamespace := "orchestrate" }}
+{{ $tag := "v21.1.0" }}
+
+orchestrate:
+  namespace: {{ env "ORCHESTRATE_NAMESPACE" | default $defaultNamespace  }}
+
+  global:
+    imageCredentials:
+      registry: {{ env "REGISTRY_URL" | default "docker.cloudsmith.io" }}
+      username: {{ requiredEnv "REGISTRY_USERNAME" }}
+      password: {{ requiredEnv "REGISTRY_PASSWORD" }}
+    image:
+      repository: {{ env "ORCHESTRATE_REPOSITORY" | default "docker.cloudsmith.io/consensys/docker-private/orchestrate" }}
+      tag: {{ env "ORCHESTRATE_TAG" | default $tag }}
+    environment: {}
+    environmentSecrets: {}
+
+  api:
+    environment:
+      PROXY_CACHE_TTL: 1s
+    environmentSecrets: {}
+
+  keyManager:
+    environment: {}
+    environmentSecrets: {}
+
+  txListener:
+    environment: {}
+    environmentSecrets: {}
+
+  txSender:
+    environment: {}
+    environmentSecrets: {}
+
+  test:
+    image:
+      repository: {{ env "TEST_REPOSITORY" | default "docker.cloudsmith.io/consensys/docker-private/orchestrate-e2e" }}
+      tag: {{ env "TEST_TAG" | default $tag }}
+    storageClass: {{ env "TEST_STORAGE" }}
+    environment: {}
+    environmentSecrets: {}
+
+vaultOperator:
+  namespace: {{ env "VAULT_OPERATOR_NAMESPACE" | default "vault-operator" }}
+
+vault:
+  namespace: {{ env "VAULT_NAMESPACE" | default ( env "ORCHESTRATE_NAMESPACE" | default $defaultNamespace ) }}
+  plugin:
+    token: {{ requiredEnv "GITHUB_TOKEN" }}
+    tag: {{ env "VAULT_PLUGIN_TAG" | default "v0.0.5" }}
+    sha256: {{ env "VAULT_PLUGIN_SHA256SUM" | default "5d63d9891463c8b7dc281759c105b45835bc8e91cde019a9bde74d858f795740" }}
+
+kafka:
+  namespace: {{ env "KAFKA_NAMESPACE" | default "kafka" }}
+
+redis:
+  enabled: true
+  namespace: {{ env "REDIS_NAMESPACE" | default ( env "ORCHESTRATE_NAMESPACE" | default $defaultNamespace ) }}
+  password: such-secret
+
+postgresql:
+  namespace: {{ env "POSTGRES_NAMESPACE" | default ( env "ORCHESTRATE_NAMESPACE" | default $defaultNamespace ) }}
+  username: api
+  password: such-secret
+  database: api
+
+observability:
+  namespace: {{ env "OBSERVABILITY_NAMESPACE" | default "observability" }}
+
 domainName: {{ env "DOMAIN_NAME" }}

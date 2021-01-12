@@ -2,27 +2,29 @@
 helmDefaults:
   verify: false
   wait: true
-  timeout: 300
+  timeout: 600 
   recreatePods: false
   force: false
+  cleanupOnFail: true
 environments:
-  orchestrate-demo:
+  prod:
     values:
       - environments/common.yaml.gotmpl
-      - environments/orchestrate-demo.yaml.gotmpl
-      - values/tags.yaml.gotmpl
-  orchestrate-staging:
+      - environments/prod.yaml
+  qa:
     values:
       - environments/common.yaml.gotmpl
-      - environments/orchestrate-staging.yaml.gotmpl
-      - values/tags.yaml.gotmpl
-  orchestrate-minikube:
+      - environments/qa.yaml
+  staging:
     values:
-      - environments/orchestrate-minikube.yaml.gotmpl
       - environments/common.yaml.gotmpl
-      - values/tags.yaml.gotmpl
+      - environments/staging.yaml
+  default:
+    values:
+      - environments/common.yaml.gotmpl
+      - environments/default.yaml
 repositories:
-  - name: helm-pegasys
+  - name: consensys
     url: https://artifacts.consensys.net/public/helm/helm/charts/
   - name: banzaicloud-stable
     url: https://kubernetes-charts.banzaicloud.com

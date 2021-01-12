@@ -1,7 +1,9 @@
 ---
-fullnameOverride: redis-nonce
-usePassword: false
+password: {{ .Values.redis.password | quote }}
 master:
+  persistence:
+    enabled: false
+slave:
   persistence:
     enabled: false
 configmap: |-
@@ -9,9 +11,9 @@ configmap: |-
   maxmemory 100mb
   maxmemory-policy allkeys-lru
 cluster:
-  enabled: false
+  enabled: {{ .Values | get "redis.cluster.enabled" false }}
+  slaveCount: {{ .Values | get "redis.cluster.slaveCount" 0 }}
 metrics:
-  enabled: {{ .Values | get "metrics.enabled" false }}
+  enabled: {{ .Values | get "observability.enabled" false }}
   serviceMonitor:
-    enabled: {{ .Values | get "metrics.enabled" false }}
-    namespace: {{ .Values | get "observabilityNamespace" }}
+    enabled: {{ .Values | get "observability.enabled" false }}

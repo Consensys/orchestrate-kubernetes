@@ -1,103 +1,45 @@
 ---
 bases:
   - helmfile-common.yaml
-
+---
 releases:
-  - name: api-key-manager
-    namespace: {{ requiredEnv "ORCHESTRATE_NAMESPACE" }}
-    chart: helm-pegasys/core-stack-api
-    version: 0.6.0
+  - name: kafka-{{ .Environment.Name }}
+    chart: bitnami/kafka
+    version: 11.8.8
+    namespace: {{ .Values.kafka.namespace }}
     values:
-      - values/common-orchestrate.yaml.gotmpl
-      - values/common-api.yaml.gotmpl
-      - values/common-multitenancy.yaml.gotmpl
-      - values/api-key-manager.yaml.gotmpl
-  - name: api-identity-manager
-    namespace: {{ requiredEnv "ORCHESTRATE_NAMESPACE" }}
-    chart: helm-pegasys/core-stack-api
-    atomic: true
-    version: 0.6.0
-    values:
-      - values/common-orchestrate.yaml.gotmpl
-      - values/common-api.yaml.gotmpl
-      - values/common-multitenancy.yaml.gotmpl
-      - values/api-identity-manager.yaml.gotmpl
-  - name: api-transaction-scheduler
-    namespace: {{ requiredEnv "ORCHESTRATE_NAMESPACE" }}
-    chart: helm-pegasys/core-stack-api
-    atomic: true
-    version: 0.6.0
-    values:
-      - values/common-orchestrate.yaml.gotmpl
-      - values/common-api.yaml.gotmpl
-      - values/common-multitenancy.yaml.gotmpl
-      - values/api-transaction-scheduler.yaml.gotmpl
-  - name: api-contract-registry
-    namespace: {{ requiredEnv "ORCHESTRATE_NAMESPACE" }}
-    chart: helm-pegasys/core-stack-api
-    atomic: true
-    version: 0.6.0
-    values:
-      - values/common-orchestrate.yaml.gotmpl
-      - values/common-api.yaml.gotmpl
-      - values/common-multitenancy.yaml.gotmpl
-      - values/api-contract-registry.yaml.gotmpl
-  - name: api-chain-registry
-    namespace: {{ requiredEnv "ORCHESTRATE_NAMESPACE" }}
-    chart: helm-pegasys/core-stack-api
-    atomic: true
-    version: 0.6.0
-    values:
-      - values/common-orchestrate.yaml.gotmpl
-      - values/common-api.yaml.gotmpl
-      - values/common-multitenancy.yaml.gotmpl
-      - values/api-chain-registry.yaml.gotmpl
-  - name: tx-crafter
-    namespace: {{ requiredEnv "ORCHESTRATE_NAMESPACE" }}
-    chart: helm-pegasys/core-stack-worker
-    atomic: true
-    version: 0.6.0
-    values:
-      - values/common-orchestrate.yaml.gotmpl
-      - values/common-worker.yaml.gotmpl
-      - values/common-multitenancy.yaml.gotmpl
-      - values/tx-crafter.yaml.gotmpl
-      - values/e2e.yaml.gotmpl
-  - name: tx-signer
-    namespace: {{ requiredEnv "ORCHESTRATE_NAMESPACE" }}
-    chart: helm-pegasys/core-stack-worker
-    atomic: true
-    version: 0.6.0
-    values:
-      - values/common-orchestrate.yaml.gotmpl
-      - values/common-worker.yaml.gotmpl
-      - values/common-multitenancy.yaml.gotmpl
-      - values/tx-signer.yaml.gotmpl
-  - name: tx-sender
-    namespace: {{ requiredEnv "ORCHESTRATE_NAMESPACE" }}
-    chart: helm-pegasys/core-stack-worker
-    atomic: true
-    version: 0.6.0
-    values:
-      - values/common-orchestrate.yaml.gotmpl
-      - values/common-worker.yaml.gotmpl
-      - values/common-multitenancy.yaml.gotmpl
-      - values/tx-sender.yaml.gotmpl
-  - name: tx-listener
-    namespace: {{ requiredEnv "ORCHESTRATE_NAMESPACE" }}
-    chart: helm-pegasys/core-stack-worker
-    atomic: true
-    version: 0.6.0
-    values:
-      - values/common-orchestrate.yaml.gotmpl
-      - values/common-worker.yaml.gotmpl
-      - values/common-multitenancy.yaml.gotmpl
-      - values/tx-listener.yaml.gotmpl
-  - name: orchestrate-service-monitor
-    namespace: {{ requiredEnv "ORCHESTRATE_NAMESPACE" }}
+      - values/kafka.yaml.gotmpl
+  - name: vault
+    namespace: {{ .Values.vault.namespace }}
     chart: incubator/raw
     version: 0.2.3
-    condition: metrics.enabled 
     atomic: true
     values:
-      - values/service-monitor.yaml 
+      - values/vault.yaml.gotmpl
+  - name: redis
+    namespace: {{ .Values.redis.namespace }}
+    chart: bitnami/redis
+    version: 10.6.0
+    atomic: true
+    condition: redis.enabled
+    values:
+      - values/redis.yaml.gotmpl
+  - name: postgresql
+    namespace: {{ .Values.postgresql.namespace }}
+    chart: bitnami/postgresql
+    atomic: true
+    version: 8.6.12
+    values:
+      - values/postgresql.yaml.gotmpl
+  - name: orchestrate
+    namespace: {{ .Values.orchestrate.namespace }}
+    chart: consensys/orchestrate
+    atomic: true
+    version: 1.0.0
+    needs:
+      - {{ .Values.kafka.namespace }}/kafka-{{ .Environment.Name }}
+      - {{ .Values.vault.namespace }}/vault
+      - {{ .Values.redis.namespace }}/redis
+      - {{ .Values.postgresql.namespace }}/postgresql
+    values:
+      - values/orchestrate.yaml.gotmpl

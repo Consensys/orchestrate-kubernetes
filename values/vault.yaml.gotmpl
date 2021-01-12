@@ -9,10 +9,6 @@ templates:
     image: vault:1.6.0
     bankVaultsImage: banzaicloud/bank-vaults:1.8.0
 
-    # Common annotations for all created resources
-    annotations:
-      common/annotation: "true"
-
     # Vault Pods , Services and TLS Secret annotations
     vaultAnnotations:
       type/instance: "vault"
@@ -20,14 +16,6 @@ templates:
     # Vault Configurer Pods and Services annotations
     vaultConfigurerAnnotations:
       type/instance: "vaultconfigurer"
-
-    # Vault Pods , Services and TLS Secret labels
-    vaultLabels:
-      example.com/log-format: "json"
-
-    # Vault Configurer Pods and Services labels
-    vaultConfigurerLabels:
-      example.com/log-format: "string"
 
     # Specify the ServiceAccount where the Vault Pod and the Bank-Vaults configurer/unsealer is running
     serviceAccount: vault
@@ -64,13 +52,13 @@ templates:
             chmod +x ${PLUGINS_PATH}/orchestrate
         env: 
           - name: GITHUB_TOKEN
-            value: {{ .Environment.Values.vaultPlugin.token }}
+            value: {{ .Values.vault.plugin.token }}
           - name: PLUGIN_VERSION
-            value: {{ .Environment.Values.vaultPlugin.tag }}
+            value: {{ .Values.vault.plugin.tag }}
           - name: PLUGIN_FILE
-            value: {{ .Environment.Values.vaultPlugin.file }}
+            value: orchestrate-hashicorp-vault-plugin
           - name: PLUGIN_REPO
-            value: {{ .Environment.Values.vaultPlugin.repo }}
+            value: ConsenSys/orchestrate-hashicorp-vault-plugin
           - name: PLUGINS_PATH
             value: /vault/plugins
         volumeMounts:
@@ -110,7 +98,7 @@ templates:
         # This is true by default
         preFlightChecks: true
       kubernetes:
-        secretNamespace: {{ .Environment.Values.vaultNamespace }}
+        secretNamespace: {{ .Values.vault.namespace }}
 
     # A YAML representation of a final vault config file.
     # See https://www.vaultproject.io/docs/configuration/ for more information.
@@ -127,39 +115,39 @@ templates:
           #tls_key_file: /vault/tls/server.key
       plugin_directory: /vault/plugins
       api_addr: http://localhost:8200
-      {{ if .Environment.Values.metrics.enabled }}
+      {{ if .Values.observability.enabled }}
       telemetry:
         statsd_address: localhost:9125
       {{ end }}
 
-    serviceMonitorEnabled: {{ .Environment.Values.metrics.enabled }}
+    serviceMonitorEnabled: {{ .Values.observability.enabled }}
 
     # See: https://github.com/banzaicloud/bank-vaults#example-external-vault-configuration for more details.
     externalConfig:
       policies:
-        {{ if .Environment.Values.metrics.enabled }}
+        {{ if .Values.observability.enabled }}
         - name: prometheus
           rules: path "sys/metrics" {
             capabilities = ["list", "read"]
             }
         {{ end }}
-        - name: api_key_manager
+        - name: orchestrate_key_manager
           rules: path "orchestrate/*" {
             capabilities = ["create", "read", "update", "list"]
             }
       auth:
         - type: kubernetes
           roles:
-            - name: api-key-manager
-              bound_service_account_names: ["api-key-manager", "vault-secrets-webhook", "vault"]
-              bound_service_account_namespaces: ["{{ .Environment.Values.vaultNamespace }}", "{{ .Environment.Values.orchestrateNamespace }}"]
-              policies: api_key_manager
-        {{ if .Environment.Values.metrics.enabled }}
+            - name: orchestrate-key-manager
+              bound_service_account_names: ["orchestrate-key-manager", "vault-secrets-webhook", "vault"]
+              bound_service_account_namespaces: ["{{ .Values.vault.namespace }}", "{{ .Values.orchestrate.namespace }}"]
+              policies: orchestrate_key_manager
+        {{ if .Values.observability.enabled }}
         - type: kubernetes
           roles:
             - name: prometheus
               bound_service_account_names: prometheus
-              bound_service_account_namespaces: {{ .Environment.Values.observabilityNamespace }}
+              bound_service_account_namespaces: {{ .Values.observability.namespace }}
               policies: prometheus
         {{ end }}
 
@@ -175,12 +163,10 @@ templates:
       plugins:
         - plugin_name: orchestrate
           command: orchestrate
-          sha256: {{ .Environment.Values.vaultPlugin.sha256 }}
+          sha256: {{ .Values.vault.plugin.sha256 }}
           type: secret
 
     vaultEnvsConfig:
-      - name: VAULT_LOG_LEVEL
-        value: debug
       - name: VAULT_STORAGE_FILE
         value: "/vault/file"
 
@@ -247,7 +233,7 @@ templates:
   apiVersion: rbac.authorization.k8s.io/v1
   kind: ClusterRoleBinding
   metadata:
-    name: vault-auth-delegator
+    name: {{ .Values.orchestrate.namespace }}-vault-auth-delegator
   roleRef:
     apiGroup: rbac.authorization.k8s.io
     kind: ClusterRole
@@ -255,7 +241,7 @@ templates:
   subjects:
     - kind: ServiceAccount
       name: vault
-      namespace: {{ .Environment.Values.vaultNamespace }}
+      namespace: {{ .Values.vault.namespace }}
     - kind: ServiceAccount
       name: vault
-      namespace: {{ .Environment.Values.orchestrateNamespace }}
+      namespace: {{ .Values.orchestrate.namespace }}

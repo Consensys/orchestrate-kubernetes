@@ -1,9 +1,7 @@
 ---
-replicaCount: {{ .Values | get "kafka.replicas" 3 }}
-defaultReplicationFactor: {{ .Values | get "kafka.replicas" 3 }}
-offsetsTopicReplicationFactor: {{ .Values | get "kafka.replicas" 3 }}
-fullnameOverride: kafka
-logRetentionHours: 24
+replicaCount: {{ .Values | get "kafka.replicaCount" 1 }}
+numPartitions: {{ .Values | get "kafka.numPartitions" 1 }}
+logRetentionHours: {{ .Values | get "kafka.logRetentionHours" 24 }}
 ## Pod Disruption Budget configuration
 ## The PDB will only be created if replicaCount is greater than 1
 ## ref: https://kubernetes.io/docs/concepts/workloads/pods/disruptions
@@ -13,23 +11,20 @@ pdb:
   maxUnavailable: 1
 persistence:
   enabled: {{ .Values | get "kafka.persistence.enabled" true }}
-  size: 4Gi
-  storageClass: {{ .Values | get "kafka.persistence.storageClass" "gp2" }}
+  size: {{ .Values | get "kafka.persistence.size" "4Gi" }}
+  storageClass: {{ .Values | get "kafka.persistence.storageClass" nil }}
 metrics:
   kafka:
-    enabled: {{ .Values | get "metrics.enabled" false }}
-  jmx:
-    enabled: {{ .Values | get "metrics.enabled" false }}
+    enabled: {{ .Values | get "observability.enabled" false }}
   serviceMonitor:
-    enabled: {{ .Values | get "metrics.enabled" false }}
-    namespace: {{ .Values | get "observabilityNamespace" }}
+    enabled: {{ .Values | get "observability.enabled" false }}
 resources:
   requests:
-    memory: 4Gi
-    cpu: 100m
+    memory: {{ .Values | get "kafka.resources.requests.memory" "4Gi" }} 
+    cpu: {{ .Values | get "kafka.resources.requests.cpu" "100m" }} 
   limits:
-    memory: 8Gi
-    cpu: 500m
+    memory: {{ .Values | get "kafka.resources.limits.memory" "8Gi" }} 
+    cpu:  {{ .Values | get "kafka.resources.limits.cpu" "500m" }} 
 affinity:
   podAntiAffinity:
     requiredDuringSchedulingIgnoredDuringExecution:
@@ -41,7 +36,7 @@ affinity:
                 - kafka
             - key: job-name
               operator: DoesNotExist
-        topologyKey: "failure-domain.beta.kubernetes.io/zone"
+        topologyKey: "topology.kubernetes.io/zone"
   podAffinity:
     preferredDuringSchedulingIgnoredDuringExecution:
       - weight: 50
@@ -54,20 +49,20 @@ affinity:
                   - zookeeper
           topologyKey: "kubernetes.io/hostname"
 zookeeper:
-  replicaCount: {{ .Values | get "zookeeper.replicas" 3 }}
+  replicaCount: {{ .Values | get "zookeeper.replicaCount" 1 }}
   resources:
     requests:
-      memory: "512Mi"
-      cpu: "100m"
+      memory: {{ .Values | get "zookeeper.resources.requests.memory" "512Mi" }}
+      cpu:  {{ .Values | get "zookeeper.resources.requests.cpu" "100m" }}
     limits:
-      memory: "1Gi"
-      cpu: "300m"
+      memory: {{ .Values | get "zookeeper.resources.limits.memory" "1Gi" }}
+      cpu: {{ .Values | get "zookeeper.resources.limits.cpu" "300m" }}
   persistence:
     enabled: {{ .Values | get "zookeeper.persistence.enabled" true }}
     size: 2Gi
-    storageClass: {{ .Values | get "zookeeper.persistence.storageClass" "gp2" }}
+    storageClass: {{ .Values | get "zookeeper.persistence.storageClass" nil }}
   metrics:
-    enabled: {{ .Values | get "metrics.enabled" false }}
+    enabled: {{ .Values | get "observability.enabled" false }}
   affinity:
     podAntiAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
@@ -77,4 +72,4 @@ zookeeper:
                 operator: In
                 values:
                   - zookeeper
-          topologyKey: "failure-domain.beta.kubernetes.io/zone"
+          topologyKey: "topology.kubernetes.io/zone"
