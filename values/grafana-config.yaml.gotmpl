@@ -7,14 +7,14 @@ templates:
   data:
     grafana.ini: |-
       [server]
-      {{- if .Environment.Values.domainName }}
-      root_url: "https://grafana.{{ .Environment.Values.domainName }}"
+      {{- if .Values.domainName }}
+      root_url: "https://grafana.{{ .Values.domainName }}"
       {{- end }}
 
       {{- if env "AUTH_ALLOWED_DOMAINS" }}
       [auth.google]
       enabled = true
-      allow_sign_up = false
+      allow_sign_up = true
       client_id = {{ env "AUTH_GOOGLE_CLIENT_ID" }}
       client_secret = {{ env "AUTH_GOOGLE_CLIENT_SECRET" }}
       scopes = https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email
@@ -37,3 +37,6 @@ templates:
           url: http://prometheus-prometheus-kube-prometheus-prometheus-0.prometheus-operated:9090
           access: proxy
           isDefault: true
+        - name: Loki
+          type: loki
+          url: http://loki:3100

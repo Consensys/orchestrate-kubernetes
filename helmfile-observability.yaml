@@ -1,32 +1,32 @@
 ---
 bases:
   - helmfile-common.yaml
-    
+---
 releases:
   - name: grafana
-    namespace: {{ requiredEnv "OBSERVABILITY_NAMESPACE" }}
+    namespace: {{ .Values.observability.namespace }}
     chart: bitnami/grafana
-    version: 4.2.3
-    condition: metrics.enabled 
+    version: 5.0.1
+    condition: observability.enabled 
     needs:
-      - {{ requiredEnv "OBSERVABILITY_NAMESPACE" }}/grafana-config
-      - {{ requiredEnv "OBSERVABILITY_NAMESPACE" }}/grafana-dashboards
+      - {{ .Values.observability.namespace }}/grafana-config
+      - {{ .Values.observability.namespace }}/grafana-dashboards
     atomic: true
     values:
       - values/grafana.yaml.gotmpl
   - name: grafana-config
-    namespace: {{ requiredEnv "OBSERVABILITY_NAMESPACE" }}
+    namespace: {{ .Values.observability.namespace }}
     chart: incubator/raw
     version: 0.2.3
-    condition: metrics.enabled 
+    condition: observability.enabled 
     atomic: true
     values:
       - values/grafana-config.yaml.gotmpl
   - name: grafana-dashboards
-    namespace: {{ requiredEnv "OBSERVABILITY_NAMESPACE" }}
+    namespace: {{ .Values.observability.namespace }}
     chart: incubator/raw
     version: 0.2.3
-    condition: metrics.enabled 
+    condition: observability.enabled 
     atomic: true
     values:
-      - values/grafana-dashboards.yaml
+      - values/grafana-dashboards.yaml.gotmpl

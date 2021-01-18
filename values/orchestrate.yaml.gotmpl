@@ -1,0 +1,177 @@
+# Values for orchestrate.
+
+{{ $kafkaURL := printf "kafka-%s.%s:9092" .Environment.Name .Values.kafka.namespace }}
+
+global:
+  environment:
+    LOG_FORMAT: json
+    TOPIC_TX_SENDER: "{{ .Values.orchestrate.namespace }}-tx-sender"
+    TOPIC_TX_RECOVER: "{{ .Values.orchestrate.namespace }}-tx-recover"
+    TOPIC_TX_DECODED: "{{ .Values.orchestrate.namespace }}-tx-decoded"
+    {{- range $key,$value := .Values.orchestrate.global.environment }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+  environmentSecrets:
+    {{- range $key,$value := .Values.orchestrate.global.environmentSecrets }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+  imageCredentials:
+    {{- .Values.orchestrate.global.imageCredentials | toYaml | nindent 4 }}
+  image:
+    {{- .Values.orchestrate.global.image | toYaml | nindent 4 }}
+  serviceMonitor:
+    enabled: {{ .Values.observability.enabled }}
+
+api:
+  replicaCount: {{ .Values | get "orchestrate.replicaCount" 1 }}
+  {{- if .Values.domainName }}
+  ingress:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: nginx
+    hosts:
+      - host: {{ .Values.orchestrate.namespace }}.{{ .Values.domainName }}
+        http:
+          paths:
+            - path: /
+              backend:
+                servicePort: http-svc
+  {{- end }}
+  environment:
+    KAFKA_URL: {{ $kafkaURL }}
+    DB_HOST: "postgresql.{{ .Values.postgresql.namespace }}"
+    DB_DATABASE: {{ .Values.postgresql.database | quote }}
+    DB_USER: {{ .Values.postgresql.username | quote }}
+    {{- range $key,$value := .Values.orchestrate.api.environment }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+  environmentSecrets:
+    DB_PASSWORD: {{ .Values.postgresql.password | quote }}
+    {{- range $key,$value := .Values.orchestrate.api.environmentSecrets }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+                - key: app.kubernetes.io/component
+                  operator: In
+                  values:
+                    - api
+            topologyKey: "topology.kubernetes.io/zone"
+          weight: 30    
+
+keyManager:
+  replicaCount: {{ .Values | get "orchestrate.replicaCount" 1 }}
+  environment:
+    VAULT_ADDR: http://vault.{{ .Values.vault.namespace }}:8200
+    VAULT_CACERT: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+    VAULT_SKIP_VERIFY: true
+    {{- range $key,$value := .Values.orchestrate.keyManager.environment }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+  environmentSecrets:
+    {{- range $key,$value := .Values.orchestrate.keyManager.environmentSecrets }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+  vaultAgent:
+    role: "orchestrate-key-manager"
+    enabled: true
+    image:
+      repository: vault
+      tag: 1.6.0
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+                - key: app.kubernetes.io/component
+                  operator: In
+                  values:
+                    - api
+            topologyKey: "topology.kubernetes.io/zone"
+          weight: 30    
+
+txListener:
+  replicaCount: {{ .Values | get "orchestrate.replicaCount" 1 }}
+  environment:
+    KAFKA_URL: {{ $kafkaURL }}
+    {{- range $key,$value := .Values.orchestrate.txListener.environment }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+  environmentSecrets:
+    {{- range $key,$value := .Values.orchestrate.txListener.environmentSecrets }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+  resources:
+    requests:
+      cpu: "100m"
+      memory: 16Mi
+    limits:
+      cpu: "300m"
+      memory: 64Mi
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+                - key: app.kubernetes.io/component
+                  operator: In
+                  values:
+                    - tx-listener
+            topologyKey: "topology.kubernetes.io/zone"
+          weight: 30
+
+txSender:
+  replicaCount: {{ .Values | get "orchestrate.replicaCount" 1 }}
+  environment:
+    KAFKA_URL: {{ $kafkaURL }}
+    REDIS_HOST: "redis-master.{{ .Values.redis.namespace }}"
+    REDIS_PORT: "6379"
+    REDIS_PASSWORD: {{ .Values.redis.password | quote }}
+    {{- range $key,$value := .Values.orchestrate.txSender.environment }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+  environmentSecrets:
+    {{- range $key,$value := .Values.orchestrate.txSender.environmentSecrets }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+  resources:
+    requests:
+      cpu: "100m"
+      memory: 16Mi
+    limits:
+      cpu: "300m"
+      memory: 64Mi
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+                - key: app.kubernetes.io/component
+                  operator: In
+                  values:
+                    - tx-sender
+            topologyKey: "topology.kubernetes.io/zone"
+          weight: 30    
+
+test:
+  enabled: {{ .Values | get "orchestrate.test.enabled" true }}
+  image:
+    {{- .Values.orchestrate.test.image | toYaml | nindent 4 }}
+  cmd: {{ .Values | get "orchestrate.test.cmd" "e2e" }}
+  storageClass:  {{ .Values | get "orchestrate.test.storageClass" nil }}
+  environment:
+    KAFKA_URL: {{ $kafkaURL }}
+    {{- range $key,$value := .Values.orchestrate.test.environment }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+  environmentSecrets:
+    {{- range $key,$value := .Values.orchestrate.test.environmentSecrets }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}

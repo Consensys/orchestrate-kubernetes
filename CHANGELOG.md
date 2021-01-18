@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file.
 
+## v5.0.0 (2020-11-27)
+### 🆕 Features
+ * Make Orchestrate Kubernetes compatible with Orchestrate v21.1.X versions
+   * Remove orchestrate-helm-worker and orchestrate-helm-api and use the single Orchestrate Helm Chart
+   * Add Orchestrate Vault plugin to hashicorp vault
+ * Add Vault Dashbord and its Prometheus configuration
+ * Add Ingress for Orchestrate API, Grafana and Prometheus
+ * Add 4 environments values: default, staging, qa and prod
+ * Add Orchestrate Dashboard to Grafana 
+
+### ⚠ BREAKING CHANGES
+ * Reorganized helmfile structure:
+   * `.Values` are structured as:
+     * orchestrate
+       * global
+       * api
+       * keyManager
+       * txListener
+       * txSender
+       * test
+     * vaultOperator
+     * vault
+     * kafka
+     * redis
+     * postgresql
+     * observability 
+   * `environments/common.yaml.gotmpl`: all environment variables that could be pass and that are common accross all environment values set
+   * `helmfile-core.yaml`: Releases Orchestrate, Kafka, Postgres and Redis
+
 ## v4.0.0 (2020-11-27)
 
 ### 🆕 Features

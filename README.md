@@ -17,52 +17,46 @@ For more information, refer to the [Orchestrate documentation](https://docs.orch
 - [Codefi Orchestrate](#codefi-orchestrate)
 - [Compatibility](#compatibility)
 - [1. Requirements](#1-requirements)
-  - [1.1. Credentials](#11-credentials)
-  - [1.2. CLI tools](#12-cli-tools)
+  - [1.1. CLI tools](#11-cli-tools)
+  - [1.2. Credentials](#12-credentials)
 - [2. Installing Orchestrate](#2-installing-orchestrate)
-  - [2.1. Docker registry credentials](#21-docker-registry-credentials)
-  - [2.2. Namespaces and environment variables](#22-namespaces-and-environment-variables)
-  - [2.3. Environement values](#23-environement-values)
-  - [2.4. Deploy Orchestrate](#24-deploy-orchestrate)
-  - [2.5. Delete Orchestrate](#25-delete-orchestrate)
-- [3. Multi-tenancy](#3-multi-tenancy)
-- [4. Hashicorp Vault](#4-hashicorp-vault)
-- [5. Observability](#5-observability)
-  - [5.1. Prometheus dashboard](#51-prometheus-dashboard)
-  - [5.2. Grafana](#52-grafana)
+  - [2.1. Quickstart](#21-quickstart)
+  - [2.2. Delete Orchestrate](#22-delete-orchestrate)
+  - [2.3. Advanced configuration](#23-advanced-configuration)
+- [3. Hashicorp Vault](#3-hashicorp-vault)
+- [4. Observability](#4-observability)
+  - [4.1. Prometheus dashboard](#41-prometheus-dashboard)
+  - [4.2. Grafana](#42-grafana)
+- [6. Upgrading](#6-upgrading)
+  - [From Orchestrate v2.5.X to v21.1.0](#from-orchestrate-v25x-to-v2110)
 
-This repository contains an implementation example on how to deploy Orchestrate and its dependencies using Kubernetes, Helm charts and Helm files.
-This is intended to help the understanding on how to run and configure Orchestrate using Kubernetes.
+This repository contains an implementation example on how to deploy Orchestrate and its dependencies using Kubernetes and Helm charts.
 
 # Compatibility
 
-| Orchestrate-kubernetes versions | Orchestrate versions         |
-|---------------------------------|------------------------------|
-| master/HEAD                     | Orchestrate v2.6.x or higher |
-| v4.1.0                          | Orchestrate v2.6.x or higher |
-| v4.0.0                          | Orchestrate v2.5.x or higher |
-| v3.1.0                          | Orchestrate v2.5.x or higher |
-| v3.0.0                          | Orchestrate v2.4.x           |
+| Orchestrate-kubernetes versions | Orchestrate versions          |
+|---------------------------------|-------------------------------|
+| master/HEAD                     | Orchestrate v21.1.x or higher |
+| v5.0.0                          | Orchestrate v21.1.x or higher |
+| v4.0.0                          | Orchestrate v2.5.x            |
+| v3.1.0                          | Orchestrate v2.5.x            |
+| v3.0.0                          | Orchestrate v2.4.x            |
 
 # 1. Requirements
 
-## 1.1. Credentials
-
-- Credentials to pull Orchestrate's Docker images;
-
-!!! Note: 
-  If you do not have them yet, please contact [orchestrate@consensys.net](mailto:orchestrate@consensys.net).
-
-## 1.2. CLI tools
+## 1.1. CLI tools
 
 - [Kubernetes](https://kubernetes.io/) version 1.16 or upper;
 - [Helm](https://helm.sh/) version 3 or upper;
 - [Helmfile](https://github.com/roboll/helmfile);
 - [Helm diff plugin](https://github.com/databus23/helm-diff).
 
-# 2. Installing Orchestrate
+## 1.2. Credentials
 
-## 2.1. Docker registry credentials
+- Credentials to pull Orchestrate's Docker images;
+
+!!! Note: 
+  If you do not have them yet, please contact [orchestrate@consensys.net](mailto:orchestrate@consensys.net).
 
 Set your Orchestrate Docker images' credentials setting the following environment variable `$REGISTRY_USERNAME`, `$REGISTRY_PASSWORD` and optionally `$REGISTRY_URL`
 
@@ -76,100 +70,31 @@ You also need to fill the github token to retrieve the Hashicorp plugin
 export GITHUB_TOKEN=<TOKEN>
 ```
 
-## 2.2. Namespaces and environment variables
+# 2. Installing Orchestrate
 
-Set environment variables to specify what namespace Orchesrate and its dependencies will be deployed. Note: all the releases could be deployed in the same namespace. Example:
+## 2.1. Quickstart
 
-```bash
-export ORCHESTRATE_NAMESPACE=orchestrate-demo
-```
-
-Optionally, specifiy the namespace where Vault Operator, Vault, Prometheus and Grafana stack will be deployed
-```
-export VAULT_NAMESPACE=vault
-export OBSERVABILITY_NAMESPACE=observability
-```
-In that case you also have to add the value `metrics.enabled=true`. Example like `envinronments/orchestrate-demo.yaml`
-```yaml
-metrics:
-  enabled: true
-```
-
-If you use Nginx Ingress Controller and you want to expose Orchestrate and Observability APIs you can set the following environment variable:
-```bash
-export DOMAIN_NAME=orchestrate.net
-```
-It will create ingress with the following hosts:
-```
-${ORCHESTRATE_NAMESPACE}.${DOMAIN_NAME}/chain-registry
-${ORCHESTRATE_NAMESPACE}.${DOMAIN_NAME}/transaction-scheduler
-${ORCHESTRATE_NAMESPACE}.${DOMAIN_NAME}/contract-registry
-grafana.${DOMAIN_NAME}
-prometheus.${DOMAIN_NAME}
-```
-
-## 2.3. Environement values
-
-The repository provides two examples of environment values set:
-- `envinronments/orchestrate-minikube.yaml` for a deployment in minikube using the default storageClass
-- `envinronments/orchestrate-staging.yaml` for a deployment in AWS using the default "gp2" storageClass
-
-Feel free to create your own environment values with the following:
-
-1. Make a copy of the file ['environments/template-placeholder.yaml'](./environments/template-placeholder.yaml) to `environments/<OrchestrateNamespace>.yaml`
-   !!! Note:
-    Keep the name of the file and of the Kubernetes namespace in mind, as you will need them to set up Orchestrate.
-
-2. Add the environment `<OrchestrateNamespace>` into the file  `helmfile-common.yaml` 
- 
-```helmyaml
-environments:
-  <OrchestrateNamespace>:
-    values:
-      - environments/common.yaml.gotmpl
-      - environments/<OrchestrateNamespace>.yaml
-      - values/tags.yaml
-```
-
-3. (Optional) Declare the blockchain networks you want to connect Orchestrate at the initilization (separate each node by a space). This step is optional as you can register a chain by REST API once deployed.
-
-```yaml
-chainRegistry:
-  init:'{"name":"<ChainName1>","tenantID":"<tenatID1>", "urls":["<ChainURL1A>","<ChainURL1B>"]} {"name":"<ChainName2>","tenantID":"<tenatID2>", "urls":["<ChainURL2A>","<ChainURL2B>"]}}'
-```
-  
-## 2.4. Deploy Orchestrate
-
-1. Deploy Orchestrate and its dependencies with the following command:
+1. To deploy a simple Orchestrate (not production ready) and its dependencies, run the following command:
 
 ```bash
-helmfile -f helmfile.yaml -e $ORCHESTRATE_NAMESPACE apply --suppress-secrets
+helmfile apply --suppress-secrets
 ```
 
-2. Once deployed you could easily test Orchestrate APIs:
+2. Once deployed you could easily test Orchestrate API in http://localhost:8081:
 
 ```
-kubectl port-forward --namespace $ORCHESTRATE_NAMESPACE svc/api-chain-registry 8081:8081
-```
-```
-kubectl port-forward --namespace $ORCHESTRATE_NAMESPACE svc/api-contract-registry 8081:8081
-```
-```
-kubectl port-forward --namespace $ORCHESTRATE_NAMESPACE svc/api-identity-manager 8081:8081
-```
-```
-kubectl port-forward --namespace $ORCHESTRATE_NAMESPACE svc/api-transaction-scheduler 8081:8081
+kubectl port-forward --namespace orchestrate svc/orchestrate-api 8081:8081
 ```
 
 [See Orchestrate APIs documentation](https://consensys.gitlab.io/client/fr/core-stack/orchestrate/latest/)
 
-## 2.5. Delete Orchestrate
+## 2.2. Delete Orchestrate
 !!!hint
-  to delete Orchestrate's deployment and its ressources run the following command:
+  to delete Orchestrate's deployment and its ressources run the following commands:
 
 ```bash
-helmfile -f helmfile.yaml -e $ORCHESTRATE_NAMESPACE delete --purge
-kubectl delete --namespace $VAULT_NAMESPACE secret vault-unseal-keys
+helmfile delete --purge
+kubectl delete namespace orchestrate
 ```
 
 If you have deployed the observability stack, you have to delete the following
@@ -182,14 +107,111 @@ kubectl delete crd alertmanagers.monitoring.coreos.com
 kubectl delete crd thanosrulers.monitoring.coreos.com
 ```
 
-# 3. Multi-tenancy
+## 2.3. Advanced configuration
 
-- `multitenancy.enabled`: Enables this Orchestrate feature (default: false).
-- `authentication.AUTH_JWT_CLAIMS_NAMESPACE`: Tenant namespace to retrieve tenantID in OpenId or Access Token (JWT) (default: "http://tenant.info/"). You will find this information on your identity provider.
-- `authentication.AUTH_JWT_CERTIFICATE`: Certificate of authentication service **encoded in base64**. You will find the information in your identity provider.
-- `authentication.AUTH_API_KEY`: This key is used for authentication internally on Orchestrate, we highly recommend to use a UUID format.
+This repository provides few examples of environment values sets:
+- `envinronments/default.yaml`: default value set when executing `helmfile apply`
+  - Deploy a light one-replica of Orchestrate services
+  - Kafka, Zookeeper, and Postgres data are not persisted 
+  - One partition per Kafka topic 
+  - Redis is not deployed and the nonce is kept in memory
+- `envinronments/staging.yaml`: `helmfile -e staging apply`
+  - Deploy a one-replica of Orchestrate services with multitenancy
+  - Kafka, Zookeeper, and Postgres data are persisted
+  - One partition per Kafka topic 
+  - Nonce are cached in Redis
+  - Deploy the observability stack
+- `envinronments/qa.yaml`: `helmfile -e qa apply`
+- `envinronments/prod.yaml`: `helmfile -e prod apply` /!\please do not use this setup as your production environement, extra work is needed.
+  - Deploy a 3-replica of Orchestrate services with multitenancy
+  - Kafka, Zookeeper, and Postgres data are persisted and replicated to 3
+  - Three partitions per Kafka topic 
+  - Deploy the observability stack
+  - Please note that vault is not HA and requires to setup an HA backend instead of file, see https://www.vaultproject.io/docs/configuration.
 
-# 4. Hashicorp Vault
+The following tables lists the configurable values for the environments. Some of them are directly configurable bia envronement variable:
+
+| Parameter                                      | Description                                                                | Default                                                     |
+|------------------------------------------------|----------------------------------------------------------------------------|-------------------------------------------------------------|
+| `orchestrate.namespace`                        | Namespace where Orchestrate will be deployed (env `ORCHESTRATE_NAMESPACE`) | `orchestrate`                                               |
+| `orchestrate.global.imageCredentials.registry` | Docker registry where Orchestrate images are stored (env `REGISTRY_URL`)   | `docker.cloudsmith.io`                                      |
+| `orchestrate.global.imageCredentials.username` | [REQUIRED] Username of the registry (env `REGISTRY_USERNAME`)              |                                                             |
+| `orchestrate.global.imageCredentials.password` | [REQUIRED] Password of the registry (env `REGISTRY_PASSWORD`)              |                                                             |
+| `orchestrate.global.image.repository`          | Path to Orchestrate image (env `ORCHESTRATE_REPOSITORY`)                   | `docker.cloudsmith.io/consensys/docker-private/orchestrate` |
+| `orchestrate.global.image.tag`                 | Orchestrate image tag (env `ORCHESTRATE_TAG`)                              | `v21.1.0`                                                   |
+| `orchestrate.api`                              | Orchestrate API values                                                     |                                                             |
+| `orchestrate.keyManager`                       | Orchestrate Key Manager values                                             |                                                             |
+| `orchestrate.txListener`                       | Orchestrate Tx Listener values                                             | `nil`                                                       |
+| `orchestrate.txSender`                         | Orchestrate Tx Sender values                                               | `nil`                                                       |
+| `orchestrate.test.image.repository`            | Path to Orchestrate test image (env `TEST_REPOSITORY`)                     | `nil`                                                       |
+| `orchestrate.test.image.tag`                   | Orchestrate test image tag (env `TEST_TAG`)                                | `nil`                                                       |
+
+For more information about values defined in values/orchestrate.yaml.gotmpl, please see https://github.com/ConsenSys/orchestrate-helm
+
+
+| Parameter                 | Description                                                                          | Default          |
+|---------------------------|--------------------------------------------------------------------------------------|------------------|
+| `vaultOperator.namespace` | Namespace where the Vault Operator will be deployed (env `VAULT_OPERATOR_NAMESPACE`) | `vault-operator` |
+
+For more information about Vault Operator, please see https://github.com/banzaicloud/bank-vaults/tree/master/charts/vault-operator
+
+| Parameter             | Description                                                                                                                                                        | Default                                                            |
+|-----------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------|
+| `vault.namespace`     | Namespace where Hashicop Vault will be deployed (env `VAULT_NAMESPACE`)                                                                                            | `orchestrate`                                                      |
+| `vault.plugin.token`  | [REQUIRED] Github token to retrieve the [Orchestrate Hashicorp Vault Plugin](https://github.com/ConsenSys/orchestrate-hashicorp-vault-plugin) (env `GITHUB_TOKEN`) |                                                                    |
+| `vault.plugin.tag`    | Orchestrate Hashicorp Vault Plugin tag (env `VAULT_PLUGIN_TAG`)                                                                                                    | `v0.0.5`                                                           |
+| `vault.plugin.sha256` | Orchestrate Hashicorp Vault Plugin SHA256 checksum  (env `VAULT_PLUGIN_SHA256SUM`)                                                                                 | `5d63d9891463c8b7dc281759c105b45835bc8e91cde019a9bde74d858f795740` |
+
+For more information about values defined in values/vault.yaml.gotmpl, please see https://github.com/banzaicloud/bank-vaults/tree/master/operator/deploy and https://github.com/banzaicloud/bank-vaults/tree/master/charts/vault
+
+| Parameter                 | Description                                                                        | Default |
+|---------------------------|------------------------------------------------------------------------------------|---------|
+| `kafka.namespace`         | Namespace where Kafka and Zookeeper Vault will be deployed (env `KAFKA_NAMESPACE`) | `1`     |
+| `kafka.replicaCount`      | Number of Kafka nodes                                                              | `1`     |
+| `kafka.numPartitions`     | The default number of log partitions per topic                                     | `1`     |
+| `kafka.logRetentionHours` | The minimum age of a log file to be eligible for deletion due to age               | `24`    |
+| `kafka.persistence`       | Kafka data persistence using PVC                                                   |         |
+| `kafka.resources`         | Resources requested and limits for Kafka containers                                |         |
+| `zookeeper.replicaCount`  | Number of Zookeeper nodes                                                          | `1`     |
+| `zookeeper.persistence`   | Zookeeper data persistence using PVC                                               |         |
+| `zookeeper.resources`     | Resources requested and limits for Zookeeper containers                            |         |
+
+For more information about values defined in values/kafka.yaml.gotmpl, please see https://github.com/bitnami/charts/tree/master/bitnami/kafka
+
+
+| Parameter                  | Description                                                    | Default       |
+|----------------------------|----------------------------------------------------------------|---------------|
+| `redis.enabled`            | If true, Redis will be deployed                                | `true`        |
+| `redis.namespace`          | Namespace where Redis will be deployed (env `REDIS_NAMESPACE`) | `orchestrate` |
+| `redis.password`           | Redis password                                                 | `such-secret` |
+| `redis.cluster.enabled`    | Use master-slave topology                                      | `false`       |
+| `redis.cluster.slaveCount` | Number of slaves                                               | `0`           |
+
+For more information about values defined in values/redis.yaml.gotmpl, please see https://github.com/bitnami/charts/tree/master/bitnami/redis
+
+| Parameter                             | Description                                                          | Default       |
+|---------------------------------------|----------------------------------------------------------------------|---------------|
+| `postgresql.namespace`                | Namespace where Postgres will be deployed (env `POSTGRES_NAMESPACE`) | `orchestrate` |
+| `postgresql.username`                 | Username of Postgres                                                 | `api`         |
+| `postgresql.password`                 | Password of Postgres                                                 | `such-secret` |
+| `postgresql.database`                 | Database name                                                        | `api`         |
+| `postgresql.replication.enabled`      | Enable replication                                                   | `false`       |
+| `postgresql.replication.readReplicas` | Number of read replicas replicas                                     | `1`           |
+| `postgresql.persistence`              | Persistence using PVC                                                |               |
+
+For more information about values defined in values/postgresql.yaml.gotmpl, please see https://github.com/bitnami/charts/tree/master/bitnami/postgresql
+
+
+| Parameter                 | Description                                                                                                 | Default         |
+|---------------------------|-------------------------------------------------------------------------------------------------------------|-----------------|
+| `observability.enabled`   | If true, The Observability stack will be deployed as well as the service monitors and the metrics exporters | `false`         |
+| `observability.namespace` | Namespace where the observability stack will be deployed  (env `OBSERVABILITY_NAMESPACE`)                   | `observability` |
+
+| Parameter    | Description                                                                                                                                                                                                                                                                                                    | Default |
+|--------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
+| `domainName` | (Option) Domain name registered to the ingress controller of your kubernetes cluster. If not empty Orchestrate API will be exposed to {{orchestrate.namespace}}.{{domainName}}. If the observability stack is enabled grafana.{{domainName}} and prometheus.{{domainName}} will be exposed too (env `DOMAIN_NAME`) | ``      |
+
+# 3. Hashicorp Vault
 
 This helmfiles deploys [Hashicorp's Vault](https://www.vaultproject.io/) based on [Bank-Vaults](https://github.com/banzaicloud/bank-vaults). We deploy first the Vault operator, then the following ressources `values/vault.yaml`:
 
@@ -199,13 +221,13 @@ This helmfiles deploys [Hashicorp's Vault](https://www.vaultproject.io/) based o
 ```yaml
   externalConfig:
     policies:
-        {{ if .Environment.Values.metrics.enabled }}
+        {{ if .Values.observability.enabled }}
         - name: prometheus
           rules: path "sys/metrics" {
             capabilities = ["list", "read"]
             }
         {{ end }}
-      - name: api_key_manager
+      - name: orchestrate_key_manager
         rules: path "orchestrate/*" {
           capabilities = ["create", "read", "update", "list"]
           }
@@ -217,16 +239,16 @@ This helmfiles deploys [Hashicorp's Vault](https://www.vaultproject.io/) based o
     auth:
       - type: kubernetes
         roles:
-          - name: api-key-manager
-            bound_service_account_names: ["api-key-manage", "vault-secrets-webhook", "vault"]
-            bound_service_account_namespaces: ["{{ .Environment.Values.vaultNamespace }}", "{{ .Environment.Values.orchestrateNamespace }}"]
-            policies: api_key_manager
-      {{ if .Environment.Values.metrics.enabled }}
+          - name: orchestrate-key-manager
+            bound_service_account_names: ["orchestrate-key-manager", "vault-secrets-webhook", "vault"]
+            bound_service_account_namespaces: ["{{ .Values.vault.namespace }}", "{{ .Values.orchestrate.namespace }}"]
+            policies: orchestrate_key_manager
+      {{ if .Values.observability.enabled }}
       - type: kubernetes
         roles:
           - name: prometheus
             bound_service_account_names: prometheus
-            bound_service_account_namespaces: {{ .Environment.Values.observabilityNamespace }}
+            bound_service_account_namespaces: {{ .Values.observability.namespace }}
             policies: prometheus
       {{ end }}
 ```
@@ -234,33 +256,26 @@ This helmfiles deploys [Hashicorp's Vault](https://www.vaultproject.io/) based o
 - Service Account
 - RBAC configuration
 
-As set in the existing envinonment configurations in the `environments` directory, the `api-key-manager` has to be connected to the hashicorp vault with the following values:
+# 4. Observability
 
-- `SECRET_STORE`: Secret storage type (default: hashicorp)
-- `VAULT_MOUNT_POINT`: Root name of the secret engine (default: orchestrate)
-- `VAULT_ADDR`: Hostname and port of Harshicorp Vault instance. (default: http://vault.{{ .Environment.Values.vaultNamespace }}:8200)
-- `VAULT_CACERT`: Path to a PEM-encoded CA certificate file on the local disk. This file is used to verify the Vault server's SSL certificate
-- `VAULT_SKIP_VERIFY`: Skip verifying Vault's certificate before communicating with it (default: false)
+This helmfile could deploy [Prometheus Operator](https://github.com/coreos/prometheus-operator) and [Prometheus](https://prometheus.io/) based on the [Kube-Prometheus Helm chart](https://github.com/bitnami/charts/tree/master/bitnami/kube-prometheus). It also deploys Grafana with default dashboards for Orchestrate, Kubernetes, Golang, Kafka, Postgres, Redis, Hashicorp Vault
 
-A sample of configuration:
-```yaml
-keyManager:
-  VAULT_CACERT: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-  VAULT_SKIP_VERIFY: true
-```
-
-# 5. Observability
-
-This helmfile could deploy [Prometheus Operator](https://github.com/coreos/prometheus-operator) and [Prometheus](https://prometheus.io/) base on the [Helm chart](https://github.com/bitnami/charts/tree/master/bitnami/kube-prometheus). It also deploys Grafana with default dashboards for Kubernetes, Golang metrics, Kafka, Postgres, Redis
-
-## 5.1. Prometheus dashboard
+## 4.1. Prometheus dashboard
 
 ```shell
 kubectl port-forward --namespace $OBSERVABILITY_NAMESPACE svc/prometheus-kube-prometheus-prometheus 9090:9090
 ```
 
-## 5.2. Grafana
+## 4.2. Grafana
 
 ```shell
 kubectl port-forward --namespace $OBSERVABILITY_NAMESPACE svc/grafana 3000:80
 ```
+
+
+# 6. Upgrading
+
+## From Orchestrate v2.5.X to v21.1.0
+
+TODO
+

@@ -1,29 +1,27 @@
 ---
 bases:
   - helmfile-common.yaml
-    
+---
 releases:
   - name: vault-operator
-    namespace: {{ requiredEnv "VAULT_NAMESPACE" }}
+    namespace: {{ .Values.vaultOperator.namespace }}
     chart: banzaicloud-stable/vault-operator
-    version: 1.8.1
+    version: 1.10.1
     wait: true
     atomic: true
-    values:
-      - values/vault-operator.yaml
   - name: prometheus-vault-agent
-    namespace:  {{ requiredEnv "OBSERVABILITY_NAMESPACE" }}
+    namespace:  {{ .Values.observability.namespace }}
     chart: incubator/raw
     version: 0.2.3
-    condition: metrics.enabled 
+    condition: observability.enabled 
     atomic: true
     values:
       - values/prometheus-vault-agent.yaml
   - name: prometheus
-    namespace: {{ requiredEnv "OBSERVABILITY_NAMESPACE" }}
+    namespace: {{ .Values.observability.namespace }}
     chart: bitnami/kube-prometheus
-    version: 2.2.2
-    condition: metrics.enabled 
+    version: 3.3.2
+    condition: observability.enabled 
     atomic: true
     disableValidation: true
     values:
