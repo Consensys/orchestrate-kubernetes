@@ -39,6 +39,9 @@ parameters:
   environment_values:
     type: string
     default: "default"
+  run_stress_test:
+    type: boolean
+    default: false
   orchestrate_namespace:
     type: string
     default: ""
@@ -71,21 +74,26 @@ jobs:
       - init
       - run:
           name: helmfile lint
-          command: helmfile -e ${ENVIRONMENT_VALUES} lint
+          command: helmfile -e ${ENVIRONMENT_VALUES} -f helmfile-core.yaml lint
   validate:
     executor: aws-eks/python3
     steps:
       - init
       - run:
           name: helmfile dry-run
-          command: helmfile -e ${ENVIRONMENT_VALUES} apply --args --dry-run --suppress-secrets --detailed-exitcode=false
+          command: helmfile -e ${ENVIRONMENT_VALUES} -f helmfile-core.yaml apply --args --dry-run --suppress-secrets --detailed-exitcode=false
   deploy:
     executor: aws-eks/python3
     steps:
       - init
       - run:
           name: helmfile apply
-          command: helmfile -e ${ENVIRONMENT_VALUES} -f helmfile-core.yaml apply --suppress-secrets --detailed-exitcode=false --concurrency 1
+          command: helmfile -e ${ENVIRONMENT_VALUES} -f helmfile-core.yaml apply --include-tests --suppress-secrets --detailed-exitcode=false --concurrency 1
+      - when:
+          condition:
+            equal: [ default, << pipeline.parameters.environment_values >> ]
+          steps:
+            - run: kubectl annotate --overwrite ns ${ORCHESTRATE_NAMESPACE} disposable=true
   test:
     executor: aws-eks/python3
     steps:
@@ -94,8 +102,11 @@ jobs:
           version: 19.03.13
           docker_layer_caching: true
       - run:
+          name: Configure test to e2e
+          command: helm upgrade orchestrate orchestrate -n ${ORCHESTRATE_NAMESPACE} --repo https://artifacts.consensys.net/public/helm/helm/charts/ --version 1.0.0 --set test.cmd=e2e --reuse-values
+      - run:
           name: helm test
-          command: helm test orchestrate -n ${ORCHESTRATE_NAMESPACE} --logs --timeout 30m
+          command: helm test orchestrate -n ${ORCHESTRATE_NAMESPACE} --timeout 30m
       - run:
           name: Extract report from volume
           when: always
@@ -128,6 +139,28 @@ jobs:
             docker cp tmp:/usr/src/app/report.html ./report.html 
       - store_artifacts:
           path: report.html
+  stress:
+    executor: aws-eks/python3
+    steps:
+      - init
+      - run:
+          name: Configure test to stress
+          command: helm upgrade orchestrate orchestrate -n ${ORCHESTRATE_NAMESPACE} --repo https://artifacts.consensys.net/public/helm/helm/charts/ --version 1.0.0 --set test.cmd=stress --reuse-values
+      - run:
+          name: helm test
+          command: helm test orchestrate -n ${ORCHESTRATE_NAMESPACE} --logs --timeout 30m
+      - run: 
+          name: Cleanup helm test
+          when: always
+          command: |
+            kubectl delete pod orchestrate-test -n ${ORCHESTRATE_NAMESPACE} --force=true || true
+  clean-namespaces:
+    executor: aws-eks/python3
+    steps:
+      - init
+      - run:
+          name: Delete namespaces
+          command: kubectl get ns -o go-template --template='{{range .items}}{{if .metadata.annotations.disposable}}{{if eq .metadata.annotations.disposable "true"}}{{.metadata.name}} {{.metadata.creationTimestamp}}{{"\n"}}{{end}}{{end}}{{end}}' | awk '$2 <= "'$(date -d'now-2 days' -Ins --utc | sed 's/+0000/Z/')'" { print $1 }' | xargs -r kubectl delete ns --grace-period=0 --force
 
 orbs:
   aws-eks: circleci/aws-eks@1.0.0
@@ -141,33 +174,61 @@ workflows:
     jobs:
       - lint
       - validate:
-          filters:
-            branches:
-              ignore:
-                - master
           requires: 
             - lint
       - deploy:
-          filters:
-            branches:
-              only:
-                - master
           requires: 
-            - lint
+            - validate
       - test:
-          filters:
-            branches:
-              only:
-                - master
           requires: 
             - deploy
-  # schedule:
+  run-stress-test:
+    when: << pipeline.parameters.run_stress_test >>
+    jobs:
+      - stress
+  clean-namespaces:
+    triggers:
+      - schedule:
+          cron: "0 * * * *"
+          filters:
+            branches:
+              only:
+                - feature/updateOrchestrateChart2
+    jobs:
+      - clean-namespaces
+
+# workflows:
+#   default:
+#     jobs:
+#       - lint
+#       - validate:
+#           filters:
+#             branches:
+#               ignore:
+#                 - master
+#           requires: 
+#             - lint
+#       - deploy:
+#           filters:
+#             branches:
+#               only:
+#                 - master
+#           requires: 
+#             - lint
+#       - test:
+#           filters:
+#             branches:
+#               only:
+#                 - master
+#           requires: 
+#             - deploy
+  # clean-namespaces:
   #   triggers:
   #       - schedule:
-  #           cron: "0 * * * *"
+  #           cron: "0 6 * * *"
   #           filters:
   #             branches:
   #               only:
   #                 - master
   #   jobs:
-  #     - test
+  #     - clean

@@ -16,7 +16,7 @@
   "gnetId": null,
   "graphTooltip": 0,
   "id": 10,
-  "iteration": 1610554741830,
+  "iteration": 1611001709187,
   "links": [],
   "panels": [
     {
@@ -62,8 +62,8 @@
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
-        "h": 9,
-        "w": 6,
+        "h": 6,
+        "w": 4,
         "x": 0,
         "y": 1
       },
@@ -85,7 +85,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "7.3.5",
+      "pluginVersion": "7.3.7",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -151,7 +151,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 10
+        "y": 7
       },
       "id": 34,
       "panels": [],
@@ -173,10 +173,10 @@
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
-        "h": 8,
-        "w": 6,
+        "h": 6,
+        "w": 4,
         "x": 0,
-        "y": 11
+        "y": 8
       },
       "hiddenSeries": false,
       "id": 61,
@@ -198,7 +198,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "7.3.5",
+      "pluginVersion": "7.3.7",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -270,10 +270,10 @@
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
-        "h": 8,
-        "w": 6,
-        "x": 6,
-        "y": 11
+        "h": 6,
+        "w": 4,
+        "x": 4,
+        "y": 8
       },
       "hiddenSeries": false,
       "id": 52,
@@ -295,7 +295,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "7.3.5",
+      "pluginVersion": "7.3.7",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -368,10 +368,10 @@
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
-        "h": 8,
-        "w": 6,
-        "x": 12,
-        "y": 11
+        "h": 6,
+        "w": 4,
+        "x": 8,
+        "y": 8
       },
       "hiddenSeries": false,
       "id": 54,
@@ -391,7 +391,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "7.3.5",
+      "pluginVersion": "7.3.7",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -469,115 +469,10 @@
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
-        "h": 9,
-        "w": 12,
-        "x": 0,
-        "y": 19
-      },
-      "hiddenSeries": false,
-      "id": 60,
-      "legend": {
-        "alignAsTable": true,
-        "avg": true,
-        "current": true,
-        "hideEmpty": true,
-        "hideZero": true,
-        "max": true,
-        "min": true,
-        "show": true,
-        "total": true,
-        "values": true
-      },
-      "lines": true,
-      "linewidth": 1,
-      "nullPointMode": "null",
-      "options": {
-        "alertThreshold": true
-      },
-      "percentage": false,
-      "pluginVersion": "7.3.5",
-      "pointradius": 2,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
-      "targets": [
-        {
-          "expr": "sum by (status,prev_status) (rate(orchestrate_transaction_scheduler_mined_latency_seconds_count{status=\"MINED\",namespace=\"$namespace\"}[1m]))",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "{{prev_status}} to {{status}}",
-          "refId": "A"
-        },
-        {
-          "expr": "sum by (status,prev_status) (rate(orchestrate_transaction_scheduler_job_latency_seconds_count{namespace=\"$namespace\"}[1m]))",
-          "interval": "",
-          "legendFormat": "{{prev_status}} to {{status}}",
-          "refId": "F"
-        }
-      ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeRegions": [],
-      "timeShift": null,
-      "title": "Transaction status rate per second",
-      "tooltip": {
-        "shared": true,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        },
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
-    },
-    {
-      "aliasColors": {},
-      "bars": false,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": null,
-      "fieldConfig": {
-        "defaults": {
-          "custom": {}
-        },
-        "overrides": []
-      },
-      "fill": 1,
-      "fillGradient": 0,
-      "gridPos": {
-        "h": 9,
-        "w": 6,
+        "h": 6,
+        "w": 4,
         "x": 12,
-        "y": 19
+        "y": 8
       },
       "hiddenSeries": false,
       "id": 48,
@@ -600,7 +495,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "7.3.5",
+      "pluginVersion": "7.3.7",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -672,10 +567,115 @@
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
-        "h": 9,
-        "w": 12,
+        "h": 6,
+        "w": 8,
         "x": 0,
-        "y": 28
+        "y": 14
+      },
+      "hiddenSeries": false,
+      "id": 60,
+      "legend": {
+        "alignAsTable": true,
+        "avg": true,
+        "current": true,
+        "hideEmpty": true,
+        "hideZero": true,
+        "max": true,
+        "min": true,
+        "show": true,
+        "total": true,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "7.3.7",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "expr": "sum by (status,prev_status) (rate(orchestrate_transaction_scheduler_mined_latency_seconds_count{status=\"MINED\",namespace=\"$namespace\"}[1m]))",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "{{prev_status}} to {{status}}",
+          "refId": "A"
+        },
+        {
+          "expr": "sum by (status,prev_status) (rate(orchestrate_transaction_scheduler_job_latency_seconds_count{namespace=\"$namespace\"}[1m]))",
+          "interval": "",
+          "legendFormat": "{{prev_status}} to {{status}}",
+          "refId": "F"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Transaction status rate per second",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 8,
+        "y": 14
       },
       "hiddenSeries": false,
       "id": 62,
@@ -698,7 +698,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "7.3.5",
+      "pluginVersion": "7.3.7",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -723,6 +723,7 @@
         },
         {
           "expr": "sum(rate(orchestrate_transaction_scheduler_job_latency_seconds_count{status=\"PENDING\",namespace=\"$namespace\"}[1m])) - sum(rate(orchestrate_transaction_scheduler_mined_latency_seconds_count{prev_status=\"PENDING\",namespace=\"$namespace\"}[1m]))",
+          "hide": true,
           "interval": "",
           "legendFormat": "PENDING",
           "refId": "B"
@@ -776,7 +777,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 37
+        "y": 20
       },
       "id": 32,
       "panels": [],
@@ -801,7 +802,7 @@
         "h": 8,
         "w": 6,
         "x": 0,
-        "y": 38
+        "y": 21
       },
       "hiddenSeries": false,
       "id": 44,
@@ -821,7 +822,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "7.3.5",
+      "pluginVersion": "7.3.7",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -831,7 +832,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum by (check) (prometheus_healthcheck_status{service=\"$service\",pod=~\"$pod\",namespace=\"$namespace\"})",
+          "expr": "sum by (check) (orchestrate_healthcheck_status{service=\"$service\",pod=~\"$pod\",namespace=\"$namespace\"})",
           "interval": "",
           "legendFormat": "{{check}}",
           "refId": "A"
@@ -910,7 +911,7 @@
         "h": 8,
         "w": 6,
         "x": 6,
-        "y": 38
+        "y": 21
       },
       "hiddenSeries": false,
       "id": 24,
@@ -930,7 +931,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "7.3.5",
+      "pluginVersion": "7.3.7",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -940,7 +941,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum by (exported_service) (http_open_connections{service=\"$service\",exported_service!~\"healthcheck@healthcheck|prometheus@prometheus|swagger@swagger\",namespace=\"$namespace\"})",
+          "expr": "sum by (exported_service) (orchestrate_http_open_connections{service=\"$service\",exported_service!~\"healthcheck@healthcheck|prometheus@prometheus|swagger@swagger\",namespace=\"$namespace\"})",
           "interval": "",
           "legendFormat": "{{ exported_service }}",
           "refId": "A"
@@ -999,14 +1000,14 @@
         "h": 24,
         "w": 12,
         "x": 12,
-        "y": 38
+        "y": 21
       },
       "id": 58,
       "options": {
         "showLabels": false,
         "showTime": false,
         "sortOrder": "Descending",
-        "wrapLogMessage": false
+        "wrapLogMessage": true
       },
       "pluginVersion": "7.2.2",
       "targets": [
@@ -1039,7 +1040,7 @@
         "h": 8,
         "w": 6,
         "x": 0,
-        "y": 46
+        "y": 29
       },
       "hiddenSeries": false,
       "id": 17,
@@ -1059,7 +1060,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "7.3.5",
+      "pluginVersion": "7.3.7",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -1069,7 +1070,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum by (exported_service,method,code) ( rate(http_requests_total{namespace=\"$namespace\",service=\"$service\",pod=~\"$pod\",exported_service!~\"healthcheck@healthcheck|prometheus@prometheus|swagger@swagger\"}[1m]) )",
+          "expr": "sum by (exported_service,method,code) ( rate(orchestrate_http_requests_total{namespace=\"$namespace\",service=\"$service\",pod=~\"$pod\",exported_service!~\"healthcheck@healthcheck|prometheus@prometheus|swagger@swagger\"}[1m]) )",
           "interval": "",
           "legendFormat": "{{exported_service}}[{{method}}][{{ code }}]",
           "refId": "A"
@@ -1134,7 +1135,7 @@
         "h": 8,
         "w": 6,
         "x": 6,
-        "y": 46
+        "y": 29
       },
       "hiddenSeries": false,
       "id": 56,
@@ -1154,7 +1155,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "7.3.5",
+      "pluginVersion": "7.3.7",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -1164,7 +1165,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum(delta(http_requests_total{code!~\"^(1|2).*\",namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\",exported_service!=\"healthcheck@healthcheck|prometheus@prometheus\"}[5m])/5)\nby (code,service,namespace)",
+          "expr": "sum(rate(orchestrate_http_requests_total{code!~\"^(1|2).*\",namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\",exported_service!=\"healthcheck@healthcheck|prometheus@prometheus\"}[1m]))\nby (code,service,namespace)",
           "interval": "",
           "legendFormat": "{{code}}",
           "refId": "A"
@@ -1229,7 +1230,7 @@
         "h": 8,
         "w": 6,
         "x": 0,
-        "y": 54
+        "y": 37
       },
       "hiddenSeries": false,
       "id": 16,
@@ -1249,7 +1250,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "7.3.5",
+      "pluginVersion": "7.3.7",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -1259,7 +1260,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "((sum by (exported_service,method,code) (rate(http_requests_latency_seconds_sum{namespace=\"$namespace\",service=\"$service\",pod=~\"$pod\",exported_service!~\"healthcheck@healthcheck|prometheus@prometheus|swagger@swagger\"}[1m])))\n/\n(sum by (exported_service,method,code) (rate(http_requests_latency_seconds_count{namespace=\"$namespace\",service=\"$service\",pod=~\"$pod\",exported_service!~\"healthcheck@healthcheck|prometheus@prometheus|swagger@swagger\"}[1m]))))*1000",
+          "expr": "((sum by (exported_service,method,code) (rate(orchestrate_http_requests_latency_seconds_sum{namespace=\"$namespace\",service=\"$service\",pod=~\"$pod\",exported_service!~\"healthcheck@healthcheck|prometheus@prometheus|swagger@swagger\"}[1m])))\n/\n(sum by (exported_service,method,code) (rate(orchestrate_http_requests_latency_seconds_count{namespace=\"$namespace\",service=\"$service\",pod=~\"$pod\",exported_service!~\"healthcheck@healthcheck|prometheus@prometheus|swagger@swagger\"}[1m]))))*1000",
           "interval": "",
           "legendFormat": "{{exported_service}}[{{method}}][{{ code }}]",
           "refId": "A"
@@ -1324,7 +1325,7 @@
         "h": 8,
         "w": 6,
         "x": 6,
-        "y": 54
+        "y": 37
       },
       "hiddenSeries": false,
       "id": 42,
@@ -1344,7 +1345,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "7.3.5",
+      "pluginVersion": "7.3.7",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -1354,19 +1355,19 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "histogram_quantile(0.90, sum(rate(http_requests_latency_seconds_bucket{namespace=\"$namespace\",service=\"$service\",pod=~\"$pod\",exported_service!~\"healthcheck@healthcheck|prometheus@prometheus|swagger@swagger\"}[5m])) by (le,exported_service))*1000",
+          "expr": "histogram_quantile(0.90, sum(rate(orchestrate_http_requests_latency_seconds_bucket{namespace=\"$namespace\",service=\"$service\",pod=~\"$pod\",exported_service!~\"healthcheck@healthcheck|prometheus@prometheus|swagger@swagger\"}[5m])) by (le,exported_service))*1000",
           "interval": "",
           "legendFormat": "{{exported_service}}[90th]",
           "refId": "B"
         },
         {
-          "expr": "histogram_quantile(0.95, sum(rate(http_requests_latency_seconds_bucket{namespace=\"$namespace\",service=\"$service\",pod=~\"$pod\",exported_service!~\"healthcheck@healthcheck|prometheus@prometheus|swagger@swagger\"}[5m])) by (le,exported_service))*1000",
+          "expr": "histogram_quantile(0.95, sum(rate(orchestrate_http_requests_latency_seconds_bucket{namespace=\"$namespace\",service=\"$service\",pod=~\"$pod\",exported_service!~\"healthcheck@healthcheck|prometheus@prometheus|swagger@swagger\"}[5m])) by (le,exported_service))*1000",
           "interval": "",
           "legendFormat": "{{exported_service}}[95th]",
           "refId": "A"
         },
         {
-          "expr": "histogram_quantile(0.99, sum(rate(http_requests_latency_seconds_bucket{namespace=\"$namespace\",service=\"$service\",pod=~\"$pod\",exported_service!~\"healthcheck@healthcheck|prometheus@prometheus|swagger@swagger\"}[5m])) by (le,exported_service))*1000",
+          "expr": "histogram_quantile(0.99, sum(rate(orchestrate_http_requests_latency_seconds_bucket{namespace=\"$namespace\",service=\"$service\",pod=~\"$pod\",exported_service!~\"healthcheck@healthcheck|prometheus@prometheus|swagger@swagger\"}[5m])) by (le,exported_service))*1000",
           "interval": "",
           "legendFormat": "{{exported_service}}[99th]",
           "refId": "C"
@@ -1428,7 +1429,7 @@
           "value": "orchestrate-staging"
         },
         "datasource": "Prometheus",
-        "definition": "query_result(prometheus_healthcheck_status)",
+        "definition": "query_result(orchestrate_healthcheck_status)",
         "error": null,
         "hide": 0,
         "includeAll": false,
@@ -1436,7 +1437,7 @@
         "multi": false,
         "name": "namespace",
         "options": [],
-        "query": "query_result(prometheus_healthcheck_status)",
+        "query": "query_result(orchestrate_healthcheck_status)",
         "refresh": 1,
         "regex": "/.*namespace=\"([^\"]*).*/",
         "skipUrlSync": false,
@@ -1451,11 +1452,11 @@
         "allValue": null,
         "current": {
           "selected": false,
-          "text": "orchestrate-key-manager",
-          "value": "orchestrate-key-manager"
+          "text": "orchestrate-api",
+          "value": "orchestrate-api"
         },
         "datasource": "Prometheus",
-        "definition": "http_open_connections{namespace=\"$namespace\"}",
+        "definition": "orchestrate_http_open_connections{namespace=\"$namespace\"}",
         "error": null,
         "hide": 0,
         "includeAll": false,
@@ -1463,7 +1464,7 @@
         "multi": false,
         "name": "service",
         "options": [],
-        "query": "http_open_connections{namespace=\"$namespace\"}",
+        "query": "orchestrate_http_open_connections{namespace=\"$namespace\"}",
         "refresh": 1,
         "regex": "/.*service=\"([^\"]*).*/",
         "skipUrlSync": false,
@@ -1510,6 +1511,6 @@
   "timepicker": {},
   "timezone": "",
   "title": "Orchestrate",
-  "uid": "WnwvRk0G",
-  "version": 3
+  "uid": "WnwvRk0Gq",
+  "version": 4
 }

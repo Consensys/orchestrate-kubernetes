@@ -9,7 +9,6 @@ orchestrate:
       AUTH_API_KEY: with-key
   test:
     enabled: true
-    cmd: "stress"
     environment:
       STRESS_CONCURRENCY: 50
       STRESS_ITERATIONS: 5000

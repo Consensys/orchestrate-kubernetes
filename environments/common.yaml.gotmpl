@@ -37,6 +37,7 @@ orchestrate:
     image:
       repository: {{ env "TEST_REPOSITORY" | default "docker.cloudsmith.io/consensys/docker-private/orchestrate-e2e" }}
       tag: {{ env "TEST_TAG" | default $tag }}
+    cmd: {{ env "TEST_CMD" }}
     storageClass: {{ env "TEST_STORAGE" }}
     environment: {}
     environmentSecrets: {}
