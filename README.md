@@ -27,8 +27,8 @@ For more information, refer to the [Orchestrate documentation](https://docs.orch
 - [4. Observability](#4-observability)
   - [4.1. Prometheus dashboard](#41-prometheus-dashboard)
   - [4.2. Grafana](#42-grafana)
-- [6. Upgrading](#6-upgrading)
-  - [From Orchestrate v2.5.X to v21.1.0](#from-orchestrate-v25x-to-v2110)
+- [5. Upgrading](#5-upgrading)
+  - [5.1. From Orchestrate v2.5.X to v21.1.X](#51-from-orchestrate-v25x-to-v211x)
 
 This repository contains an implementation example on how to deploy Orchestrate and its dependencies using Kubernetes and Helm charts.
 
@@ -56,7 +56,7 @@ This repository contains an implementation example on how to deploy Orchestrate 
 - Credentials to pull Orchestrate's Docker images;
 
 !!! Note: 
-  If you do not have them yet, please contact [orchestrate@consensys.net](mailto:orchestrate@consensys.net).
+  To get a free trial please contact [orchestrate@consensys.net](mailto:orchestrate@consensys.net).
 
 Set your Orchestrate Docker images' credentials setting the following environment variable `$REGISTRY_USERNAME`, `$REGISTRY_PASSWORD` and optionally `$REGISTRY_URL`
 
@@ -122,7 +122,6 @@ This repository provides few examples of environment values sets:
   - Nonce are cached in Redis
   - Deploy the observability stack
 - `envinronments/qa.yaml`: `helmfile -e qa apply`
-- `envinronments/prod.yaml`: `helmfile -e prod apply` /!\please do not use this setup as your production environement, extra work is needed.
   - Deploy a 3-replica of Orchestrate services with multitenancy
   - Kafka, Zookeeper, and Postgres data are persisted and replicated to 3
   - Three partitions per Kafka topic 
@@ -213,7 +212,7 @@ For more information about values defined in values/postgresql.yaml.gotmpl, plea
 
 # 3. Hashicorp Vault
 
-This helmfiles deploys [Hashicorp's Vault](https://www.vaultproject.io/) based on [Bank-Vaults](https://github.com/banzaicloud/bank-vaults). We deploy first the Vault operator, then the following ressources `values/vault.yaml`:
+This helmfiles deploys [Hashicorp's Vault](https://www.vaultproject.io/) based on [Bank-Vaults](https://github.com/banzaicloud/bank-vaults). We deploy first the Vault operator, then the following ressources contained in `values/vault.yaml`:
 
 - Vault CRD's, including [Vault policy](https://www.vaultproject.io/docs/concepts/policies), [Vault authentication](https://www.vaultproject.io/docs/concepts/auth), and [Orchestrate Hashicorp Vault Plugin](https://github.com/ConsenSys/orchestrate-hashicorp-vault-plugin)
 
@@ -252,13 +251,13 @@ This helmfiles deploys [Hashicorp's Vault](https://www.vaultproject.io/) based o
             policies: prometheus
       {{ end }}
 ```
-- PVC
+- PVCs
 - Service Account
 - RBAC configuration
 
 # 4. Observability
 
-This helmfile could deploy [Prometheus Operator](https://github.com/coreos/prometheus-operator) and [Prometheus](https://prometheus.io/) based on the [Kube-Prometheus Helm chart](https://github.com/bitnami/charts/tree/master/bitnami/kube-prometheus). It also deploys Grafana with default dashboards for Orchestrate, Kubernetes, Golang, Kafka, Postgres, Redis, Hashicorp Vault
+This helmfile could deploy [Prometheus Operator](https://github.com/coreos/prometheus-operator) and [Prometheus](https://prometheus.io/) based on the [Kube-Prometheus Helm chart](https://github.com/bitnami/charts/tree/master/bitnami/kube-prometheus). It also deploys Grafana with default dashboards for Orchestrate, Kubernetes, Golang, Kafka, Postgres, Redis, and Hashicorp Vault
 
 ## 4.1. Prometheus dashboard
 
@@ -273,9 +272,8 @@ kubectl port-forward --namespace $OBSERVABILITY_NAMESPACE svc/grafana 3000:80
 ```
 
 
-# 6. Upgrading
+# 5. Upgrading
 
-## From Orchestrate v2.5.X to v21.1.0
+## 5.1. From Orchestrate v2.5.X to v21.1.X
 
-TODO
-
+[Read the steps to upgrade Orchestrate v2.5.X to v21.1.X](docs/upgrades/v21-1-X.md)

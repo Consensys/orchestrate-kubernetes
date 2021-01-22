@@ -62,6 +62,8 @@ api:
                     - api
             topologyKey: "topology.kubernetes.io/zone"
           weight: 30    
+  copyDB:
+    enabled: false
 
 keyManager:
   replicaCount: {{ .Values | get "orchestrate.replicaCount" 1 }}
@@ -77,11 +79,11 @@ keyManager:
     {{ $key }}: {{ $value | quote }}
     {{- end }}
   vaultAgent:
-    role: "orchestrate-key-manager"
     enabled: true
+    role: "orchestrate-key-manager"
     image:
       repository: vault
-      tag: 1.6.0
+      tag: 1.6.1
   affinity:
     podAntiAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:
@@ -96,7 +98,6 @@ keyManager:
           weight: 30    
 
 txListener:
-  replicaCount: {{ .Values | get "orchestrate.replicaCount" 1 }}
   environment:
     KAFKA_URL: {{ $kafkaURL }}
     {{- range $key,$value := .Values.orchestrate.txListener.environment }}
@@ -165,7 +166,6 @@ test:
   image:
     {{- .Values.orchestrate.test.image | toYaml | nindent 4 }}
   cmd: {{ .Values | get "orchestrate.test.cmd" "e2e" }}
-  storageClass:  {{ .Values | get "orchestrate.test.storageClass" nil }}
   environment:
     KAFKA_URL: {{ $kafkaURL }}
     {{- range $key,$value := .Values.orchestrate.test.environment }}
@@ -174,4 +174,9 @@ test:
   environmentSecrets:
     {{- range $key,$value := .Values.orchestrate.test.environmentSecrets }}
     {{ $key }}: {{ $value | quote }}
+    {{- end }}
+  report:
+    enabled: {{ .Values | get "orchestrate.test.report.enabled" false }}
+    {{- if .Values.orchestrate.test.report.storageClass }}
+    storageClass:  {{ .Values.orchestrate.test.report.storageClass }}
     {{- end }}

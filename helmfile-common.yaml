@@ -7,10 +7,6 @@ helmDefaults:
   force: false
   cleanupOnFail: true
 environments:
-  prod:
-    values:
-      - environments/common.yaml.gotmpl
-      - environments/prod.yaml
   qa:
     values:
       - environments/common.yaml.gotmpl
@@ -26,7 +22,7 @@ environments:
 repositories:
   - name: consensys
     url: https://artifacts.consensys.net/public/helm/helm/charts/
-  - name: banzaicloud-stable
+  - name: banzaicloud
     url: https://kubernetes-charts.banzaicloud.com
   - name: bitnami
     url: https://charts.bitnami.com/bitnami/

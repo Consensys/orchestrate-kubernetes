@@ -6,7 +6,7 @@ templates:
     name: "vault"
   spec:
     size: 1
-    image: vault:1.6.0
+    image: vault:1.6.1
     bankVaultsImage: banzaicloud/bank-vaults:1.8.0
 
     # Vault Pods , Services and TLS Secret annotations
@@ -105,11 +105,10 @@ templates:
     config:
       storage:
         file:
-          path: "${ .Env.VAULT_STORAGE_FILE }" # An example how Vault config environment interpolation can be used
+          path: "${ .Env.VAULT_STORAGE_FILE }"
       listener:
         tcp:
           address: "0.0.0.0:8200"
-          # Uncommenting the following line and deleting tls_cert_file and tls_key_file disables TLS
           tls_disable: true
           #tls_cert_file: /vault/tls/server.crt
           #tls_key_file: /vault/tls/server.key
