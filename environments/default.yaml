@@ -22,7 +22,7 @@ kafka:
     requests:
       memory: "1Gi"
     limits:
-      memory: 2Gi
+      memory: "2Gi"
   persistence:
     enabled: false
 

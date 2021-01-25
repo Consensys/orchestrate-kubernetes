@@ -38,7 +38,7 @@ commands:
 parameters:
   environment_values:
     type: string
-    default: "default"
+    default: ""
   run_stress_test:
     type: boolean
     default: false
@@ -96,7 +96,9 @@ jobs:
           condition:
             equal: [ default, << pipeline.parameters.environment_values >> ]
           steps:
-            - run: kubectl annotate --overwrite ns ${ORCHESTRATE_NAMESPACE} disposable=true
+            - run: 
+                name: Annotate as disposable environement
+                command: kubectl annotate --overwrite ns ${ORCHESTRATE_NAMESPACE} disposable=true
   e2e:
     executor: aws-eks/python3
     steps:
