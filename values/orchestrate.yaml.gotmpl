@@ -168,6 +168,7 @@ test:
   cmd: {{ .Values | get "orchestrate.test.cmd" "e2e" }}
   environment:
     KAFKA_URL: {{ $kafkaURL }}
+    KAFKA_CONSUMER_GROUP_NAME: group-{{ .Values | get "orchestrate.test.cmd" "e2e" }}
     {{- range $key,$value := .Values.orchestrate.test.environment }}
     {{ $key }}: {{ $value | quote }}
     {{- end }}
