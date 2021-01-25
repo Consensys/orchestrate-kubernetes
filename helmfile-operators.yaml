@@ -5,7 +5,7 @@ bases:
 releases:
   - name: vault-operator
     namespace: {{ .Values.vaultOperator.namespace }}
-    chart: banzaicloud-stable/vault-operator
+    chart: banzaicloud/vault-operator
     version: 1.10.1
     wait: true
     atomic: true

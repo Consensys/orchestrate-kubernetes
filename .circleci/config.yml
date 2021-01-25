@@ -39,6 +39,12 @@ parameters:
   environment_values:
     type: string
     default: "default"
+  run_stress_test:
+    type: boolean
+    default: false
+  run_delete_namespace:
+    type: boolean
+    default: false
   orchestrate_namespace:
     type: string
     default: ""
@@ -71,22 +77,27 @@ jobs:
       - init
       - run:
           name: helmfile lint
-          command: helmfile -e ${ENVIRONMENT_VALUES} lint
+          command: helmfile -e ${ENVIRONMENT_VALUES} -f helmfile-core.yaml lint
   validate:
     executor: aws-eks/python3
     steps:
       - init
       - run:
           name: helmfile dry-run
-          command: helmfile -e ${ENVIRONMENT_VALUES} apply --args --dry-run --suppress-secrets --detailed-exitcode=false
+          command: helmfile -e ${ENVIRONMENT_VALUES} -f helmfile-core.yaml apply --args --dry-run --suppress-secrets --detailed-exitcode=false
   deploy:
     executor: aws-eks/python3
     steps:
       - init
       - run:
           name: helmfile apply
-          command: helmfile -e ${ENVIRONMENT_VALUES} -f helmfile-core.yaml apply --suppress-secrets --detailed-exitcode=false --concurrency 1
-  test:
+          command: helmfile -e ${ENVIRONMENT_VALUES} -f helmfile-core.yaml apply --include-tests --suppress-secrets --detailed-exitcode=false --concurrency 1
+      - when:
+          condition:
+            equal: [ default, << pipeline.parameters.environment_values >> ]
+          steps:
+            - run: kubectl annotate --overwrite ns ${ORCHESTRATE_NAMESPACE} disposable=true
+  e2e:
     executor: aws-eks/python3
     steps:
       - init
@@ -94,13 +105,16 @@ jobs:
           version: 19.03.13
           docker_layer_caching: true
       - run:
+          name: Configure test to e2e
+          command: helm upgrade orchestrate orchestrate -n ${ORCHESTRATE_NAMESPACE} --repo https://artifacts.consensys.net/public/helm/helm/charts/ --version 1.0.0 --set test.cmd=e2e,test.report.enabled=true --reuse-values
+      - run:
           name: helm test
-          command: helm test orchestrate -n ${ORCHESTRATE_NAMESPACE} --logs --timeout 30m
+          command: helm test orchestrate -n ${ORCHESTRATE_NAMESPACE} --timeout 30m
       - run:
           name: Extract report from volume
           when: always
           command: |
-            kubectl run -n ${ORCHESTRATE_NAMESPACE} tmp --image=alpine:3.12.0  --overrides='{ "kind": "Pod", "apiVersion": "v1", "spec": { "containers": [{ "name": "alpine", "image": "alpine:3.12.0", "stdin":true, "volumeMounts": [{ "mountPath": "/report/output", "name": "output" }] }], "volumes": [{ "name":"output", "persistentVolumeClaim":{ "claimName": "orchestrate-test-output-pvc" } }], "restartPolicy": "Never" } }'
+            kubectl run -n ${ORCHESTRATE_NAMESPACE} tmp --image=alpine:3.12.0  --overrides='{ "kind": "Pod", "apiVersion": "v1", "spec": { "containers": [{ "name": "alpine", "image": "alpine:3.12.0", "stdin":true, "volumeMounts": [{ "mountPath": "/report/output", "name": "output" }] }], "volumes": [{ "name":"output", "persistentVolumeClaim":{ "claimName": "orchestrate-test-report-pvc" } }], "restartPolicy": "Never" } }'
             for i in {1..100}; do kubectl cp ${ORCHESTRATE_NAMESPACE}/tmp:/report/output/report.json $PWD/report.json && break; sleep 3; done
       - store_artifacts:
           path: report.json
@@ -128,6 +142,35 @@ jobs:
             docker cp tmp:/usr/src/app/report.html ./report.html 
       - store_artifacts:
           path: report.html
+  stress:
+    executor: aws-eks/python3
+    steps:
+      - init
+      - run:
+          name: Configure test to stress
+          command: helm upgrade orchestrate orchestrate -n ${ORCHESTRATE_NAMESPACE} --repo https://artifacts.consensys.net/public/helm/helm/charts/ --version 1.0.0 --set test.cmd=stress,test.report.enabled=false --reuse-values
+      - run:
+          name: helm test
+          command: helm test orchestrate -n ${ORCHESTRATE_NAMESPACE} --logs --timeout 30m
+      - run: 
+          name: Cleanup helm test
+          when: always
+          command: |
+            kubectl delete pod orchestrate-test -n ${ORCHESTRATE_NAMESPACE} --force=true || true
+  delete-namespace:
+    executor: aws-eks/python3
+    steps:
+      - init
+      - run:
+          name: Delete namespace
+          command: kubectl delete ns ${ORCHESTRATE_NAMESPACE}
+  clean-namespaces:
+    executor: aws-eks/python3
+    steps:
+      - init
+      - run:
+          name: Delete namespaces
+          command: kubectl get ns -o go-template --template='{{range .items}}{{if .metadata.annotations.disposable}}{{if eq .metadata.annotations.disposable "true"}}{{.metadata.name}} {{.metadata.creationTimestamp}}{{"\n"}}{{end}}{{end}}{{end}}' | awk '$2 <= "'$(date -d'now-2 days' -Ins --utc | sed 's/+0000/Z/')'" { print $1 }' | xargs -r kubectl delete ns --grace-period=0 --force
 
 orbs:
   aws-eks: circleci/aws-eks@1.0.0
@@ -154,20 +197,28 @@ workflows:
                 - master
           requires: 
             - lint
-      - test:
+      - e2e:
           filters:
             branches:
               only:
                 - master
           requires: 
             - deploy
-  # schedule:
-  #   triggers:
-  #       - schedule:
-  #           cron: "0 * * * *"
-  #           filters:
-  #             branches:
-  #               only:
-  #                 - master
-  #   jobs:
-  #     - test
+  run-delete-namespace:
+    when: << pipeline.parameters.run_delete_namespace >>
+    jobs:
+      - delete-namespace
+  run-stress-test:
+    when: << pipeline.parameters.run_stress_test >>
+    jobs:
+      - stress
+  schedule-clean-namespaces:
+    triggers:
+      - schedule:
+          cron: "0 5 * * *"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - clean-namespaces

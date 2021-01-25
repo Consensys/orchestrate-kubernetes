@@ -28,14 +28,12 @@ kafka:
     requests:
       memory: "1Gi"
     limits:
-      memory: "1Gi"
-  replicaCount: 1
+      memory: "2Gi"
   logRetentionHours: 5
 
 zookeeper:
   resources:
     requests:
-      memory: "1Gi"
+      memory: "512Mi"
     limits:
-      memory: "1Gi"
-  replicaCount: 1
+      memory: "2Gi"

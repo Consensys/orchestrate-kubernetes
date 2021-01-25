@@ -7,10 +7,10 @@ All notable changes to this project will be documented in this file.
  * Make Orchestrate Kubernetes compatible with Orchestrate v21.1.X versions
    * Remove orchestrate-helm-worker and orchestrate-helm-api and use the single Orchestrate Helm Chart
    * Add Orchestrate Vault plugin to hashicorp vault
+   * Add Grafana Dashboard for Orchestrate
  * Add Vault Dashbord and its Prometheus configuration
  * Add Ingress for Orchestrate API, Grafana and Prometheus
- * Add 4 environments values: default, staging, qa and prod
- * Add Orchestrate Dashboard to Grafana 
+ * Add 3 environments values: default, staging, and qa
 
 ### ⚠ BREAKING CHANGES
  * Reorganized helmfile structure:

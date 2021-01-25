@@ -37,9 +37,12 @@ orchestrate:
     image:
       repository: {{ env "TEST_REPOSITORY" | default "docker.cloudsmith.io/consensys/docker-private/orchestrate-e2e" }}
       tag: {{ env "TEST_TAG" | default $tag }}
-    storageClass: {{ env "TEST_STORAGE" }}
+    cmd: {{ env "TEST_CMD" | default "e2e" }}
     environment: {}
     environmentSecrets: {}
+    report:
+      enabled: {{ env "TEST_REPORT_ENABLED" | default false }}
+      storageClass: {{ env "TEST_REPORT_STORAGE" }}
 
 vaultOperator:
   namespace: {{ env "VAULT_OPERATOR_NAMESPACE" | default "vault-operator" }}
@@ -48,8 +51,8 @@ vault:
   namespace: {{ env "VAULT_NAMESPACE" | default ( env "ORCHESTRATE_NAMESPACE" | default $defaultNamespace ) }}
   plugin:
     token: {{ requiredEnv "GITHUB_TOKEN" }}
-    tag: {{ env "VAULT_PLUGIN_TAG" | default "v0.0.5" }}
-    sha256: {{ env "VAULT_PLUGIN_SHA256SUM" | default "5d63d9891463c8b7dc281759c105b45835bc8e91cde019a9bde74d858f795740" }}
+    tag: {{ env "VAULT_PLUGIN_TAG" | default "v0.0.8" }}
+    sha256: {{ env "VAULT_PLUGIN_SHA256SUM" | default "0a4905a51e343033450f5f46924e1fb472d4220efaa5bca34d4d36bf93afdd29" }}
 
 kafka:
   namespace: {{ env "KAFKA_NAMESPACE" | default "kafka" }}
