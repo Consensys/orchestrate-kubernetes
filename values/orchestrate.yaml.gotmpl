@@ -62,8 +62,6 @@ api:
                     - api
             topologyKey: "topology.kubernetes.io/zone"
           weight: 30    
-  copyDB:
-    enabled: false
 
 keyManager:
   replicaCount: {{ .Values | get "orchestrate.replicaCount" 1 }}
@@ -93,7 +91,7 @@ keyManager:
                 - key: app.kubernetes.io/component
                   operator: In
                   values:
-                    - api
+                    - key-manager
             topologyKey: "topology.kubernetes.io/zone"
           weight: 30    
 
