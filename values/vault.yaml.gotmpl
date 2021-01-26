@@ -32,33 +32,20 @@ templates:
           - /bin/sh
           - -c
           - |
-            apk add --no-cache jq wget
-            echo "Installing orchestrate-hashicorp-vault-plugin version '$PLUGIN_VERSION'"
-            parser=". | map(select(.tag_name == \"$PLUGIN_VERSION\"))[0].assets | map(select(.name == \"$PLUGIN_FILE\"))[0].id"
-
-            echo "Obtaining asset_id of $PLUGIN_FILE..."
-            asset_id=`wget -q --auth-no-challenge --proxy off --header="Authorization: token $GITHUB_TOKEN" --header="Accept: application/vnd.github.v3.raw" https://api.github.com/repos/$PLUGIN_REPO/releases -O - | jq "$parser"`
-            if [ -z "$asset_id" ]; then
-              echo "ERROR: version $PLUGIN_VERSION not found asset $PLUGIN_FILE"
-              exit 1
-            fi;
-
-            echo "Downloading $FILE(ID:$asset_id)..."
-            wget -q --auth-no-challenge --proxy off --header='Accept:application/octet-stream' \
-              https://$GITHUB_TOKEN:@api.github.com/repos/$PLUGIN_REPO/releases/assets/$asset_id \
+            apk add --no-cache wget
+            wget -q --header='Accept:application/octet-stream' \
+              $PLUGIN_REPO/releases/download/$PLUGIN_VERSION/$PLUGIN_FILE \
               -O "${PLUGINS_PATH}/orchestrate"
-
-            echo "File at ${PLUGINS_PATH}/orchestrate"
             chmod +x ${PLUGINS_PATH}/orchestrate
+            echo "${PLUGIN_VERSION}/${PLUGIN_FILE} downloaded"
+            echo "File at ${PLUGINS_PATH}/orchestrate"
         env: 
-          - name: GITHUB_TOKEN
-            value: {{ .Values.vault.plugin.token }}
           - name: PLUGIN_VERSION
             value: {{ .Values.vault.plugin.tag }}
           - name: PLUGIN_FILE
             value: orchestrate-hashicorp-vault-plugin
           - name: PLUGIN_REPO
-            value: ConsenSys/orchestrate-hashicorp-vault-plugin
+            value: https://github.com/ConsenSys/orchestrate-hashicorp-vault-plugin
           - name: PLUGINS_PATH
             value: /vault/plugins
         volumeMounts:

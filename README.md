@@ -65,11 +65,6 @@ export REGISTRY_USERNAME=<USER>
 export REGISTRY_PASSWORD=<PASSWORD>
 ```
 
-You also need to fill the github token to retrieve the Hashicorp plugin
-```bash
-export GITHUB_TOKEN=<TOKEN>
-```
-
 # 2. Installing Orchestrate
 
 ## 2.1. Quickstart
@@ -157,7 +152,6 @@ For more information about Vault Operator, please see https://github.com/banzaic
 | Parameter             | Description                                                                                                                                                        | Default                                                            |
 |-----------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------|
 | `vault.namespace`     | Namespace where Hashicop Vault will be deployed (env `VAULT_NAMESPACE`)                                                                                            | `orchestrate`                                                      |
-| `vault.plugin.token`  | [REQUIRED] Github token to retrieve the [Orchestrate Hashicorp Vault Plugin](https://github.com/ConsenSys/orchestrate-hashicorp-vault-plugin) (env `GITHUB_TOKEN`) |                                                                    |
 | `vault.plugin.tag`    | Orchestrate Hashicorp Vault Plugin tag (env `VAULT_PLUGIN_TAG`)                                                                                                    | `v0.0.5`                                                           |
 | `vault.plugin.sha256` | Orchestrate Hashicorp Vault Plugin SHA256 checksum  (env `VAULT_PLUGIN_SHA256SUM`)                                                                                 | `5d63d9891463c8b7dc281759c105b45835bc8e91cde019a9bde74d858f795740` |
 
