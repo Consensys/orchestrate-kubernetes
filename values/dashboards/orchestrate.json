@@ -12,12 +12,25 @@
       }
     ]
   },
+  "description": "ConsenSys Orchestrate Dashboard",
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
   "id": 10,
-  "iteration": 1611654849381,
-  "links": [],
+  "iteration": 1611847658082,
+  "links": [
+    {
+      "icon": "doc",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": true,
+      "title": "Orchestrate Documentation",
+      "tooltip": "Visit Orchestrate Documentation",
+      "type": "link",
+      "url": "https://docs.orchestrate.consensys.net"
+    }
+  ],
   "panels": [
     {
       "collapsed": false,
@@ -34,101 +47,63 @@
       "type": "row"
     },
     {
-      "aliasColors": {},
-      "bars": false,
-      "dashLength": 10,
-      "dashes": false,
       "datasource": null,
+      "description": "Latest block processed among active listening sessions",
       "fieldConfig": {
         "defaults": {
-          "custom": {}
+          "custom": {},
+          "mappings": [],
+          "noValue": "N/A",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          }
         },
         "overrides": []
       },
-      "fill": 1,
-      "fillGradient": 0,
       "gridPos": {
         "h": 7,
-        "w": 12,
+        "w": 8,
         "x": 0,
         "y": 1
       },
-      "hiddenSeries": false,
-      "id": 61,
-      "legend": {
-        "avg": false,
-        "current": false,
-        "hideEmpty": true,
-        "hideZero": true,
-        "max": false,
-        "min": false,
-        "show": true,
-        "total": false,
-        "values": false
-      },
-      "lines": true,
-      "linewidth": 1,
-      "nullPointMode": "null",
+      "id": 65,
       "options": {
-        "alertThreshold": true
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "last"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value_and_name"
       },
-      "percentage": false,
       "pluginVersion": "7.3.7",
-      "pointradius": 2,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
       "targets": [
         {
-          "expr": "sum by (status,prev_status) (increase(orchestrate_transaction_scheduler_job_latency_seconds_sum[1m])) / sum by (status,prev_status) (increase(orchestrate_transaction_scheduler_job_latency_seconds_count[1m]))*1000",
+          "expr": "orchestrate_transaction_listener_current_block{namespace=\"$namespace\",chain_uuid=~\"$chain_uuid\"} and (rate(orchestrate_transaction_listener_current_block{namespace=\"$namespace\",chain_uuid=~\"$chain_uuid\"}[$time_frame]) > 0)",
           "interval": "",
-          "legendFormat": "{{prev_status}} to {{status}}",
+          "legendFormat": "{{ chain_uuid }}",
           "refId": "A"
         }
       ],
-      "thresholds": [],
       "timeFrom": null,
-      "timeRegions": [],
       "timeShift": null,
-      "title": "Pre-sent average duration (ms)",
-      "tooltip": {
-        "shared": true,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": "0",
-          "show": true
-        },
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": "0",
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
+      "title": "Current Block",
+      "type": "stat"
     },
     {
       "aliasColors": {},
@@ -136,104 +111,8 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": null,
-      "fieldConfig": {
-        "defaults": {
-          "custom": {}
-        },
-        "overrides": []
-      },
-      "fill": 1,
-      "fillGradient": 0,
-      "gridPos": {
-        "h": 7,
-        "w": 12,
-        "x": 12,
-        "y": 1
-      },
-      "hiddenSeries": false,
-      "id": 52,
-      "legend": {
-        "avg": false,
-        "current": false,
-        "hideEmpty": true,
-        "hideZero": true,
-        "max": false,
-        "min": false,
-        "show": true,
-        "total": false,
-        "values": false
-      },
-      "lines": true,
-      "linewidth": 1,
-      "nullPointMode": "null",
-      "options": {
-        "alertThreshold": true
-      },
-      "percentage": false,
-      "pluginVersion": "7.3.7",
-      "pointradius": 2,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": true,
-      "steppedLine": false,
-      "targets": [
-        {
-          "expr": "sum by (status,prev_status) (rate(orchestrate_transaction_scheduler_mined_latency_seconds_sum[1m])) / sum by (status,prev_status) (rate(orchestrate_transaction_scheduler_mined_latency_seconds_count[1m]))",
-          "interval": "",
-          "legendFormat": "{{prev_status}} to {{status}}",
-          "refId": "A"
-        }
-      ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeRegions": [],
-      "timeShift": null,
-      "title": "Post-sent average duration (s)",
-      "tooltip": {
-        "shared": true,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "decimals": null,
-          "format": "short",
-          "label": "",
-          "logBase": 1,
-          "max": null,
-          "min": "0",
-          "show": true
-        },
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
-    },
-    {
-      "aliasColors": {},
-      "bars": false,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": null,
+      "decimals": 1,
+      "description": "Duration for a new block to be caught by the Transaction Listener",
       "fieldConfig": {
         "defaults": {
           "custom": {}
@@ -245,14 +124,14 @@
       "gridPos": {
         "h": 7,
         "w": 8,
-        "x": 0,
-        "y": 8
+        "x": 8,
+        "y": 1
       },
       "hiddenSeries": false,
       "id": 48,
       "legend": {
         "alignAsTable": true,
-        "avg": false,
+        "avg": true,
         "current": false,
         "hideEmpty": true,
         "hideZero": true,
@@ -260,7 +139,7 @@
         "min": false,
         "show": true,
         "total": false,
-        "values": false
+        "values": true
       },
       "lines": true,
       "linewidth": 1,
@@ -279,7 +158,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "rate(orchestrate_transaction_listener_current_block{namespace=\"$namespace\"}[1m])",
+          "expr": "1/(rate(orchestrate_transaction_listener_current_block{namespace=\"$namespace\",chain_uuid=~\"$chain_uuid\"}[$time_frame]) > 0)",
           "interval": "",
           "legendFormat": "{{ chain_uuid }}",
           "refId": "A"
@@ -289,7 +168,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Block processed (/s)",
+      "title": "Listener block time",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -305,8 +184,9 @@
       },
       "yaxes": [
         {
-          "format": "short",
-          "label": null,
+          "decimals": 1,
+          "format": "s",
+          "label": "",
           "logBase": 1,
           "max": null,
           "min": null,
@@ -332,6 +212,7 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": null,
+      "description": "Transaction final status breakdown between MINED, STORED and FAILED",
       "fieldConfig": {
         "defaults": {
           "custom": {},
@@ -344,19 +225,22 @@
       "gridPos": {
         "h": 7,
         "w": 8,
-        "x": 8,
-        "y": 8
+        "x": 16,
+        "y": 1
       },
       "hiddenSeries": false,
       "id": 54,
       "legend": {
-        "avg": false,
+        "alignAsTable": true,
+        "avg": true,
         "current": false,
+        "hideEmpty": true,
+        "hideZero": true,
         "max": false,
         "min": false,
         "show": true,
         "total": false,
-        "values": false
+        "values": true
       },
       "lines": true,
       "linewidth": 1,
@@ -375,13 +259,13 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "(\n  (sum(rate(orchestrate_transaction_scheduler_mined_latency_seconds_count{status=\"MINED\"}[15m])) or vector(0))\n  +\n  (sum(rate(orchestrate_transaction_scheduler_job_latency_seconds_count{status=\"STORED\"}[15m])) or vector(0))\n)\n/\n(\n  (sum(rate(orchestrate_transaction_scheduler_mined_latency_seconds_count{status=\"MINED\"}[15m])) or vector(0))\n  +\n  (sum(rate(orchestrate_transaction_scheduler_job_latency_seconds_count{status=~\"STORED|FAILED\"}[15m])) or vector(0))\n)*100",
+          "expr": "(\n  (sum(rate(orchestrate_transaction_scheduler_mined_latency_seconds_count{status=\"MINED\",chain_uuid=~\"$chain_uuid\"}[$time_frame])) or vector(0))\n  +\n  (sum(rate(orchestrate_transaction_scheduler_job_latency_seconds_count{status=\"STORED\",chain_uuid=~\"$chain_uuid\"}[$time_frame])) or vector(0))\n)\n/\n(\n  (sum(rate(orchestrate_transaction_scheduler_mined_latency_seconds_count{status=\"MINED\",chain_uuid=~\"$chain_uuid\"}[$time_frame])) or vector(0))\n  +\n  (sum(rate(orchestrate_transaction_scheduler_job_latency_seconds_count{status=~\"STORED|FAILED\",chain_uuid=~\"$chain_uuid\"}[$time_frame])) or vector(0))\n)*100",
           "interval": "",
           "legendFormat": "Sucess",
           "refId": "C"
         },
         {
-          "expr": "(sum(rate(orchestrate_transaction_scheduler_job_latency_seconds_count{status=\"FAILED\"}[15m])) or vector(0))\n/\n(\n  (sum(rate(orchestrate_transaction_scheduler_mined_latency_seconds_count{status=\"MINED\"}[15m])) or vector(0))\n  +\n  (sum(rate(orchestrate_transaction_scheduler_job_latency_seconds_count{status=~\"STORED|FAILED\"}[15m])) or vector(0))\n)*100",
+          "expr": "(sum(rate(orchestrate_transaction_scheduler_job_latency_seconds_count{status=\"FAILED\",chain_uuid=~\"$chain_uuid\"}[$time_frame])) or vector(0))\n/\n(\n  (sum(rate(orchestrate_transaction_scheduler_mined_latency_seconds_count{status=\"MINED\",chain_uuid=~\"$chain_uuid\"}[$time_frame])) or vector(0))\n  +\n  (sum(rate(orchestrate_transaction_scheduler_job_latency_seconds_count{status=~\"STORED|FAILED\",chain_uuid=~\"$chain_uuid\"}[$time_frame])) or vector(0))\n)*100",
           "interval": "",
           "legendFormat": "Fail",
           "refId": "D"
@@ -391,7 +275,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Success rate (%)",
+      "title": "Success rate",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -420,7 +304,7 @@
           "logBase": 1,
           "max": null,
           "min": "0",
-          "show": true
+          "show": false
         }
       ],
       "yaxis": {
@@ -434,6 +318,8 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": null,
+      "decimals": 0,
+      "description": "Values are calculated based on the last restart of the API and do not reflect the state in Orchestrate",
       "fieldConfig": {
         "defaults": {
           "custom": {}
@@ -445,7 +331,164 @@
       "gridPos": {
         "h": 7,
         "w": 8,
-        "x": 16,
+        "x": 0,
+        "y": 8
+      },
+      "hiddenSeries": false,
+      "id": 63,
+      "legend": {
+        "alignAsTable": true,
+        "avg": false,
+        "current": true,
+        "hideEmpty": true,
+        "hideZero": true,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "7.3.7",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [
+        {
+          "alias": "MINED",
+          "yaxis": 2
+        },
+        {
+          "alias": "FAILED",
+          "yaxis": 2
+        },
+        {
+          "alias": "STORED",
+          "yaxis": 2
+        }
+      ],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "expr": "clamp_min(sum(orchestrate_transaction_scheduler_job_latency_seconds_count{status=\"PENDING\",namespace=\"$namespace\",chain_uuid=~\"$chain_uuid\"}) - sum(orchestrate_transaction_scheduler_job_latency_seconds_count{prev_status=\"PENDING\",namespace=\"$namespace\",chain_uuid=~\"$chain_uuid\"}) -\nsum(orchestrate_transaction_scheduler_mined_latency_seconds_count{prev_status=\"PENDING\",namespace=\"$namespace\",chain_uuid=~\"$chain_uuid\"}), 0)",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "PENDING",
+          "refId": "A"
+        },
+        {
+          "expr": "sum(orchestrate_transaction_scheduler_job_latency_seconds_count{status=\"STARTED\",namespace=\"$namespace\",chain_uuid=~\"$chain_uuid\"}) - sum(orchestrate_transaction_scheduler_job_latency_seconds_count{prev_status=\"STARTED\",namespace=\"$namespace\",chain_uuid=~\"$chain_uuid\"})",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "STARTED",
+          "refId": "B"
+        },
+        {
+          "expr": "clamp_min(sum(orchestrate_transaction_scheduler_job_latency_seconds_count{status=\"RESENDING\",namespace=\"$namespace\",chain_uuid=~\"$chain_uuid\"}) - sum(orchestrate_transaction_scheduler_job_latency_seconds_count{prev_status=\"RESENDING\",namespace=\"$namespace\",chain_uuid=~\"$chain_uuid\"}), 0)",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "RESENDING",
+          "refId": "C"
+        },
+        {
+          "expr": "clamp_min(sum(orchestrate_transaction_scheduler_job_latency_seconds_count{status=\"RECOVERING\",namespace=\"$namespace\",chain_uuid=~\"$chain_uuid\"}) - sum(orchestrate_transaction_scheduler_job_latency_seconds_count{prev_status=\"RECOVERING\",namespace=\"$namespace\",chain_uuid=~\"$chain_uuid\"}), 0)",
+          "interval": "",
+          "legendFormat": "RECOVERING",
+          "refId": "D"
+        },
+        {
+          "expr": "sum(orchestrate_transaction_scheduler_mined_latency_seconds_count{status=\"MINED\",namespace=\"$namespace\",chain_uuid=~\"$chain_uuid\"})",
+          "interval": "",
+          "legendFormat": "MINED",
+          "refId": "E"
+        },
+        {
+          "expr": "sum(orchestrate_transaction_scheduler_job_latency_seconds_count{status=\"FAILED\",namespace=\"$namespace\",chain_uuid=~\"$chain_uuid\"})",
+          "interval": "",
+          "legendFormat": "FAILED",
+          "refId": "F"
+        },
+        {
+          "expr": "sum(orchestrate_transaction_scheduler_job_latency_seconds_count{status=\"STORED\",namespace=\"$namespace\",chain_uuid=~\"$chain_uuid\"})",
+          "interval": "",
+          "legendFormat": "STORED",
+          "refId": "G"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Status count",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "decimals": 0,
+          "format": "short",
+          "label": "",
+          "logBase": 1,
+          "max": null,
+          "min": "0",
+          "show": true
+        },
+        {
+          "decimals": null,
+          "format": "short",
+          "label": "",
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {
+        "CREATED to STARTED": "blue",
+        "PENDING to MINED": "green",
+        "STARTED to PENDING": "orange"
+      },
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": null,
+      "description": "Transaction throughput by status",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 8,
         "y": 8
       },
       "hiddenSeries": false,
@@ -453,13 +496,13 @@
       "legend": {
         "alignAsTable": true,
         "avg": true,
-        "current": true,
+        "current": false,
         "hideEmpty": true,
         "hideZero": true,
         "max": true,
         "min": true,
         "show": true,
-        "total": true,
+        "total": false,
         "values": true
       },
       "lines": true,
@@ -479,14 +522,14 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum by (status,prev_status) (rate(orchestrate_transaction_scheduler_mined_latency_seconds_count{status=\"MINED\",namespace=\"$namespace\"}[1m]))",
+          "expr": "sum by (status,prev_status) (rate(orchestrate_transaction_scheduler_mined_latency_seconds_count{status=\"MINED\",namespace=\"$namespace\",chain_uuid=~\"$chain_uuid\"}[$time_frame]))",
           "hide": false,
           "interval": "",
           "legendFormat": "{{prev_status}} to {{status}}",
           "refId": "A"
         },
         {
-          "expr": "sum by (status,prev_status) (rate(orchestrate_transaction_scheduler_job_latency_seconds_count{namespace=\"$namespace\"}[1m]))",
+          "expr": "sum by (status,prev_status) (rate(orchestrate_transaction_scheduler_job_latency_seconds_count{namespace=\"$namespace\",chain_uuid=~\"$chain_uuid\"}[$time_frame]))",
           "interval": "",
           "legendFormat": "{{prev_status}} to {{status}}",
           "refId": "F"
@@ -513,7 +556,7 @@
       "yaxes": [
         {
           "format": "short",
-          "label": null,
+          "label": "",
           "logBase": 1,
           "max": null,
           "min": "0",
@@ -525,6 +568,143 @@
           "logBase": 1,
           "max": null,
           "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {
+        "CREATED to STARTED": "blue",
+        "PENDING to MINED": "green",
+        "STARTED to PENDING": "yellow"
+      },
+      "bars": false,
+      "cacheTimeout": null,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": null,
+      "description": "Transaction latency by status",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": null,
+            "filterable": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 16,
+        "y": 8
+      },
+      "hiddenSeries": false,
+      "id": 61,
+      "interval": null,
+      "legend": {
+        "alignAsTable": true,
+        "avg": true,
+        "current": false,
+        "hideEmpty": true,
+        "hideZero": false,
+        "max": true,
+        "min": true,
+        "rightSide": false,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "7.3.7",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [
+        {
+          "alias": "PENDING to MINED",
+          "yaxis": 2
+        }
+      ],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "expr": "sum by (status,prev_status) (rate(orchestrate_transaction_scheduler_job_latency_seconds_sum{namespace=\"$namespace\",chain_uuid=~\"$chain_uuid\"}[$time_frame])) / sum by (status,prev_status) (rate(orchestrate_transaction_scheduler_job_latency_seconds_count{namespace=\"$namespace\",chain_uuid=~\"$chain_uuid\"}[$time_frame]))*1000",
+          "interval": "",
+          "legendFormat": "{{prev_status}} to {{status}}",
+          "refId": "A"
+        },
+        {
+          "expr": "sum by (status,prev_status) (rate(orchestrate_transaction_scheduler_mined_latency_seconds_sum{namespace=\"$namespace\",chain_uuid=~\"$chain_uuid\"}[$time_frame])) / sum by (status,prev_status) (rate(orchestrate_transaction_scheduler_mined_latency_seconds_count{namespace=\"$namespace\",chain_uuid=~\"$chain_uuid\"}[$time_frame]))",
+          "interval": "",
+          "legendFormat": "{{prev_status}} to {{status}}",
+          "refId": "B"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Average duration",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "decimals": null,
+          "format": "ms",
+          "label": "",
+          "logBase": 1,
+          "max": null,
+          "min": "0",
+          "show": true
+        },
+        {
+          "decimals": null,
+          "format": "s",
+          "label": "",
+          "logBase": 1,
+          "max": null,
+          "min": "0",
           "show": true
         }
       ],
@@ -553,6 +733,7 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": null,
+      "description": "",
       "fieldConfig": {
         "defaults": {
           "custom": {}
@@ -562,7 +743,7 @@
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
-        "h": 5,
+        "h": 7,
         "w": 8,
         "x": 0,
         "y": 16
@@ -570,13 +751,14 @@
       "hiddenSeries": false,
       "id": 44,
       "legend": {
+        "alignAsTable": true,
         "avg": false,
-        "current": false,
+        "current": true,
         "max": false,
         "min": false,
         "show": true,
         "total": false,
-        "values": false
+        "values": true
       },
       "lines": true,
       "linewidth": 1,
@@ -621,7 +803,7 @@
       },
       "yaxes": [
         {
-          "decimals": null,
+          "decimals": 0,
           "format": "short",
           "label": null,
           "logBase": 1,
@@ -635,7 +817,107 @@
           "logBase": 1,
           "max": null,
           "min": null,
+          "show": false
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": null,
+      "description": "4XX and 5XX error codes returned per second",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 8,
+        "y": 16
+      },
+      "hiddenSeries": false,
+      "id": 56,
+      "legend": {
+        "alignAsTable": true,
+        "avg": true,
+        "current": false,
+        "hideEmpty": true,
+        "hideZero": true,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "7.3.7",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "expr": "sum(rate(orchestrate_http_requests_total{code!~\"^(1|2).*\",namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\",exported_service!=\"healthcheck@healthcheck|prometheus@prometheus\"}[$time_frame]))\nby (code,service,namespace)",
+          "interval": "",
+          "legendFormat": "{{code}}",
+          "refId": "A"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "HTTP error codes",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "decimals": 0,
+          "format": "reqps",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": "0",
           "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": false
         }
       ],
       "yaxis": {
@@ -672,21 +954,22 @@
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
-        "h": 5,
+        "h": 7,
         "w": 8,
-        "x": 8,
+        "x": 16,
         "y": 16
       },
       "hiddenSeries": false,
       "id": 24,
       "legend": {
-        "avg": false,
+        "alignAsTable": true,
+        "avg": true,
         "current": false,
         "max": false,
         "min": false,
         "show": true,
         "total": false,
-        "values": false
+        "values": true
       },
       "lines": true,
       "linewidth": 1,
@@ -731,6 +1014,7 @@
       },
       "yaxes": [
         {
+          "decimals": 0,
           "format": "short",
           "label": null,
           "logBase": 1,
@@ -744,102 +1028,7 @@
           "logBase": 1,
           "max": null,
           "min": null,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
-    },
-    {
-      "aliasColors": {},
-      "bars": false,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": null,
-      "fieldConfig": {
-        "defaults": {
-          "custom": {}
-        },
-        "overrides": []
-      },
-      "fill": 1,
-      "fillGradient": 0,
-      "gridPos": {
-        "h": 5,
-        "w": 8,
-        "x": 16,
-        "y": 16
-      },
-      "hiddenSeries": false,
-      "id": 56,
-      "legend": {
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "show": true,
-        "total": false,
-        "values": false
-      },
-      "lines": true,
-      "linewidth": 1,
-      "nullPointMode": "null",
-      "options": {
-        "alertThreshold": true
-      },
-      "percentage": false,
-      "pluginVersion": "7.3.7",
-      "pointradius": 2,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
-      "targets": [
-        {
-          "expr": "sum(rate(orchestrate_http_requests_total{code!~\"^(1|2).*\",namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\",exported_service!=\"healthcheck@healthcheck|prometheus@prometheus\"}[1m]))\nby (code,service,namespace)",
-          "interval": "",
-          "legendFormat": "{{code}}",
-          "refId": "A"
-        }
-      ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeRegions": [],
-      "timeShift": null,
-      "title": "HTTP error codes",
-      "tooltip": {
-        "shared": true,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": "0",
-          "show": true
-        },
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
+          "show": false
         }
       ],
       "yaxis": {
@@ -865,18 +1054,21 @@
         "h": 7,
         "w": 8,
         "x": 0,
-        "y": 21
+        "y": 23
       },
       "hiddenSeries": false,
-      "id": 16,
+      "id": 17,
       "legend": {
-        "avg": false,
+        "alignAsTable": true,
+        "avg": true,
         "current": false,
+        "hideEmpty": true,
+        "hideZero": true,
         "max": false,
         "min": false,
         "show": true,
         "total": false,
-        "values": false
+        "values": true
       },
       "lines": true,
       "linewidth": 1,
@@ -895,9 +1087,9 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "((sum by (exported_service,method,code) (rate(orchestrate_http_requests_latency_seconds_sum{namespace=\"$namespace\",service=\"$service\",pod=~\"$pod\",exported_service!~\"healthcheck@healthcheck|prometheus@prometheus|swagger@swagger\"}[1m])))\n/\n(sum by (exported_service,method,code) (rate(orchestrate_http_requests_latency_seconds_count{namespace=\"$namespace\",service=\"$service\",pod=~\"$pod\",exported_service!~\"healthcheck@healthcheck|prometheus@prometheus|swagger@swagger\"}[1m]))))*1000",
+          "expr": "sum by (exported_service,method,code) ( rate(orchestrate_http_requests_total{namespace=\"$namespace\",service=\"$service\",pod=~\"$pod\",exported_service!~\"healthcheck@healthcheck|prometheus@prometheus|swagger@swagger\"}[$time_frame]) )",
           "interval": "",
-          "legendFormat": "{{exported_service}}[{{method}}][{{ code }}]",
+          "legendFormat": "{{exported_service}}/{{method}}/{{ code }}",
           "refId": "A"
         }
       ],
@@ -905,7 +1097,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Average duration (ms)",
+      "title": "Throughput",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -921,11 +1113,11 @@
       },
       "yaxes": [
         {
-          "format": "short",
+          "format": "reqps",
           "label": null,
           "logBase": 1,
           "max": null,
-          "min": "0",
+          "min": null,
           "show": true
         },
         {
@@ -960,18 +1152,20 @@
         "h": 7,
         "w": 8,
         "x": 8,
-        "y": 21
+        "y": 23
       },
       "hiddenSeries": false,
-      "id": 42,
+      "id": 16,
       "legend": {
-        "avg": false,
+        "alignAsTable": true,
+        "avg": true,
         "current": false,
+        "hideEmpty": true,
         "max": false,
         "min": false,
         "show": true,
         "total": false,
-        "values": false
+        "values": true
       },
       "lines": true,
       "linewidth": 1,
@@ -990,29 +1184,17 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "histogram_quantile(0.90, sum(rate(orchestrate_http_requests_latency_seconds_bucket{namespace=\"$namespace\",service=\"$service\",pod=~\"$pod\",exported_service!~\"healthcheck@healthcheck|prometheus@prometheus|swagger@swagger\"}[5m])) by (le,exported_service))*1000",
+          "expr": "((sum by (exported_service,method,code) (rate(orchestrate_http_requests_latency_seconds_sum{namespace=\"$namespace\",service=\"$service\",pod=~\"$pod\",exported_service!~\"healthcheck@healthcheck|prometheus@prometheus|swagger@swagger\"}[$time_frame])))\n/\n(sum by (exported_service,method,code) (rate(orchestrate_http_requests_latency_seconds_count{namespace=\"$namespace\",service=\"$service\",pod=~\"$pod\",exported_service!~\"healthcheck@healthcheck|prometheus@prometheus|swagger@swagger\"}[$time_frame]))))*1000",
           "interval": "",
-          "legendFormat": "{{exported_service}}[90th]",
-          "refId": "B"
-        },
-        {
-          "expr": "histogram_quantile(0.95, sum(rate(orchestrate_http_requests_latency_seconds_bucket{namespace=\"$namespace\",service=\"$service\",pod=~\"$pod\",exported_service!~\"healthcheck@healthcheck|prometheus@prometheus|swagger@swagger\"}[5m])) by (le,exported_service))*1000",
-          "interval": "",
-          "legendFormat": "{{exported_service}}[95th]",
+          "legendFormat": "{{exported_service}}/{{method}}/{{ code }}",
           "refId": "A"
-        },
-        {
-          "expr": "histogram_quantile(0.99, sum(rate(orchestrate_http_requests_latency_seconds_bucket{namespace=\"$namespace\",service=\"$service\",pod=~\"$pod\",exported_service!~\"healthcheck@healthcheck|prometheus@prometheus|swagger@swagger\"}[5m])) by (le,exported_service))*1000",
-          "interval": "",
-          "legendFormat": "{{exported_service}}[99th]",
-          "refId": "C"
         }
       ],
       "thresholds": [],
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Percentiles duration (ms)",
+      "title": "Average duration",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -1028,11 +1210,11 @@
       },
       "yaxes": [
         {
-          "format": "short",
+          "format": "ms",
           "label": null,
           "logBase": 1,
           "max": null,
-          "min": null,
+          "min": "0",
           "show": true
         },
         {
@@ -1067,18 +1249,21 @@
         "h": 7,
         "w": 8,
         "x": 16,
-        "y": 21
+        "y": 23
       },
       "hiddenSeries": false,
-      "id": 17,
+      "id": 42,
       "legend": {
-        "avg": false,
+        "alignAsTable": true,
+        "avg": true,
         "current": false,
+        "hideEmpty": true,
+        "hideZero": true,
         "max": false,
         "min": false,
         "show": true,
         "total": false,
-        "values": false
+        "values": true
       },
       "lines": true,
       "linewidth": 1,
@@ -1097,20 +1282,34 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum by (exported_service,method,code) ( rate(orchestrate_http_requests_total{namespace=\"$namespace\",service=\"$service\",pod=~\"$pod\",exported_service!~\"healthcheck@healthcheck|prometheus@prometheus|swagger@swagger\"}[1m]) )",
+          "expr": "histogram_quantile(0.90, sum(rate(orchestrate_http_requests_latency_seconds_bucket{namespace=\"$namespace\",service=\"$service\",pod=~\"$pod\",exported_service!~\"healthcheck@healthcheck|prometheus@prometheus|swagger@swagger\"}[$time_frame])) by (le,exported_service))*1000",
+          "hide": true,
           "interval": "",
-          "legendFormat": "{{exported_service}}[{{method}}][{{ code }}]",
+          "legendFormat": "{{exported_service}}/90th",
+          "refId": "B"
+        },
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(orchestrate_http_requests_latency_seconds_bucket{namespace=\"$namespace\",service=\"$service\",pod=~\"$pod\",exported_service!~\"healthcheck@healthcheck|prometheus@prometheus|swagger@swagger\"}[$time_frame])) by (le,exported_service))*1000",
+          "hide": true,
+          "interval": "",
+          "legendFormat": "{{exported_service}}/95th",
           "refId": "A"
+        },
+        {
+          "expr": "histogram_quantile(0.99, sum(rate(orchestrate_http_requests_latency_seconds_bucket{namespace=\"$namespace\",service=\"$service\",pod=~\"$pod\",exported_service!~\"healthcheck@healthcheck|prometheus@prometheus|swagger@swagger\"}[$time_frame])) by (le,exported_service))*1000",
+          "interval": "",
+          "legendFormat": "{{exported_service}}/99th",
+          "refId": "C"
         }
       ],
       "thresholds": [],
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Throughput (/s)",
+      "title": "Percentiles duration",
       "tooltip": {
         "shared": true,
-        "sort": 0,
+        "sort": 2,
         "value_type": "individual"
       },
       "type": "graph",
@@ -1123,7 +1322,7 @@
       },
       "yaxes": [
         {
-          "format": "short",
+          "format": "ms",
           "label": null,
           "logBase": 1,
           "max": null,
@@ -1136,7 +1335,7 @@
           "logBase": 1,
           "max": null,
           "min": null,
-          "show": true
+          "show": false
         }
       ],
       "yaxis": {
@@ -1156,14 +1355,14 @@
         "h": 9,
         "w": 24,
         "x": 0,
-        "y": 28
+        "y": 30
       },
       "id": 58,
       "options": {
         "showLabels": false,
         "showTime": false,
         "sortOrder": "Descending",
-        "wrapLogMessage": true
+        "wrapLogMessage": false
       },
       "pluginVersion": "7.2.2",
       "targets": [
@@ -1179,16 +1378,22 @@
       "type": "logs"
     }
   ],
-  "refresh": "5s",
+  "refresh": "10s",
   "schemaVersion": 26,
   "style": "dark",
-  "tags": [],
+  "tags": [
+    "Ethereum",
+    "Blockchain",
+    "ConsenSys",
+    "Orchestrate",
+    "Transaction"
+  ],
   "templating": {
     "list": [
       {
         "allValue": null,
         "current": {
-          "selected": true,
+          "selected": false,
           "text": "orchestrate-staging",
           "value": "orchestrate-staging"
         },
@@ -1265,6 +1470,128 @@
         "tagsQuery": "",
         "type": "query",
         "useTags": false
+      },
+      {
+        "allValue": null,
+        "current": {
+          "selected": false,
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": "Prometheus",
+        "definition": "orchestrate_transaction_listener_current_block{namespace=~\"$namespace\"}",
+        "error": null,
+        "hide": 0,
+        "includeAll": true,
+        "label": null,
+        "multi": false,
+        "name": "chain_uuid",
+        "options": [],
+        "query": "orchestrate_transaction_listener_current_block{namespace=~\"$namespace\"}",
+        "refresh": 1,
+        "regex": "/.*chain_uuid=\"([^\"]*).*/",
+        "skipUrlSync": false,
+        "sort": 0,
+        "tagValuesQuery": "",
+        "tags": [],
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      },
+      {
+        "allValue": null,
+        "current": {
+          "selected": true,
+          "text": "2m",
+          "value": "2m"
+        },
+        "error": null,
+        "hide": 0,
+        "includeAll": false,
+        "label": null,
+        "multi": false,
+        "name": "time_frame",
+        "options": [
+          {
+            "selected": false,
+            "text": "1m",
+            "value": "1m"
+          },
+          {
+            "selected": true,
+            "text": "2m",
+            "value": "2m"
+          },
+          {
+            "selected": false,
+            "text": "5m",
+            "value": "5m"
+          },
+          {
+            "selected": false,
+            "text": "10m",
+            "value": "10m"
+          },
+          {
+            "selected": false,
+            "text": "15m",
+            "value": "15m"
+          },
+          {
+            "selected": false,
+            "text": "30m",
+            "value": "30m"
+          },
+          {
+            "selected": false,
+            "text": "1h",
+            "value": "1h"
+          },
+          {
+            "selected": false,
+            "text": "2h",
+            "value": "2h"
+          },
+          {
+            "selected": false,
+            "text": "6h",
+            "value": "6h"
+          },
+          {
+            "selected": false,
+            "text": "12h",
+            "value": "12h"
+          },
+          {
+            "selected": false,
+            "text": "1d",
+            "value": "1d"
+          },
+          {
+            "selected": false,
+            "text": "2d",
+            "value": "2d"
+          },
+          {
+            "selected": false,
+            "text": "5d",
+            "value": "5d"
+          },
+          {
+            "selected": false,
+            "text": "14d",
+            "value": "14d"
+          },
+          {
+            "selected": false,
+            "text": "30d",
+            "value": "30d"
+          }
+        ],
+        "query": "1m,2m,5m,10m,15m,30m,1h,2h,6h,12h,1d,2d,5d,14d,30d",
+        "queryValue": "",
+        "skipUrlSync": false,
+        "type": "custom"
       }
     ]
   },
@@ -1276,5 +1603,5 @@
   "timezone": "",
   "title": "Orchestrate",
   "uid": "WnwvRk0Gq",
-  "version": 21
+  "version": 1
 }

@@ -42,4 +42,4 @@ postgresql:
 redis:
   cluster:
     enabled: true
-    slaveCount: 1
+    slaveCount: 2
