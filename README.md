@@ -105,23 +105,20 @@ kubectl delete crd thanosrulers.monitoring.coreos.com
 ## 2.3. Advanced configuration
 
 This repository provides few examples of environment values sets:
-- `envinronments/default.yaml`: default value set when executing `helmfile apply`
+- `environments/default.yaml`: default value set when executing `helmfile apply`
   - Deploy a light one-replica of Orchestrate services
   - Kafka, Zookeeper, and Postgres data are not persisted 
   - One partition per Kafka topic 
-  - Redis is not deployed and the nonce is kept in memory
-- `envinronments/staging.yaml`: `helmfile -e staging apply`
-  - Deploy a one-replica of Orchestrate services with multitenancy
+- `environments/qa.yaml`: `helmfile -e qa apply`
+  - Deploy a 3-replica of Orchestrate services with multitenancy
   - Kafka, Zookeeper, and Postgres data are persisted
-  - One partition per Kafka topic 
-  - Nonce are cached in Redis
-  - Deploy the observability stack
-- `envinronments/qa.yaml`: `helmfile -e qa apply`
+  - 3 partitions per Kafka topic
+- `environments/staging.yaml`: `helmfile -e staging apply`
   - Deploy a 3-replica of Orchestrate services with multitenancy
   - Kafka, Zookeeper, and Postgres data are persisted and replicated to 3
-  - Three partitions per Kafka topic 
-  - Deploy the observability stack
-  - Please note that vault is not HA and requires to setup an HA backend instead of file, see https://www.vaultproject.io/docs/configuration.
+  - 3 partitions per Kafka topic 
+  - Postgres and Redis in cluter mode with 1 master and 2 slaves
+  - Please note that vault is not HA and requires to setup an HA backend instead of file, see https://www.vaultproject.io/docs/configuration
 
 The following tables lists the configurable values for the environments. Some of them are directly configurable bia envronement variable:
 

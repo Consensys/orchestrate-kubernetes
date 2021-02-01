@@ -30,7 +30,7 @@ api:
     annotations:
       kubernetes.io/ingress.class: nginx
     hosts:
-      - host: {{ .Values.orchestrate.namespace }}.{{ .Values.domainName }}
+      - host: {{ .Values.orchestrate.namespace }}.orchestrate.{{ .Values.domainName }}
         http:
           paths:
             - path: /
