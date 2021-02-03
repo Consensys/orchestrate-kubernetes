@@ -229,10 +229,6 @@ workflows:
                 - master
           requires: 
             - deploy
-  run-delete-namespace:
-    when: << pipeline.parameters.run_delete_namespace >>
-    jobs:
-      - delete-namespace
   run-stress-test:
     when: << pipeline.parameters.only_run_stress_test >>
     jobs:
@@ -247,13 +243,3 @@ workflows:
                 - master
     jobs:
       - clean-namespaces
-  schedule-stress-test:
-    triggers:
-      - schedule:
-          cron: "0 * * * *"
-          filters:
-            branches:
-              only:
-                - master
-    jobs:
-      - stress

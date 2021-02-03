@@ -17,7 +17,7 @@
   "gnetId": null,
   "graphTooltip": 0,
   "id": 13,
-  "iteration": 1611872145470,
+  "iteration": 1612435775256,
   "links": [
     {
       "icon": "doc",
@@ -189,7 +189,7 @@
           "label": "",
           "logBase": 1,
           "max": null,
-          "min": null,
+          "min": "0",
           "show": true
         },
         {
@@ -385,7 +385,7 @@
           "refId": "A"
         },
         {
-          "expr": "sum(orchestrate_transaction_scheduler_job_latency_seconds_count{status=\"STARTED\",namespace=\"$namespace\",chain_uuid=~\"$chain_uuid\"}) - sum(orchestrate_transaction_scheduler_job_latency_seconds_count{prev_status=\"STARTED\",namespace=\"$namespace\",chain_uuid=~\"$chain_uuid\"})",
+          "expr": "clamp_min(sum(orchestrate_transaction_scheduler_job_latency_seconds_count{status=\"STARTED\",namespace=\"$namespace\",chain_uuid=~\"$chain_uuid\"}) - sum(orchestrate_transaction_scheduler_job_latency_seconds_count{prev_status=\"STARTED\",namespace=\"$namespace\",chain_uuid=~\"$chain_uuid\"}), 0)",
           "hide": false,
           "interval": "",
           "legendFormat": "STARTED",
@@ -1042,6 +1042,7 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": null,
+      "decimals": 2,
       "fieldConfig": {
         "defaults": {
           "custom": {}
@@ -1117,7 +1118,7 @@
           "label": null,
           "logBase": 1,
           "max": null,
-          "min": null,
+          "min": "0",
           "show": true
         },
         {
@@ -1393,9 +1394,9 @@
       {
         "allValue": null,
         "current": {
-          "selected": true,
-          "text": "orchestrate-staging",
-          "value": "orchestrate-staging"
+          "selected": false,
+          "text": "staging",
+          "value": "staging"
         },
         "datasource": "Prometheus",
         "definition": "query_result(orchestrate_healthcheck_status)",
@@ -1501,7 +1502,7 @@
       {
         "allValue": null,
         "current": {
-          "selected": false,
+          "selected": true,
           "text": "2m",
           "value": "2m"
         },
