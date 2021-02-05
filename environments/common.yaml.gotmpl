@@ -55,6 +55,12 @@ vault:
 
 kafka:
   namespace: {{ env "KAFKA_NAMESPACE" | default "kafka" }}
+  auth:
+    enabled: true
+    username: user1
+    password: secret
+  externalAccess:
+    enabled: {{ env "KAFKA_EXTERNAL_ACCESS" | default false }}
 
 redis:
   enabled: true

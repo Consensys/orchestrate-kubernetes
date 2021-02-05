@@ -146,25 +146,29 @@ For more information about values defined in values/orchestrate.yaml.gotmpl, ple
 
 For more information about Vault Operator, please see https://github.com/banzaicloud/bank-vaults/tree/master/charts/vault-operator
 
-| Parameter             | Description                                                                                                                                                        | Default                                                            |
-|-----------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------|
-| `vault.namespace`     | Namespace where Hashicop Vault will be deployed (env `VAULT_NAMESPACE`)                                                                                            | `orchestrate`                                                      |
-| `vault.plugin.tag`    | Orchestrate Hashicorp Vault Plugin tag (env `VAULT_PLUGIN_TAG`)                                                                                                    | `v0.0.5`                                                           |
-| `vault.plugin.sha256` | Orchestrate Hashicorp Vault Plugin SHA256 checksum  (env `VAULT_PLUGIN_SHA256SUM`)                                                                                 | `5d63d9891463c8b7dc281759c105b45835bc8e91cde019a9bde74d858f795740` |
+| Parameter             | Description                                                                        | Default                                                            |
+|-----------------------|------------------------------------------------------------------------------------|--------------------------------------------------------------------|
+| `vault.namespace`     | Namespace where Hashicop Vault will be deployed (env `VAULT_NAMESPACE`)            | `orchestrate`                                                      |
+| `vault.plugin.tag`    | Orchestrate Hashicorp Vault Plugin tag (env `VAULT_PLUGIN_TAG`)                    | `v0.0.9`                                                           |
+| `vault.plugin.sha256` | Orchestrate Hashicorp Vault Plugin SHA256 checksum  (env `VAULT_PLUGIN_SHA256SUM`) | `4919a7fcf66fe98b459e6a46f9233aae9fc2f224ccbb6a44049e2f608b9eebf5` |
 
 For more information about values defined in values/vault.yaml.gotmpl, please see https://github.com/banzaicloud/bank-vaults/tree/master/operator/deploy and https://github.com/banzaicloud/bank-vaults/tree/master/charts/vault
 
-| Parameter                 | Description                                                                        | Default |
-|---------------------------|------------------------------------------------------------------------------------|---------|
-| `kafka.namespace`         | Namespace where Kafka and Zookeeper Vault will be deployed (env `KAFKA_NAMESPACE`) | `1`     |
-| `kafka.replicaCount`      | Number of Kafka nodes                                                              | `1`     |
-| `kafka.numPartitions`     | The default number of log partitions per topic                                     | `1`     |
-| `kafka.logRetentionHours` | The minimum age of a log file to be eligible for deletion due to age               | `24`    |
-| `kafka.persistence`       | Kafka data persistence using PVC                                                   |         |
-| `kafka.resources`         | Resources requested and limits for Kafka containers                                |         |
-| `zookeeper.replicaCount`  | Number of Zookeeper nodes                                                          | `1`     |
-| `zookeeper.persistence`   | Zookeeper data persistence using PVC                                               |         |
-| `zookeeper.resources`     | Resources requested and limits for Zookeeper containers                            |         |
+| Parameter                      | Description                                                                                                                                                                                                                                                               | Default  |
+|--------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------|
+| `kafka.namespace`              | Namespace where Kafka and Zookeeper Vault will be deployed (env `KAFKA_NAMESPACE`)                                                                                                                                                                                        | `1`      |
+| `kafka.replicaCount`           | Number of Kafka nodes                                                                                                                                                                                                                                                     | `1`      |
+| `kafka.numPartitions`          | The default number of log partitions per topic                                                                                                                                                                                                                            | `1`      |
+| `kafka.logRetentionHours`      | The minimum age of a log file to be eligible for deletion due to age                                                                                                                                                                                                      | `24`     |
+| `kafka.persistence`            | Kafka data persistence using PVC                                                                                                                                                                                                                                          |          |
+| `kafka.resources`              | Resources requested and limits for Kafka containers                                                                                                                                                                                                                       |          |
+| `kafka.auth.enabled`           | Enable SASL PLAINTEXT authentification                                                                                                                                                                                                                                    | `true`   |
+| `kafka.auth.username`          | Kafka client username                                                                                                                                                                                                                                                     | `user1`  |
+| `kafka.auth.password`          | Kafka client password                                                                                                                                                                                                                                                     | `secret` |
+| `kafka.externalAccess.enabled` | Enable external access to kafka through a new load balancer (env `KAFKA_EXTERNAL_ACCESS`). If enabled, you use external-dns, and `domainName` is provided, then each kafka brokers will be reachable in kafka-{{environement}}-$i.{{kafka.namespace}}.{{domainName}}:9094 | `false`  |
+| `zookeeper.replicaCount`       | Number of Zookeeper nodes                                                                                                                                                                                                                                                 | `1`      |
+| `zookeeper.persistence`        | Zookeeper data persistence using PVC                                                                                                                                                                                                                                      |          |
+| `zookeeper.resources`          | Resources requested and limits for Zookeeper containers                                                                                                                                                                                                                   |          |
 
 For more information about values defined in values/kafka.yaml.gotmpl, please see https://github.com/bitnami/charts/tree/master/bitnami/kafka
 
@@ -197,8 +201,8 @@ For more information about values defined in values/postgresql.yaml.gotmpl, plea
 | `observability.enabled`   | If true, The Observability stack will be deployed as well as the service monitors and the metrics exporters | `false`         |
 | `observability.namespace` | Namespace where the observability stack will be deployed  (env `OBSERVABILITY_NAMESPACE`)                   | `observability` |
 
-| Parameter    | Description                                                                                                                                                                                                                                                                                                    | Default |
-|--------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
+| Parameter    | Description                                                                                                                                                                                                                                                                                                        | Default |
+|--------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
 | `domainName` | (Option) Domain name registered to the ingress controller of your kubernetes cluster. If not empty Orchestrate API will be exposed to {{orchestrate.namespace}}.{{domainName}}. If the observability stack is enabled grafana.{{domainName}} and prometheus.{{domainName}} will be exposed too (env `DOMAIN_NAME`) | ``      |
 
 # 3. Hashicorp Vault

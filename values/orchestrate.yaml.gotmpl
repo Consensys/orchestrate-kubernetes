@@ -1,6 +1,7 @@
 # Values for orchestrate.
 
 {{ $kafkaURL := printf "kafka-%s.%s:9092" .Environment.Name .Values.kafka.namespace }}
+{{ $kafkaEnv := ternary (dict "KAFKA_URL" $kafkaURL "KAFKA_SASL_ENABLED" true "KAFKA_SASL_MECHANISM" "PLAIN" "KAFKA_SASL_USER" .Values.kafka.auth.username "KAFKA_SASL_PASSWORD" .Values.kafka.auth.password) (dict "KAFKA_URL" $kafkaURL) .Values.kafka.auth.enabled }}
 
 global:
   environment:
@@ -8,10 +9,6 @@ global:
     TOPIC_TX_SENDER: "{{ .Values.orchestrate.namespace }}-tx-sender"
     TOPIC_TX_RECOVER: "{{ .Values.orchestrate.namespace }}-tx-recover"
     TOPIC_TX_DECODED: "{{ .Values.orchestrate.namespace }}-tx-decoded"
-    {{/* KAFKA_SASL_ENABLED: true
-    KAFKA_SASL_MECHANISM: PLAIN
-    KAFKA_SASL_USER: brokerUser
-    KAFKA_SASL_PASSWORD: brokerPassword */}}
     {{- range $key,$value := .Values.orchestrate.global.environment }}
     {{ $key }}: {{ $value | quote }}
     {{- end }}
@@ -42,7 +39,9 @@ api:
                 servicePort: http-svc
   {{- end }}
   environment:
-    KAFKA_URL: {{ $kafkaURL }}
+    {{- range $key, $value := $kafkaEnv }}
+    {{ $key }}: {{ $value }}
+    {{- end }}
     DB_HOST: "postgresql.{{ .Values.postgresql.namespace }}"
     DB_DATABASE: {{ .Values.postgresql.database | quote }}
     DB_USER: {{ .Values.postgresql.username | quote }}
@@ -101,7 +100,9 @@ keyManager:
 
 txListener:
   environment:
-    KAFKA_URL: {{ $kafkaURL }}
+    {{- range $key, $value := $kafkaEnv }}
+    {{ $key }}: {{ $value }}
+    {{- end }}
     {{- range $key,$value := .Values.orchestrate.txListener.environment }}
     {{ $key }}: {{ $value | quote }}
     {{- end }}
@@ -132,7 +133,9 @@ txListener:
 txSender:
   replicaCount: {{ .Values | get "orchestrate.replicaCount" 1 }}
   environment:
-    KAFKA_URL: {{ $kafkaURL }}
+    {{- range $key, $value := $kafkaEnv }}
+    {{ $key }}: {{ $value }}
+    {{- end }}
     REDIS_HOST: "redis-master.{{ .Values.redis.namespace }}"
     REDIS_PORT: "6379"
     REDIS_PASSWORD: {{ .Values.redis.password | quote }}
@@ -169,7 +172,9 @@ test:
     {{- .Values.orchestrate.test.image | toYaml | nindent 4 }}
   cmd: {{ .Values | get "orchestrate.test.cmd" "e2e" }}
   environment:
-    KAFKA_URL: {{ $kafkaURL }}
+    {{- range $key, $value := $kafkaEnv }}
+    {{ $key }}: {{ $value }}
+    {{- end }}
     KAFKA_CONSUMER_GROUP_NAME: group-{{ .Values | get "orchestrate.test.cmd" "e2e" }}
     {{- range $key,$value := .Values.orchestrate.test.environment }}
     {{ $key }}: {{ $value | quote }}

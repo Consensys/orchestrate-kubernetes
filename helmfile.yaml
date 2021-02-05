@@ -5,5 +5,4 @@ bases:
 helmfiles:
   - helmfile-operators.yaml
   - helmfile-observability.yaml
-  - helmfile-kafka.yaml
   - helmfile-core.yaml
