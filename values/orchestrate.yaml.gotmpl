@@ -8,6 +8,10 @@ global:
     TOPIC_TX_SENDER: "{{ .Values.orchestrate.namespace }}-tx-sender"
     TOPIC_TX_RECOVER: "{{ .Values.orchestrate.namespace }}-tx-recover"
     TOPIC_TX_DECODED: "{{ .Values.orchestrate.namespace }}-tx-decoded"
+    {{/* KAFKA_SASL_ENABLED: true
+    KAFKA_SASL_MECHANISM: PLAIN
+    KAFKA_SASL_USER: brokerUser
+    KAFKA_SASL_PASSWORD: brokerPassword */}}
     {{- range $key,$value := .Values.orchestrate.global.environment }}
     {{ $key }}: {{ $value | quote }}
     {{- end }}

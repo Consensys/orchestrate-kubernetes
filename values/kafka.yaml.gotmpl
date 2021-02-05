@@ -2,6 +2,30 @@
 replicaCount: {{ .Values | get "kafka.replicaCount" 1 }}
 numPartitions: {{ .Values | get "kafka.numPartitions" 1 }}
 logRetentionHours: {{ .Values | get "kafka.logRetentionHours" 24 }}
+{{- if .Values.domainName }}
+externalAccess:
+  enabled: true
+  service:
+    type: LoadBalancer
+    port: 9094
+    annotations:
+      external-dns.alpha.kubernetes.io/hostname: "{{ printf "{{ .targetPod }}" }}.{{ .Values.domainName }}"
+  autoDiscovery:
+    enabled: true
+serviceAccount:
+  create: true
+rbac:
+  create: true
+{{- end }}
+{{/* auth:
+  clientProtocol: sasl
+  jaas:
+    clientUsers:
+      - brokerUser
+    clientPassword:
+      - brokerPassword
+    zookeeperUser: zookeeperUser
+    zookeeperPassword: zookeeperPassword */}}
 ## Pod Disruption Budget configuration
 ## The PDB will only be created if replicaCount is greater than 1
 ## ref: https://kubernetes.io/docs/concepts/workloads/pods/disruptions
@@ -73,3 +97,9 @@ zookeeper:
                 values:
                   - zookeeper
           topologyKey: "topology.kubernetes.io/zone"
+  {{/* auth:
+    enabled: true
+    serverUsers: zookeeperUser
+    serverPasswords: zookeeperPassword
+    clientUser: zookeeperUser
+    clientPassword: zookeeperPassword */}}
