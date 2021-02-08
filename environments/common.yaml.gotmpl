@@ -12,7 +12,7 @@ orchestrate:
       password: {{ requiredEnv "REGISTRY_PASSWORD" }}
     image:
       repository: {{ env "ORCHESTRATE_REPOSITORY" | default "docker.cloudsmith.io/consensys/docker-private/orchestrate" }}
-      tag: {{ env "ORCHESTRATE_TAG" | default $tag }}
+      tag: {{ env "ORCHESTRATE_TAG" | default $tag | quote }}
     environment: {}
     environmentSecrets: {}
 
@@ -36,7 +36,7 @@ orchestrate:
   test:
     image:
       repository: {{ env "TEST_REPOSITORY" | default "docker.cloudsmith.io/consensys/docker-private/orchestrate-e2e" }}
-      tag: {{ env "TEST_TAG" | default $tag }}
+      tag: {{ env "TEST_TAG" | default $tag | quote }}
     cmd: {{ env "TEST_CMD" | default "e2e" }}
     environment: {}
     environmentSecrets: {}

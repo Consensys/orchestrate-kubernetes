@@ -113,13 +113,6 @@ txListener:
     {{- range $key,$value := .Values.orchestrate.txListener.environmentSecrets }}
     {{ $key }}: {{ $value | quote }}
     {{- end }}
-  resources:
-    requests:
-      cpu: "100m"
-      memory: 16Mi
-    limits:
-      cpu: "300m"
-      memory: 64Mi
   affinity:
     podAntiAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:
@@ -149,13 +142,6 @@ txSender:
     {{- range $key,$value := .Values.orchestrate.txSender.environmentSecrets }}
     {{ $key }}: {{ $value | quote }}
     {{- end }}
-  resources:
-    requests:
-      cpu: "100m"
-      memory: 16Mi
-    limits:
-      cpu: "300m"
-      memory: 64Mi
   affinity:
     podAntiAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:
