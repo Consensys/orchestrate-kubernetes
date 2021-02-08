@@ -30,6 +30,9 @@ api:
     enabled: true
     annotations:
       kubernetes.io/ingress.class: nginx
+      nginx.ingress.kubernetes.io/affinity: cookie
+      nginx.ingress.kubernetes.io/affinity-mode: persistent
+      nginx.ingress.kubernetes.io/session-cookie-max-age: "2"
     hosts:
       - host: {{ .Values.orchestrate.namespace }}.orchestrate.{{ .Values.domainName }}
         http:

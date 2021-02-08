@@ -3,19 +3,18 @@ orchestrate:
   global:
     environment:
       MULTI_TENANCY_ENABLED: true
-      AUTH_JWT_CLAIMS_NAMESPACE: http://orchestrate.info
+      AUTH_JWT_CLAIMS_NAMESPACE: orchestrate.namespace
       AUTH_JWT_CERTIFICATE: MIIDYjCCAkoCCQC9pJWk7qdipjANBgkqhkiG9w0BAQsFADBzMQswCQYDVQQGEwJGUjEOMAwGA1UEBwwFUGFyaXMxEjAQBgNVBAoMCUNvbnNlblN5czEQMA4GA1UECwwHUGVnYVN5czEuMCwGA1UEAwwlZTJlLXRlc3RzLm9yY2hlc3RyYXRlLmNvbnNlbnN5cy5wYXJpczAeFw0xOTEyMjcxNjI5MTdaFw0yMDEyMjYxNjI5MTdaMHMxCzAJBgNVBAYTAkZSMQ4wDAYDVQQHDAVQYXJpczESMBAGA1UECgwJQ29uc2VuU3lzMRAwDgYDVQQLDAdQZWdhU3lzMS4wLAYDVQQDDCVlMmUtdGVzdHMub3JjaGVzdHJhdGUuY29uc2Vuc3lzLnBhcmlzMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAo0NqWqI3TSi1uOBvCUquclWo4LcsYT21tNUXQ8YyqVYRSsiBv+ZKZBCjD8XklLPih40kFSe+r6DNca5/LH/okQIdc8nsQg+BLCkXeH2NFv+QYtPczAw4YhS6GVxJk3u9sfp8NavWBcQbD3MMDpehMOvhSl0zoP/ZlH6ErKHNtoQgUpPNVQGysNU21KpClmIDD/L1drsbq+rFiDrcVWaOLwGxr8SBd/0b4ngtcwH16RJaxcIXXT5AVia1CNdzmU5/AIg3OfgzvKn5AGrMZBsmGAiCyn4/P3PnuF81/WHukk5ETLnzOH+vC2elSmZ8y80HCGeqOiQ1rs66L936wX8cDwIDAQABMA0GCSqGSIb3DQEBCwUAA4IBAQCNcTs3n/Ps+yIZDH7utxTOaqpDTCB10MzPmb22UAal89couIT6R0fAu14p/LTkxdb2STDySsQY2/Lv6rPdFToHGUI9ZYOTYW1GOWkt1EAao9BzdsoJVwmTON6QnOBKy/9RxlhWP+XSWVsY0te6KYzS7rQyzQoJQeeBNMpUnjiQji9kKi5j9rbVMdjIb4HlmYrcE95ps+oFkyJoA1HLVytAeOjJPXGToNlv3k2UPJzOFUM0ujWWeBTyHMCmZ4RhlrfzDNffY5dlW82USjc5dBlzRyZalXSjhcVhK4asUodomVntrvCShp/8C9LpbQZ+ugFNE8J6neStWrhpRU9/sBJx
     environmentSecrets:
       AUTH_API_KEY: with-key
-  
   test:
     enabled: true
     environment:
       TEST_GLOBAL_DATA: '{"nodes":{"besu_1":{"URLs":["http://besu-validator1.besu:8545"],"privateAddress":"A1aVtMxLCUHmBVHXoZzzBgPbW/wj5axDpW9X8l91SGo=","fundedPublicKeys":["0x7e654d251da770a068413677967f6d3ea2fea9e4","0x93f7274c9059e601be4512f656b57b830e019e41"],"fundedPrivateKeys":["56202652FDFFD802B7252A456DBD8F3ECC0352BBDE76C23B40AFE8AEBD714E2E","1476c66de79a57e8ab4cadceccbe858c99e5edf3bffea5404b15322b5421e18c"]},"besu_2":{"URLs":["http://besu-validator2.besu:8545"],"privateAddress":"Ko2bVqD+nNlNYL5EE7y3IdOnviftjiizpjRt+HTuFBs="},"besu_3":{"URLs":["http://besu-validator3.besu:8545"],"privateAddress":"k2zXEin4Ip/qBGlRkJejnGWdP9cjkK+DAvKNW31L2C8="},"quorum_1":{"URLs":["http://quorum-node1.quorum:8545"],"privateAddress":"BULeR8JyUWhiuuCMU/HLA0Q5pzkYT+cHII3ZKBey3Bo=","PrivateTxManager":{"url":"http://quorum-node1.quorum:9080","type":"Tessera"},"fundedPublicKeys":["0x6009608a02a7a15fd6689d6dad560c44e9ab61ff"],"fundedPrivateKeys":["86B021CCB810F26A30445B85F71E4C1596A11A97DDF9B9E348AC93D1DA6735BC"]},"quorum_2":{"privateAddress":"QfeDAys9MPDs2XHExtc84jKGHxZg/aj52DTh0vtA3Xc="},"quorum_3":{"privateAddress":"1iTZde/ndBHvzhcl7V68x44Vx7pl8nwx9LqnM/AfJUg="},"geth":{"URLs":["http://geth.geth:8545"],"fundedPublicKeys":["0xdbb881a51CD4023E4400CEF3ef73046743f08da3"],"fundedPrivateKeys":["5FBB50BFF6DFAD35C4A374C9237BA2F7EAED9C6868E0108CB259B62D68029B1A"]}}}'
       CUCUMBER_PATHS: "/features"
       ARTIFACTS_PATH: "/artifacts"
-      CUCUMBER_CONCURRENCY: 10
-      CUCUMBER_STEPS_TIMEOUT: '50s'
+      CUCUMBER_CONCURRENCY: 5
+      CUCUMBER_STEPS_TIMEOUT: '1m'
       CUCUMBER_FORMAT: "cucumber"
       CUCUMBER_OUTPUTPATH: "/report/output/report.json"
       STRESS_CONCURRENCY: 25

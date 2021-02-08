@@ -34,43 +34,11 @@ commands:
             curl -L --fail --retry 3 -o ./helmfile  https://github.com/roboll/helmfile/releases/download/v0.130.0/helmfile_linux_amd64
             chmod +x ./helmfile
             sudo mv ./helmfile /usr/local/bin/helmfile
-  stress:
-    description: "Run stress test"
-    parameters:
-      orchestrate_namespace:
-        default: "staging"
-        type: string
-    steps:
-      - when:
-          condition:
-            or:
-              - equal: [ true, << pipeline.parameters.run_stress_test >> ]
-              - equal: [ true, << pipeline.parameters.only_run_stress_test >> ]
-          steps:
-            - run:
-                name: Configure test to stress
-                command: helm upgrade orchestrate orchestrate -n <<parameters.orchestrate_namespace>> --repo https://artifacts.consensys.net/public/helm/helm/charts/ --version 1.0.0 --set test.cmd=stress,test.report.enabled=false --reuse-values
-            - run:
-                name: Run stress test
-                command: helm test orchestrate -n <<parameters.orchestrate_namespace>> --logs --timeout 30m
-            - run: 
-                name: Cleanup helm test
-                command: |
-                  kubectl delete pod orchestrate-test -n <<parameters.orchestrate_namespace>> --force=true || true
 
 parameters:
   environment_values:
     type: string
     default: ""  
-  only_run_stress_test:
-    type: boolean
-    default: false
-  run_stress_test:
-    type: boolean
-    default: false
-  run_delete_namespace:
-    type: boolean
-    default: false
   orchestrate_namespace:
     type: string
     default: ""
@@ -125,66 +93,6 @@ jobs:
             - run: 
                 name: Annotate as disposable environement
                 command: kubectl annotate --overwrite ns ${ORCHESTRATE_NAMESPACE} disposable=true
-  tests:
-    executor: aws-eks/python3
-    steps:
-      - init
-      - setup_remote_docker:
-          version: 19.03.13
-          docker_layer_caching: true
-      - run:
-          name: Configure test to e2e
-          command: helm upgrade orchestrate orchestrate -n ${ORCHESTRATE_NAMESPACE} --repo https://artifacts.consensys.net/public/helm/helm/charts/ --version 1.0.0 --set test.cmd=e2e,test.report.enabled=true --reuse-values
-      - run:
-          name: Run e2e test
-          command: helm test orchestrate -n ${ORCHESTRATE_NAMESPACE} --timeout 30m
-      - run:
-          name: Extract report from volume
-          when: always
-          command: |
-            kubectl run -n ${ORCHESTRATE_NAMESPACE} tmp --image=alpine:3.12.0  --overrides='{ "kind": "Pod", "apiVersion": "v1", "spec": { "containers": [{ "name": "alpine", "image": "alpine:3.12.0", "stdin":true, "volumeMounts": [{ "mountPath": "/report/output", "name": "output" }] }], "volumes": [{ "name":"output", "persistentVolumeClaim":{ "claimName": "orchestrate-test-report-pvc" } }], "restartPolicy": "Never" } }'
-            for i in {1..100}; do kubectl cp ${ORCHESTRATE_NAMESPACE}/tmp:/report/output/report.json $PWD/report.json && break; sleep 3; done
-      - store_artifacts:
-          path: report.json
-      - run: 
-          name: Cleanup helm test
-          when: always
-          command: |
-            kubectl delete pod orchestrate-test -n ${ORCHESTRATE_NAMESPACE} --force=true || true
-            kubectl delete pod tmp -n ${ORCHESTRATE_NAMESPACE} --force=true || true
-      - run: 
-          name: Prepare docker for build report
-          when: always
-          command: |
-            echo ${REGISTRY_PASSWORD} | docker login ${REGISTRY_URL} --username ${REGISTRY_USERNAME} --password-stdin
-            docker pull ${REPORT_REPOSITORY}
-      - run: 
-          name: Build report
-          when: always
-          # Impossible to mount volumes with docker run (see https://circleci.com/docs/2.0/building-docker-images/)
-          # Use docker cp instead
-          command: |
-            docker run --name tmp -it -d ${REPORT_REPOSITORY} sh
-            docker cp $PWD/report.json tmp:/usr/src/app/report.json 
-            docker exec tmp npm start 
-            docker cp tmp:/usr/src/app/report.html ./report.html 
-      - store_artifacts:
-          path: report.html
-      - stress:
-          orchestrate_namespace: ${ORCHESTRATE_NAMESPACE}
-  stress:
-    executor: aws-eks/python3
-    steps:
-      - init
-      - stress:
-          orchestrate_namespace: ${ORCHESTRATE_NAMESPACE}
-  delete-namespace:
-    executor: aws-eks/python3
-    steps:
-      - init
-      - run:
-          name: Delete namespace
-          command: kubectl delete ns ${ORCHESTRATE_NAMESPACE}
   clean-namespaces:
     executor: aws-eks/python3
     steps:
@@ -202,8 +110,6 @@ version: 2.1
 
 workflows:
   default:
-    when:
-      not: << pipeline.parameters.only_run_stress_test >>
     jobs:
       - lint:
           filters:
@@ -217,26 +123,17 @@ workflows:
                 - master
           requires: 
             - lint
+  circleci-api:
+    when: 
+      and: 
+        - << pipeline.parameters.environment_values >>
+        - << pipeline.parameters.orchestrate_namespace >>
+    jobs:
       - deploy:
           filters:
             branches:
               only:
                 - master
-      - tests:
-          filters:
-            branches:
-              only:
-                - master
-          requires: 
-            - deploy
-  run-delete-namespace:
-    when: << pipeline.parameters.run_delete_namespace >>
-    jobs:
-      - delete-namespace
-  run-stress-test:
-    when: << pipeline.parameters.only_run_stress_test >>
-    jobs:
-      - stress
   schedule-clean-namespaces:
     triggers:
       - schedule:
@@ -247,13 +144,3 @@ workflows:
                 - master
     jobs:
       - clean-namespaces
-  schedule-stress-test:
-    triggers:
-      - schedule:
-          cron: "0 * * * *"
-          filters:
-            branches:
-              only:
-                - master
-    jobs:
-      - stress
