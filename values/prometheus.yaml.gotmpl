@@ -1,5 +1,7 @@
 ---
 prometheus:
+  querySpec:
+    maxConcurrency: 100
   {{- if .Values.observability.enabled }}
   serviceAccount:
     name: prometheus
@@ -36,10 +38,10 @@ prometheus:
       nginx.ingress.kubernetes.io/auth-signin: 'https://forwardauth.{{ .Values.domainName }}?uri=$scheme://$host$request_uri'
       {{- end }}
       kubernetes.io/ingress.class: "nginx"
-    hosts:
-      - name: prometheus.{{ .Values.domainName }}
-        path: /
-    tls:
+    hostname: prometheus.{{ .Values.domainName }}
+    externalUrl: https://prometheus.{{ .Values.domainName }}
+    path: /
+    extraTls:
       - hosts:
         - prometheus.{{ .Values.domainName }}
   {{- end }}
