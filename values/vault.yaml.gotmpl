@@ -6,7 +6,7 @@ templates:
     name: "vault"
   spec:
     size: 1
-    image: vault:1.6.1
+    image: vault:1.6.2
     bankVaultsImage: banzaicloud/bank-vaults:1.8.0
 
     # Vault Pods , Services and TLS Secret annotations
@@ -27,12 +27,11 @@ templates:
 
     vaultInitContainers:
       - name: orchestrate-plugin
-        image: alpine:3.12
+        image: alpine:3.13
         command:
           - /bin/sh
           - -c
           - |
-            apk add --no-cache wget
             wget -q --header='Accept:application/octet-stream' \
               $PLUGIN_REPO/releases/download/$PLUGIN_VERSION/$PLUGIN_FILE \
               -O "${PLUGINS_PATH}/orchestrate"
@@ -106,6 +105,10 @@ templates:
         statsd_address: localhost:9125
       {{ end }}
 
+    vaultEnvsConfig:
+      - name: VAULT_STORAGE_FILE
+        value: "/vault/file"
+
     serviceMonitorEnabled: {{ .Values.observability.enabled }}
 
     # See: https://github.com/banzaicloud/bank-vaults#example-external-vault-configuration for more details.
@@ -151,10 +154,6 @@ templates:
           command: orchestrate
           sha256: {{ .Values.vault.plugin.sha256 }}
           type: secret
-
-    vaultEnvsConfig:
-      - name: VAULT_STORAGE_FILE
-        value: "/vault/file"
 
     # Marks presence of Istio, which influences things like port namings
     istioEnabled: false
