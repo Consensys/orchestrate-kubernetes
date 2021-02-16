@@ -33,17 +33,6 @@ orchestrate:
     environment: {}
     environmentSecrets: {}
 
-  test:
-    image:
-      repository: {{ env "TEST_REPOSITORY" | default "docker.cloudsmith.io/consensys/docker-private/orchestrate-e2e" }}
-      tag: {{ env "TEST_TAG" | default $tag | quote }}
-    cmd: {{ env "TEST_CMD" | default "e2e" }}
-    environment: {}
-    environmentSecrets: {}
-    report:
-      enabled: {{ env "TEST_REPORT_ENABLED" | default false }}
-      storageClass: {{ env "TEST_REPORT_STORAGE" }}
-
 vaultOperator:
   namespace: {{ env "VAULT_OPERATOR_NAMESPACE" | default "vault-operator" }}
 

@@ -154,26 +154,3 @@ txSender:
                     - tx-sender
             topologyKey: "topology.kubernetes.io/zone"
           weight: 30    
-
-test:
-  enabled: {{ .Values | get "orchestrate.test.enabled" true }}
-  image:
-    {{- .Values.orchestrate.test.image | toYaml | nindent 4 }}
-  cmd: {{ .Values | get "orchestrate.test.cmd" "e2e" }}
-  environment:
-    {{- range $key, $value := $kafkaEnv }}
-    {{ $key }}: {{ $value }}
-    {{- end }}
-    KAFKA_CONSUMER_GROUP_NAME: group-{{ .Values | get "orchestrate.test.cmd" "e2e" }}
-    {{- range $key,$value := .Values.orchestrate.test.environment }}
-    {{ $key }}: {{ $value | quote }}
-    {{- end }}
-  environmentSecrets:
-    {{- range $key,$value := .Values.orchestrate.test.environmentSecrets }}
-    {{ $key }}: {{ $value | quote }}
-    {{- end }}
-  report:
-    enabled: {{ .Values | get "orchestrate.test.report.enabled" false }}
-    {{- if .Values.orchestrate.test.report.storageClass }}
-    storageClass:  {{ .Values.orchestrate.test.report.storageClass }}
-    {{- end }}
