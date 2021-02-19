@@ -2,13 +2,12 @@ observability:
   enabled: true
 
 kafka:
+  logRetentionHours: 1
   resources:
     requests:
       memory: "1Gi"
     limits:
       memory: "2Gi"
-  persistence:
-    enabled: false
 
 zookeeper:
   resources:
@@ -16,9 +15,4 @@ zookeeper:
       memory: "512Mi"
     limits:
       memory: "1Gi"
-  persistence:
-    enabled: false
 
-postgresql:
-  persistence:
-    enabled: false

@@ -1,8 +1,10 @@
-# Values for orchestrate.
-
 {{ $kafkaURL := printf "kafka-%s.%s:9092" .Environment.Name .Values.kafka.namespace }}
 {{ $kafkaEnv := ternary (dict "KAFKA_URL" $kafkaURL "KAFKA_SASL_ENABLED" true "KAFKA_SASL_MECHANISM" "PLAIN" "KAFKA_SASL_USER" .Values.kafka.auth.username "KAFKA_SASL_PASSWORD" .Values.kafka.auth.password) (dict "KAFKA_URL" $kafkaURL) .Values.kafka.auth.enabled }}
+{{ $replicaCount := .Values | get "orchestrate.replicaCount" 1 }}
+{{/* API Proxy cache TTL */}}
+{{ $proxyCacheTTL := "2" }}
 
+# Values for orchestrate.
 global:
   environment:
     LOG_FORMAT: json
@@ -24,7 +26,7 @@ global:
     enabled: {{ .Values.observability.enabled }}
 
 api:
-  replicaCount: {{ .Values | get "orchestrate.replicaCount" 1 }}
+  replicaCount: {{ $replicaCount }}
   {{- if .Values.domainName }}
   ingress:
     enabled: true
@@ -32,7 +34,7 @@ api:
       kubernetes.io/ingress.class: nginx
       nginx.ingress.kubernetes.io/affinity: cookie
       nginx.ingress.kubernetes.io/affinity-mode: persistent
-      nginx.ingress.kubernetes.io/session-cookie-max-age: "2"
+      nginx.ingress.kubernetes.io/session-cookie-max-age: {{ $proxyCacheTTL | quote }}
     hosts:
       - host: {{ .Values.orchestrate.namespace }}.orchestrate.{{ .Values.domainName }}
         http:
@@ -45,17 +47,31 @@ api:
     {{- range $key, $value := $kafkaEnv }}
     {{ $key }}: {{ $value }}
     {{- end }}
+    {{- if .Values.postgresqlHA.enabled }}
+    DB_HOST: "postgresql-ha-pgpool.{{ .Values.postgresqlHA.namespace }}"
+    DB_DATABASE: {{ .Values.postgresqlHA.postgresql.database | quote }}
+    DB_USER: {{ .Values.postgresqlHA.postgresql.username | quote }}
+    {{- else }}
     DB_HOST: "postgresql.{{ .Values.postgresql.namespace }}"
     DB_DATABASE: {{ .Values.postgresql.database | quote }}
     DB_USER: {{ .Values.postgresql.username | quote }}
+    {{- end }}
+    PROXY_CACHE_TTL: {{ $proxyCacheTTL }}s
     {{- range $key,$value := .Values.orchestrate.api.environment }}
     {{ $key }}: {{ $value | quote }}
     {{- end }}
+  service:
+    sessionAffinityTimeout: {{ $proxyCacheTTL }}
   environmentSecrets:
+    {{- if .Values.postgresqlHA.enabled }}
+    DB_PASSWORD: {{ .Values.postgresqlHA.postgresql.password | quote }}
+    {{- else }}
     DB_PASSWORD: {{ .Values.postgresql.password | quote }}
+    {{- end }}
     {{- range $key,$value := .Values.orchestrate.api.environmentSecrets }}
     {{ $key }}: {{ $value | quote }}
     {{- end }}
+  {{- if gt $replicaCount 1 }}
   affinity:
     podAntiAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:
@@ -67,10 +83,11 @@ api:
                   values:
                     - api
             topologyKey: "topology.kubernetes.io/zone"
-          weight: 30    
+          weight: 100    
+  {{- end }}
 
 keyManager:
-  replicaCount: {{ .Values | get "orchestrate.replicaCount" 1 }}
+  replicaCount: {{ $replicaCount }}
   environment:
     VAULT_ADDR: http://vault.{{ .Values.vault.namespace }}:8200
     VAULT_CACERT: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
@@ -87,7 +104,8 @@ keyManager:
     role: "orchestrate-key-manager"
     image:
       repository: vault
-      tag: 1.6.1
+      tag: 1.6.2
+  {{- if gt $replicaCount 1 }}
   affinity:
     podAntiAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:
@@ -99,7 +117,8 @@ keyManager:
                   values:
                     - key-manager
             topologyKey: "topology.kubernetes.io/zone"
-          weight: 30    
+          weight: 100    
+  {{- end }}
 
 txListener:
   environment:
@@ -113,21 +132,9 @@ txListener:
     {{- range $key,$value := .Values.orchestrate.txListener.environmentSecrets }}
     {{ $key }}: {{ $value | quote }}
     {{- end }}
-  affinity:
-    podAntiAffinity:
-      preferredDuringSchedulingIgnoredDuringExecution:
-        - podAffinityTerm:
-            labelSelector:
-              matchExpressions:
-                - key: app.kubernetes.io/component
-                  operator: In
-                  values:
-                    - tx-listener
-            topologyKey: "topology.kubernetes.io/zone"
-          weight: 30
 
 txSender:
-  replicaCount: {{ .Values | get "orchestrate.replicaCount" 1 }}
+  replicaCount: {{ $replicaCount }}
   environment:
     {{- range $key, $value := $kafkaEnv }}
     {{ $key }}: {{ $value }}
@@ -142,6 +149,7 @@ txSender:
     {{- range $key,$value := .Values.orchestrate.txSender.environmentSecrets }}
     {{ $key }}: {{ $value | quote }}
     {{- end }}
+  {{- if gt $replicaCount 1 }}
   affinity:
     podAntiAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:
@@ -153,4 +161,5 @@ txSender:
                   values:
                     - tx-sender
             topologyKey: "topology.kubernetes.io/zone"
-          weight: 30    
+          weight: 100    
+  {{- end }}

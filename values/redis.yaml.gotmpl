@@ -1,19 +1,35 @@
+{{ $replicaCount := .Values | get "kafka.replicaCount" 1 }}
+{{ $slaveCount := .Values | get "redis.cluster.slaveCount" 0 }}
 ---
 password: {{ .Values.redis.password | quote }}
 master:
-  persistence:
-    enabled: false
-slave:
   persistence:
     enabled: false
 configmap: |-
   notify-keyspace-events Kg
   maxmemory 100mb
   maxmemory-policy allkeys-lru
-cluster:
-  enabled: {{ .Values | get "redis.cluster.enabled" false }}
-  slaveCount: {{ .Values | get "redis.cluster.slaveCount" 0 }}
 metrics:
   enabled: {{ .Values | get "observability.enabled" false }}
   serviceMonitor:
     enabled: {{ .Values | get "observability.enabled" false }}
+{{- if gt $slaveCount 1 }}
+{{/* sentinel:
+  enabled: true */}}
+cluster:
+  enabled: {{ .Values | get "redis.cluster.enabled" false }}
+  slaveCount: {{ $slaveCount }}
+slave:
+  persistence:
+    enabled: false
+affinity:
+  podAntiAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+            - key: app
+              operator: In
+              values:
+                - redis
+        topologyKey: "topology.kubernetes.io/zone"
+{{- end }}

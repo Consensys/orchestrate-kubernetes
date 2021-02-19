@@ -1,5 +1,7 @@
+{{ $replicaCount := .Values | get "kafka.replicaCount" 1 }}
+
 ---
-replicaCount: {{ .Values | get "kafka.replicaCount" 1 }}
+replicaCount: {{ $replicaCount }}
 numPartitions: {{ .Values | get "kafka.numPartitions" 1 }}
 logRetentionHours: {{ .Values | get "kafka.logRetentionHours" 24 }}
 {{- if and .Values.domainName .Values.kafka.externalAccess.enabled }}
@@ -26,8 +28,10 @@ auth:
     - {{ .Values.kafka.auth.username }}
     clientPasswords:
     - {{ .Values.kafka.auth.password }}
-    zookeeperUser: zookeeperUser
-    zookeeperPassword: zookeeperPassword
+    {{- if .Values.zookeeper.auth.enabled }}
+    zookeeperUser: {{ .Values.zookeeper.auth.serverUsers }}
+    zookeeperPassword: {{ .Values.zookeeper.auth.serverPasswords }}
+    {{- end }}
 {{- end }}
 ## Pod Disruption Budget configuration
 ## The PDB will only be created if replicaCount is greater than 1
@@ -52,6 +56,7 @@ resources:
   limits:
     memory: {{ .Values | get "kafka.resources.limits.memory" "8Gi" }} 
     cpu:  {{ .Values | get "kafka.resources.limits.cpu" "500m" }} 
+{{- if gt $replicaCount 1 }}
 affinity:
   podAntiAffinity:
     requiredDuringSchedulingIgnoredDuringExecution:
@@ -75,6 +80,7 @@ affinity:
                 values:
                   - zookeeper
           topologyKey: "kubernetes.io/hostname"
+{{- end }}
 zookeeper:
   replicaCount: {{ .Values | get "zookeeper.replicaCount" 1 }}
   resources:
@@ -86,10 +92,11 @@ zookeeper:
       cpu: {{ .Values | get "zookeeper.resources.limits.cpu" "300m" }}
   persistence:
     enabled: {{ .Values | get "zookeeper.persistence.enabled" true }}
-    size: 2Gi
+    size: {{ .Values | get "zookeeper.persistence.size" "2Gi" }}
     storageClass: {{ .Values | get "zookeeper.persistence.storageClass" nil }}
   metrics:
     enabled: {{ .Values | get "observability.enabled" false }}
+  {{- if gt $replicaCount 1 }}
   affinity:
     podAntiAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
@@ -100,11 +107,12 @@ zookeeper:
                 values:
                   - zookeeper
           topologyKey: "topology.kubernetes.io/zone"
-{{- if .Values.kafka.auth.enabled }}
+  {{- end }}
+  {{- if .Values.zookeeper.auth.enabled }}
   auth:
     enabled: true
-    serverUsers: zookeeperUser
-    serverPasswords: zookeeperPassword
-    clientUser: zookeeperUser
-    clientPassword: zookeeperPassword
-{{- end }}
+    serverUsers: {{ .Values.zookeeper.auth.serverUsers }}
+    serverPasswords: {{ .Values.zookeeper.auth.serverPasswords }}
+    clientUser: {{ .Values.zookeeper.auth.clientUser }}
+    clientPassword: {{ .Values.zookeeper.auth.clientPassword }}
+  {{- end }}

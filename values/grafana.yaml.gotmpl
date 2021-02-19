@@ -24,25 +24,14 @@ ingress:
 {{- end }}
 
 dashboardsConfigMaps:
-  - configMapName: kubernetes-dashboard 
-    fileName: kubernetes.json
-  - configMapName: kafka-dashboard
-    fileName: kafka.json
-  - configMapName: golang-dashboard
-    fileName: golang.json
-  - configMapName: postgres-dashboard
-    fileName: postgres.json
-  - configMapName: redis-dashboard
-    fileName: redis.json
-  - configMapName: vault-dashboard
-    fileName: vault.json
-  - configMapName: orchestrate-dashboard
-    fileName: orchestrate.json
-  - configMapName: prometheus-dashboard
-    fileName: prometheus.json
+  {{- range $_, $file := ( exec "bash" (list "-c" "echo -n dashboards/*.json") | splitList " " ) }}
+  - configMapName: {{ base $file | replace (ext $file) "" }}-dashboard
+    fileName: {{ base $file }}
+  {{- end }}
 
 datasources:
   secretName: datasource-secret
 
 admin:
-  password: frenchfries
+  user: {{ .Values.observability.grafana.user }}
+  password: {{ .Values.observability.grafana.password }}

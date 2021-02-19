@@ -12,7 +12,7 @@ observability:
 
 kafka:
   numPartitions: 3
-  logRetentionHours: 1
+  logRetentionHours: 12
   resources:
     requests:
       memory: "1Gi"
