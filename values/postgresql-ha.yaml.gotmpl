@@ -1,0 +1,41 @@
+---
+pgpool:
+  replicaCount: {{ .Values | get "postgresqlHA.pgpool.replicaCount" 1 }}
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+                - key: app.kubernetes.io/component
+                  operator: In
+                  values:
+                    - pgpool
+            topologyKey: "topology.kubernetes.io/zone"
+          weight: 100    
+postgresql:
+  database: {{ .Values.postgresqlHA.postgresql.database | quote }}
+  username: {{ .Values.postgresqlHA.postgresql.username | quote }}
+  password: {{ .Values.postgresqlHA.postgresql.password | quote }}
+  replicaCount: {{ .Values | get "postgresqlHA.postgresql.replicaCount" 1 }}
+  repmgrPassword: {{ .Values.postgresqlHA.postgresql.repmgrPassword | quote }}
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+                - key: app.kubernetes.io/component
+                  operator: In
+                  values:
+                    - postgresql
+            topologyKey: "topology.kubernetes.io/zone"
+          weight: 100    
+persistence:
+  enabled: {{ .Values | get "postgresqlHA.persistence.enabled" true }}
+  size: {{ .Values | get "postgresqlHA.persistence.size" "8Gi" }}
+  storageClass: {{ .Values | get "postgresqlHA.persistence.storageClass" nil }}
+metrics:
+  enabled: {{ .Values | get "observability.enabled" false }}
+  serviceMonitor:
+    enabled: {{ .Values | get "observability.enabled" false }}

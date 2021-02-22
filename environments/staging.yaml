@@ -20,11 +20,19 @@ zookeeper:
   replicaCount: 3
 
 postgresql:
-  replication:
-    enabled: true
-    readReplicas: 2
+  enabled: false
+
+postgresqlHA:
+  enabled: true
+  postgresql:
+    replicaCount: 3
+  pgpool:
+    replicaCount: 3
 
 redis:
   cluster:
     enabled: true
     slaveCount: 2
+
+vault:
+  replicaCount: 3

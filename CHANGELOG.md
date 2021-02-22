@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## v5.1.0 (Unreleased)
+
+ * Make Vault, Postgres, Redis Highly Available in Multi-Availability Zones
+
 ## v5.0.0 (2020-11-27)
 ### 🆕 Features
  * Make Orchestrate Kubernetes compatible with Orchestrate v21.1.X versions

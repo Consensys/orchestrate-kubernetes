@@ -28,14 +28,23 @@ releases:
     namespace: {{ .Values.postgresql.namespace }}
     chart: bitnami/postgresql
     atomic: true
+    condition: postgresql.enabled
     version: 8.6.12
     values:
       - values/postgresql.yaml.gotmpl
+  - name: postgresql-ha
+    namespace: {{ .Values.postgresqlHA.namespace }}
+    chart: bitnami/postgresql-ha
+    atomic: true
+    condition: postgresqlHA.enabled
+    version: 6.5.2
+    values:
+      - values/postgresql-ha.yaml.gotmpl
   - name: orchestrate
     namespace: {{ .Values.orchestrate.namespace }}
     chart: consensys/orchestrate
     atomic: true
-    version: 1.0.0
+    version: 1.0.1
     needs:
       - {{ .Values.kafka.namespace }}/kafka-{{ .Environment.Name }}
       - {{ .Values.vault.namespace }}/vault

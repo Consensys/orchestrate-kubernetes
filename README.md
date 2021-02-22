@@ -107,18 +107,18 @@ kubectl delete crd thanosrulers.monitoring.coreos.com
 This repository provides few examples of environment values sets:
 - `environments/default.yaml`: default value set when executing `helmfile apply`
   - Deploy a light one-replica of Orchestrate services
-  - Kafka, Zookeeper, and Postgres data are not persisted 
   - One partition per Kafka topic 
 - `environments/qa.yaml`: `helmfile -e qa apply`
-  - Deploy a 3-replica of Orchestrate services with multitenancy
-  - Kafka, Zookeeper, and Postgres data are persisted
+  - Deploy a Orchestrate services with multitenancy
   - 3 partitions per Kafka topic
 - `environments/staging.yaml`: `helmfile -e staging apply`
-  - Deploy a 3-replica of Orchestrate services with multitenancy
-  - Kafka, Zookeeper, and Postgres data are persisted and replicated to 3
-  - 3 partitions per Kafka topic 
-  - Postgres and Redis in cluter mode with 1 master and 2 slaves
-  - Please note that vault is not HA and requires to setup an HA backend instead of file, see https://www.vaultproject.io/docs/configuration
+  - Deploy a 3-replica of Orchestrate services with multitenancy distributed accros Availability-Zones
+  - 3-replica of Kafka and Zookeeper with 3 partitions per Kafka topic
+  - Postgres cluster with 1 master and 2 slaves. With PGPool-II and Repmgr 
+  - Redis in cluter mode with 1 master and 2 slaves
+  - 3 Hashicorp Vault with raft integrated storage
+
+Note: All the passwords and usernames of every dependendcies are located in `environments/common.yaml.gotmpl`. Do not forget to change, eventually extract, those values depending on how you want to manage those secrets.
 
 The following tables lists the configurable values for the environments. Some of them are directly configurable bia envronement variable:
 
@@ -149,26 +149,34 @@ For more information about Vault Operator, please see https://github.com/banzaic
 | Parameter             | Description                                                                        | Default                                                            |
 |-----------------------|------------------------------------------------------------------------------------|--------------------------------------------------------------------|
 | `vault.namespace`     | Namespace where Hashicop Vault will be deployed (env `VAULT_NAMESPACE`)            | `orchestrate`                                                      |
+| `vault.replicaCount`  | Number of Vault instance                                                           | `1`                                                                |
 | `vault.plugin.tag`    | Orchestrate Hashicorp Vault Plugin tag (env `VAULT_PLUGIN_TAG`)                    | `v0.0.9`                                                           |
 | `vault.plugin.sha256` | Orchestrate Hashicorp Vault Plugin SHA256 checksum  (env `VAULT_PLUGIN_SHA256SUM`) | `4919a7fcf66fe98b459e6a46f9233aae9fc2f224ccbb6a44049e2f608b9eebf5` |
 
 For more information about values defined in values/vault.yaml.gotmpl, please see https://github.com/banzaicloud/bank-vaults/tree/master/operator/deploy and https://github.com/banzaicloud/bank-vaults/tree/master/charts/vault
 
-| Parameter                      | Description                                                                                                                                                                                                                                                               | Default  |
-|--------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------|
-| `kafka.namespace`              | Namespace where Kafka and Zookeeper Vault will be deployed (env `KAFKA_NAMESPACE`)                                                                                                                                                                                        | `1`      |
-| `kafka.replicaCount`           | Number of Kafka nodes                                                                                                                                                                                                                                                     | `1`      |
-| `kafka.numPartitions`          | The default number of log partitions per topic                                                                                                                                                                                                                            | `1`      |
-| `kafka.logRetentionHours`      | The minimum age of a log file to be eligible for deletion due to age                                                                                                                                                                                                      | `24`     |
-| `kafka.persistence`            | Kafka data persistence using PVC                                                                                                                                                                                                                                          |          |
-| `kafka.resources`              | Resources requested and limits for Kafka containers                                                                                                                                                                                                                       |          |
-| `kafka.auth.enabled`           | Enable SASL PLAINTEXT authentification                                                                                                                                                                                                                                    | `true`   |
-| `kafka.auth.username`          | Kafka client username                                                                                                                                                                                                                                                     | `user1`  |
-| `kafka.auth.password`          | Kafka client password                                                                                                                                                                                                                                                     | `secret` |
-| `kafka.externalAccess.enabled` | Enable external access to kafka through a new load balancer (env `KAFKA_EXTERNAL_ACCESS`). If enabled, you use external-dns, and `domainName` is provided, then each kafka brokers will be reachable in kafka-{{environement}}-$i.{{kafka.namespace}}.{{domainName}}:9094 | `false`  |
-| `zookeeper.replicaCount`       | Number of Zookeeper nodes                                                                                                                                                                                                                                                 | `1`      |
-| `zookeeper.persistence`        | Zookeeper data persistence using PVC                                                                                                                                                                                                                                      |          |
-| `zookeeper.resources`          | Resources requested and limits for Zookeeper containers                                                                                                                                                                                                                   |          |
+| Parameter                             | Description                                                                                                                                                                                                                                                               | Default  |
+|---------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------|
+| `kafka.namespace`                     | Namespace where Kafka and Zookeeper Vault will be deployed (env `KAFKA_NAMESPACE`)                                                                                                                                                                                        | `1`      |
+| `kafka.replicaCount`                  | Number of Kafka instance nodes                                                                                                                                                                                                                                            | `1`      |
+| `kafka.numPartitions`                 | The default number of log partitions per topic                                                                                                                                                                                                                            | `1`      |
+| `kafka.logRetentionHours`             | The minimum age of a log file to be eligible for deletion due to age                                                                                                                                                                                                      | `24`     |
+| `kafka.persistence.enabled`           | Enabled Kafka data persistence                                                                                                                                                                                                                                            | `true`   |
+| `kafka.persistence.size`              | Kafka data persistence size PVC                                                                                                                                                                                                                                           | `4Gi`    |
+| `kafka.resources.requests.memory`     | Memory requested for Kafka containers                                                                                                                                                                                                                                     | `4Gi`    |
+| `kafka.resources.requests.cpu`        | CPU requested for Kafka containers                                                                                                                                                                                                                                        | `100m`   |
+| `kafka.resources.limits.memory`       | Memory limit for Kafka containers                                                                                                                                                                                                                                         | `8Gi`    |
+| `kafka.resources.limits.cpu`          | CPU limit for Kafka containers                                                                                                                                                                                                                                            | `500m`   |
+| `kafka.auth.enabled`                  | Enable SASL PLAINTEXT authentification                                                                                                                                                                                                                                    | `true`   |
+| `kafka.auth.username`                 | Kafka client username                                                                                                                                                                                                                                                     | `user1`  |
+| `kafka.auth.password`                 | Kafka client password                                                                                                                                                                                                                                                     | `secret` |
+| `kafka.externalAccess.enabled`        | Enable external access to kafka through a new load balancer (env `KAFKA_EXTERNAL_ACCESS`). If enabled, you use external-dns, and `domainName` is provided, then each kafka brokers will be reachable in kafka-{{environement}}-$i.{{kafka.namespace}}.{{domainName}}:9094 | `false`  |
+| `zookeeper.replicaCount`              | Number of Zookeeper nodes                                                                                                                                                                                                                                                 | `1`      |
+| `zookeeper.persistence`               | Zookeeper data persistence using PVC                                                                                                                                                                                                                                      |          |
+| `zookeeper.resources.requests.memory` | Memory requested for Zookeeper containers                                                                                                                                                                                                                                 | `512Mi`  |
+| `zookeeper.resources.requests.cpu`    | CPU requested for Zookeeper containers                                                                                                                                                                                                                                    | `100m`   |
+| `zookeeper.resources.limits.memory`   | Memory limit for Zookeeper containers                                                                                                                                                                                                                                     | `1Gi`    |
+| `zookeeper.resources.limits.cpu`      | CPU limit for Zookeeper containers                                                                                                                                                                                                                                        | `300m`   |
 
 For more information about values defined in values/kafka.yaml.gotmpl, please see https://github.com/bitnami/charts/tree/master/bitnami/kafka
 
@@ -185,21 +193,38 @@ For more information about values defined in values/redis.yaml.gotmpl, please se
 
 | Parameter                             | Description                                                          | Default       |
 |---------------------------------------|----------------------------------------------------------------------|---------------|
+| `postgresql.enabled`                  | If true, Postgres will be deployed                                   | `true`        |
 | `postgresql.namespace`                | Namespace where Postgres will be deployed (env `POSTGRES_NAMESPACE`) | `orchestrate` |
 | `postgresql.username`                 | Username of Postgres                                                 | `api`         |
 | `postgresql.password`                 | Password of Postgres                                                 | `such-secret` |
 | `postgresql.database`                 | Database name                                                        | `api`         |
 | `postgresql.replication.enabled`      | Enable replication                                                   | `false`       |
-| `postgresql.replication.readReplicas` | Number of read replicas replicas                                     | `1`           |
-| `postgresql.persistence`              | Persistence using PVC                                                |               |
+| `postgresql.replication.readReplicas` | Number of read replicas                                              | `1`           |
+| `postgresql.persistence.size`         | PVC storage request size                                             | `8Gi`         |
 
 For more information about values defined in values/postgresql.yaml.gotmpl, please see https://github.com/bitnami/charts/tree/master/bitnami/postgresql
 
+| Parameter                                | Description                                                             | Default       |
+|------------------------------------------|-------------------------------------------------------------------------|---------------|
+| `postgresqlHA.enabled`                   | If true, Postgres HA will be deployed                                   | `false`       |
+| `postgresqlHA.namespace`                 | Namespace where Postgres HA will be deployed (env `POSTGRES_NAMESPACE`) | `orchestrate` |
+| `postgresqlHA.postgresql.username`       | Username of Postgres                                                    | `api`         |
+| `postgresqlHA.postgresql.password`       | Password of Postgres                                                    | `such-secret` |
+| `postgresqlHA.postgresql.database`       | Database name                                                           | `api`         |
+| `postgresqlHA.postgresql.repmgrPassword` | Repmgr password                                                         | `api`         |
+| `postgresqlHA.postgresql.replicaCount`   | Number of replicas                                                      | `1`           |
+| `postgresqlHA.persistence.size`          | PVC storage request size                                                | `8Gi`         |
+| `postgresqlHA.pgpool.replicaCount`       | Number of PGPool-II replicas                                            | `1`           |
 
-| Parameter                 | Description                                                                                                 | Default         |
-|---------------------------|-------------------------------------------------------------------------------------------------------------|-----------------|
-| `observability.enabled`   | If true, The Observability stack will be deployed as well as the service monitors and the metrics exporters | `false`         |
-| `observability.namespace` | Namespace where the observability stack will be deployed  (env `OBSERVABILITY_NAMESPACE`)                   | `observability` |
+For more information about values defined in values/postgresql.yaml.gotmpl, please see https://github.com/bitnami/charts/tree/master/bitnami/postgresql-ha
+
+
+| Parameter                        | Description                                                                                                 | Default         |
+|----------------------------------|-------------------------------------------------------------------------------------------------------------|-----------------|
+| `observability.enabled`          | If true, The Observability stack will be deployed as well as the service monitors and the metrics exporters | `false`         |
+| `observability.namespace`        | Namespace where the observability stack will be deployed  (env `OBSERVABILITY_NAMESPACE`)                   | `observability` |
+| `observability.grafana.user`     | Root user name                                                                                              | `admin`         |
+| `observability.grafana.password` | Root user password                                                                                          | `frenchfries`   |
 
 | Parameter    | Description                                                                                                                                                                                                                                                                                                        | Default |
 |--------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
@@ -207,8 +232,7 @@ For more information about values defined in values/postgresql.yaml.gotmpl, plea
 
 # 3. Hashicorp Vault
 
-This helmfiles deploys [Hashicorp's Vault](https://www.vaultproject.io/) based on [Bank-Vaults](https://github.com/banzaicloud/bank-vaults). We deploy first the Vault operator, then the following ressources contained in `values/vault.yaml`:
-
+This helmfiles deploys [Hashicorp's Vault](https://www.vaultproject.io/) with integrated storage with raft with [Bank-Vaults](https://github.com/banzaicloud/bank-vaults). We deploy first the Vault operator, then the following ressources contained in `values/vault.yaml`:
 - Vault CRD's, including [Vault policy](https://www.vaultproject.io/docs/concepts/policies), [Vault authentication](https://www.vaultproject.io/docs/concepts/auth), and [Orchestrate Hashicorp Vault Plugin](https://github.com/ConsenSys/orchestrate-hashicorp-vault-plugin)
 
 [Vault policy](https://www.vaultproject.io/docs/concepts/policies)

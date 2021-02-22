@@ -5,6 +5,7 @@ replication:
   readReplicas:  {{ .Values | get "postgresql.replication.readReplicas" 1 }}
 persistence:
   enabled: {{ .Values | get "postgresql.persistence.enabled" true }}
+  size: {{ .Values | get "postgresql.persistence.size" "8Gi" }}
   storageClass: {{ .Values | get "postgresql.persistence.storageClass" nil }}
 livenessProbe:
   enabled: true

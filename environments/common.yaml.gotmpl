@@ -17,8 +17,7 @@ orchestrate:
     environmentSecrets: {}
 
   api:
-    environment:
-      PROXY_CACHE_TTL: 2s
+    environment: {}
     environmentSecrets: {}
 
   keyManager:
@@ -51,18 +50,39 @@ kafka:
   externalAccess:
     enabled: {{ env "KAFKA_EXTERNAL_ACCESS" | default false }}
 
+zookeeper:
+  auth:
+    enabled: true
+    serverUsers: zookeeperUser
+    serverPasswords: zookeeperPassword
+    clientUser: zookeeperClientUser
+    clientPassword: zookeeperClientPassword
+
 redis:
   enabled: true
   namespace: {{ env "REDIS_NAMESPACE" | default ( env "ORCHESTRATE_NAMESPACE" | default $defaultNamespace ) }}
   password: such-secret
 
 postgresql:
+  enabled: true
   namespace: {{ env "POSTGRES_NAMESPACE" | default ( env "ORCHESTRATE_NAMESPACE" | default $defaultNamespace ) }}
   username: api
   password: such-secret
   database: api
 
+postgresqlHA:
+  enabled: false
+  namespace: {{ env "POSTGRES_NAMESPACE" | default ( env "ORCHESTRATE_NAMESPACE" | default $defaultNamespace ) }}
+  postgresql:
+    username: api
+    password: such-secret
+    database: api
+    repmgrPassword: such-secret
+
 observability:
   namespace: {{ env "OBSERVABILITY_NAMESPACE" | default "observability" }}
+  grafana:
+    user: admin
+    password: frenchfries
 
 domainName: {{ env "DOMAIN_NAME" }}
