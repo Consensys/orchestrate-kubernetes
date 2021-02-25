@@ -128,7 +128,7 @@ The following tables lists the configurable values for the environments. Some of
 | `orchestrate.global.imageCredentials.registry` | Docker registry where Orchestrate images are stored (env `REGISTRY_URL`)   | `docker.cloudsmith.io`                                      |
 | `orchestrate.global.imageCredentials.username` | [REQUIRED] Username of the registry (env `REGISTRY_USERNAME`)              |                                                             |
 | `orchestrate.global.imageCredentials.password` | [REQUIRED] Password of the registry (env `REGISTRY_PASSWORD`)              |                                                             |
-| `orchestrate.global.image.repository`          | Path to Orchestrate image (env `ORCHESTRATE_REPOSITORY`)                   | `docker.cloudsmith.io/consensys/docker-private/orchestrate` |
+| `orchestrate.global.image.repository`          | Path to Orchestrate image (env `ORCHESTRATE_REPOSITORY`)                   | `docker.cloudsmith.io/consensys/priv/orchestrate` |
 | `orchestrate.global.image.tag`                 | Orchestrate image tag (env `ORCHESTRATE_TAG`)                              | `v21.1.0`                                                   |
 | `orchestrate.api`                              | Orchestrate API values                                                     |                                                             |
 | `orchestrate.keyManager`                       | Orchestrate Key Manager values                                             |                                                             |
