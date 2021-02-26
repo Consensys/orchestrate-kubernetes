@@ -1,17 +1,17 @@
 ---
 {{ $defaultNamespace := "orchestrate" }}
-{{ $tag := "v21.1.0" }}
+{{ $tag := "v21.1.2" }}
 
 orchestrate:
   namespace: {{ env "ORCHESTRATE_NAMESPACE" | default $defaultNamespace  }}
 
   global:
     imageCredentials:
-      registry: {{ env "REGISTRY_URL" | default "docker.cloudsmith.io" }}
+      registry: {{ env "REGISTRY_URL" | default "docker.consensys.net" }}
       username: {{ requiredEnv "REGISTRY_USERNAME" }}
       password: {{ requiredEnv "REGISTRY_PASSWORD" }}
     image:
-      repository: {{ env "ORCHESTRATE_REPOSITORY" | default "docker.cloudsmith.io/consensys/priv/orchestrate" }}
+      repository: {{ env "ORCHESTRATE_REPOSITORY" | default "docker.consensys.net/priv/orchestrate" }}
       tag: {{ env "ORCHESTRATE_TAG" | default $tag | quote }}
     environment: {}
     environmentSecrets: {}
