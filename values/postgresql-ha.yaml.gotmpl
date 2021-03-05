@@ -19,6 +19,7 @@ postgresql:
   password: {{ .Values.postgresqlHA.postgresql.password | quote }}
   replicaCount: {{ .Values | get "postgresqlHA.postgresql.replicaCount" 1 }}
   repmgrPassword: {{ .Values.postgresqlHA.postgresql.repmgrPassword | quote }}
+  syncReplication: true
   affinity:
     podAntiAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:

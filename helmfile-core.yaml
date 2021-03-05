@@ -44,7 +44,7 @@ releases:
     namespace: {{ .Values.orchestrate.namespace }}
     chart: consensys/orchestrate
     atomic: true
-    version: 1.0.1
+    version: 1.0.2
     needs:
       - {{ .Values.kafka.namespace }}/kafka-{{ .Environment.Name }}
       - {{ .Values.vault.namespace }}/vault
