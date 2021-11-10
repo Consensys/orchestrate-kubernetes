@@ -42,9 +42,9 @@ releases:
       - values/postgresql-ha.yaml.gotmpl
   - name: orchestrate
     namespace: {{ .Values.orchestrate.namespace }}
-    chart: consensys/orchestrate
+    chart: chartmuseum/orchestrate
     atomic: true
-    version: 1.0.2
+    version: 1.0.6
     needs:
       - {{ .Values.kafka.namespace }}/kafka-{{ .Environment.Name }}
       - {{ .Values.vault.namespace }}/vault
@@ -52,3 +52,19 @@ releases:
       - {{ .Values.postgresql.namespace }}/postgresql
     values:
       - values/orchestrate.yaml.gotmpl
+  - name: postgres
+    namespace: {{ .Values.qkm.namespace }}
+    chart: bitnami/postgresql
+    version: 10.9.5
+    atomic: true
+    values:
+      - values/qkm-postgres.yaml.gotmpl
+  - name: quorum-key-manager
+    namespace: {{ .Values.qkm.namespace }}
+    chart: consensys/quorumkeymanager
+    atomic: true
+    version: 1.1.1
+    needs:
+      - {{ .Values.qkm.namespace }}/postgres
+    values:
+      - values/qkm.yaml.gotmpl

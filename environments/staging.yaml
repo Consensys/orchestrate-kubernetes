@@ -9,7 +9,7 @@ orchestrate:
       AUTH_API_KEY: with-key
 
 observability:
-  enabled: true
+  enabled: false
 
 kafka:
   replicaCount: 3

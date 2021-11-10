@@ -79,6 +79,26 @@ postgresqlHA:
     database: api
     repmgrPassword: such-secret
 
+qkm:
+  namespace: {{ env "QKM_NAMESPACE" | default $defaultNamespace  }}
+
+  image:
+    repository: {{ env "QKM_REPOSITORY" | default "docker.io/consensys/quorum-key-manager" }}
+    tag: {{ env "QKM_TAG" | default $tag | quote }}
+    pullPolicy: Always
+
+  environment: {}
+  environmentSecrets: {}
+
+  postgresql:
+    tls:
+      enabled: false
+    database: testDb
+
+  auth:
+    apikey:
+      file: "/apikey/sample.csv"
+
 observability:
   namespace: {{ env "OBSERVABILITY_NAMESPACE" | default "observability" }}
   grafana:
@@ -86,3 +106,5 @@ observability:
     password: frenchfries
 
 domainName: {{ env "DOMAIN_NAME" }}
+
+b64Manifests: {{ requiredEnv "B64_MANIFESTS" }}

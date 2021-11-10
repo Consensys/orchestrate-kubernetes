@@ -1,5 +1,16 @@
 observability:
-  enabled: true
+  enabled: false
+
+qkm:
+  auth:
+    apikey:
+      enabled: true
+      file: "/apikey/sample.csv"
+    tls:
+      enabled: false
+    oidc:
+      enabled: false
+
 
 kafka:
   logRetentionHours: 1

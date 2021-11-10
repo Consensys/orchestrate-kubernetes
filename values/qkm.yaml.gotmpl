@@ -1,0 +1,68 @@
+
+postgresql:
+  certs:
+    ca: {{ env "QKM_PG_CA" }}
+    client:
+      key: {{ env "QKM_PG_CLIENT_KEY" }}
+      crt: {{ env "QKM_PG_CLIENT_CRT" }}
+  tls:
+    enabled: false
+  database: testDb
+
+auth:
+  apikey:
+    enabled: true
+    file: "/apikey/api-keys.csv"
+    contents: |
+      {{ readFile "api-key/api-keys.csv" }}
+
+  oidc:
+    enabled: false
+    ca: {{ env "QKM_AUTH_OIDC_CA" }}
+    pubKey: {{ env "QKM_AUTH_OIDC_PUB_KEY" }}
+    issuer: {{ env "QKM_AUTH_OIDC_ISSUER_URL" }}
+  tls:
+    enabled: false
+    cacert: {{ env "QKM_AUTH_TLS_CA"}}
+    secretName: {{ env "QKM_AUTH_TLS_SECRET_NAME" }}
+
+storage:
+  nfs:
+    enabled: true
+    driver: {{ env "QKM_STORAGE_NFS_DRIVER" }}
+    provisioner: {{ env "QKM_STORAGE_NFS_PROVISIONER" }}
+    fsID: {{ env "QKM_STORAGE_NFS_FS_ID" }}
+
+environment:
+  HTTP_HOST: 0.0.0.0
+  LOG_FORMAT: json
+  DB_HOST: postgres-postgresql.{{ .Values.qkm.namespace }}
+  DB_PORT: 5432
+  DB_DATABASE: {{ .Values.qkm.postgresql.database }}
+  DB_PASSWORD: "1234567890"
+  {{ if .Values.qkm.auth.tls.enabled }}
+  HTTPS_ENABLED: {{ .Values.qkm.auth.tls.enabled }}
+  HTTPS_SERVER_KEY: "/certificates/tls.key"
+  HTTPS_SERVER_CERT: "/certificates/tls.crt"
+  AUTH_TLS_CA: "/certificates/ca.crt"
+  {{ end }}
+  {{ if .Values.qkm.auth.apikey.enabled }}
+  AUTH_API_KEY_FILE: {{ .Values.qkm.auth.apikey.file }}
+  {{ end }}
+  {{ if .Values.qkm.auth.oidc.enabled }}
+  AUTH_OIDC_CA_CERT: "/oidc_certs/ca.crt"
+  AUTH_OIDC_PUB_KEY: "/oidc_certs/oidc.pub"
+  AUTH_OIDC_ISSUER_URL: {{ .Values.qkm.auth.oidc.issuer }}
+  {{ end }}
+  {{- range $key,$value := .Values.qkm.environment }}
+  {{ $key }}: {{ $value | quote }}
+  {{- end }}
+environmentSecrets:
+  {{- range $key,$value := .Values.qkm.environmentSecrets }}
+  {{ $key }}: {{ $value | quote }}
+  {{- end }}
+
+manifests: |-
+  {{ if .Values.b64Manifests }}
+  {{- toYaml .Values.b64Manifests | b64dec }}
+  {{ end }}
