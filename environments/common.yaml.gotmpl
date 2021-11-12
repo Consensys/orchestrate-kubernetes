@@ -1,9 +1,17 @@
 ---
 {{ $defaultNamespace := "orchestrate" }}
-{{ $tag := "v21.1.3" }}
+{{ $defaultOrchestrateChart := "consensys/orchestrate" }}
+{{ $defaultQkmChart := "consensys/quorumkeymanager" }}
+{{ $defaultOrchestrateChartVersion := "1.0.6" }}
+{{ $defaultQkmChartVersion := "1.1.1" }}
+{{ $defaultNamespace := "orchestrate" }}
+{{ $tag := "v21.1.10" }}
 
 orchestrate:
   namespace: {{ env "ORCHESTRATE_NAMESPACE" | default $defaultNamespace  }}
+  chart: 
+    name: {{ env "ORCHESTRATE_CHART" | default $defaultOrchestrateChart  }}
+    version: {{ env "ORCHESTRATE_CHART_VERSION" | default $defaultOrchestrateChartVersion  }}
 
   global:
     imageCredentials:
@@ -81,6 +89,9 @@ postgresqlHA:
 
 qkm:
   namespace: {{ env "QKM_NAMESPACE" | default $defaultNamespace  }}
+  chart:
+    name: {{ env "QKM_CHART" | default $defaultQkmChart  }}
+    version: {{ env "QKM_CHART_VERSION" | default $defaultQkmChartVersion  }}
 
   image:
     repository: {{ env "QKM_REPOSITORY" | default "docker.io/consensys/quorum-key-manager" }}
@@ -93,11 +104,15 @@ qkm:
   postgresql:
     tls:
       enabled: false
-    database: testDb
+    database: {{ env "QKM_POSTGRES_DB" | default "qkmDB" }}
+    password: {{ env "QKM_POSTGRES_DB_PWD" | default "qkmDB" }}
 
   auth:
     apikey:
       file: "/apikey/sample.csv"
+
+postgresql-qkm:
+    enabled: true
 
 observability:
   namespace: {{ env "OBSERVABILITY_NAMESPACE" | default "observability" }}

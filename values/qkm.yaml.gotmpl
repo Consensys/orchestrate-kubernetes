@@ -39,7 +39,7 @@ environment:
   DB_HOST: postgres-postgresql.{{ .Values.qkm.namespace }}
   DB_PORT: 5432
   DB_DATABASE: {{ .Values.qkm.postgresql.database }}
-  DB_PASSWORD: "1234567890"
+  DB_PASSWORD: {{ .Values.qkm.postgresql.password }}
   {{ if .Values.qkm.auth.tls.enabled }}
   HTTPS_ENABLED: {{ .Values.qkm.auth.tls.enabled }}
   HTTPS_SERVER_KEY: "/certificates/tls.key"
