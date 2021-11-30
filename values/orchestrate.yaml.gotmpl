@@ -14,7 +14,24 @@ global:
     {{- range $key,$value := .Values.orchestrate.global.environment }}
     {{ $key }}: {{ $value | quote }}
     {{- end }}
+    {{- if .Values.qkm.enabled }}
+    KEY_MANAGER_URL: {{ .Values.qkm.fullname }}.{{ .Values.qkm.namespace }}
+    {{- if .Values.qkm.url }}
+    KEY_MANAGER_URL: {{ .Values.qkm.url }}
+    {{- end }}
+    {{- end }}
+    AUTH_JWT_ISSUER_URL: {{ .Values.orchestrate.auth.jwt.issuerUrl }}
+    AUTH_JWT_AUDIENCE: {{ .Values.orchestrate.auth.jwt.audience }}
+    AUTH_JWT_ORCHESTRATE_CLAIMS: {{ .Values.orchestrate.auth.jwt.claims }}
+    KEY_MANAGER_STORE_NAME: {{ .Values.qkm.orchestrate.storeName }}
+    {{- if .Values.qkm.auth.tls.enabled }}
+    KEY_MANAGER_TLS_SKIP_VERIFY: false
+    KEY_MANAGER_CLIENT_TLS_KEY: "/certificates/client.key"
+    KEY_MANAGER_CLIENT_TLS_CERT: "/certificates/client.crt"
+    {{- end }}
+
   environmentSecrets:
+    KEY_MANAGER_API_KEY: {{ .Values.qkm.orchestrate.apiKey }}
     {{- range $key,$value := .Values.orchestrate.global.environmentSecrets }}
     {{ $key }}: {{ $value | quote }}
     {{- end }}
