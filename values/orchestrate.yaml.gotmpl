@@ -42,6 +42,10 @@ global:
   serviceMonitor:
     enabled: {{ .Values.observability.enabled }}
 
+{{/* compliance with 21.1.X versions of orchestrate */}}
+keyManager:
+  enabled: false
+
 api:
   replicaCount: {{ $replicaCount }}
   {{- if .Values.domainName }}
@@ -106,39 +110,34 @@ api:
           weight: 100    
   {{- end }}
 
-keyManager:
-  replicaCount: {{ $replicaCount }}
+migrate:
   environment:
-    VAULT_ADDR: http://vault.{{ .Values.vault.namespace }}:8200
-    VAULT_CACERT: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-    VAULT_SKIP_VERIFY: true
-    {{- range $key,$value := .Values.orchestrate.keyManager.environment }}
+    {{- range $key, $value := $kafkaEnv }}
+    {{ $key }}: {{ $value }}
+    {{- end }}
+    {{- if .Values.postgresqlHA.enabled }}
+    DB_HOST: "postgresql-ha-pgpool.{{ .Values.postgresqlHA.namespace }}"
+    DB_DATABASE: {{ .Values.postgresqlHA.postgresql.database | quote }}
+    DB_USER: {{ .Values.postgresqlHA.postgresql.username | quote }}
+    {{- else }}
+    DB_HOST: "postgresql.{{ .Values.postgresql.namespace }}"
+    DB_DATABASE: {{ .Values.postgresql.database | quote }}
+    DB_USER: {{ .Values.postgresql.username | quote }}
+    {{- end }}
+    PROXY_CACHE_TTL: {{ $proxyCacheTTL }}s
+    {{- range $key,$value := .Values.orchestrate.api.environment }}
     {{ $key }}: {{ $value | quote }}
     {{- end }}
+  service:
+    sessionAffinityTimeout: {{ $proxyCacheTTL }}
   environmentSecrets:
-    {{- range $key,$value := .Values.orchestrate.keyManager.environmentSecrets }}
-    {{ $key }}: {{ $value | quote }}
+    {{- if .Values.postgresqlHA.enabled }}
+    DB_PASSWORD: {{ .Values.postgresqlHA.postgresql.password | quote }}
+    {{- else }}
+    DB_PASSWORD: {{ .Values.postgresql.password | quote }}
     {{- end }}
-  vaultAgent:
-    enabled: true
-    role: "orchestrate-key-manager"
-    image:
-      repository: vault
-      tag: 1.6.2
-  {{- if gt $replicaCount 1 }}
-  affinity:
-    podAntiAffinity:
-      preferredDuringSchedulingIgnoredDuringExecution:
-        - podAffinityTerm:
-            labelSelector:
-              matchExpressions:
-                - key: app.kubernetes.io/component
-                  operator: In
-                  values:
-                    - key-manager
-            topologyKey: "topology.kubernetes.io/zone"
-          weight: 100    
-  {{- end }}
+
+
 
 txListener:
   environment:
@@ -183,3 +182,7 @@ txSender:
             topologyKey: "topology.kubernetes.io/zone"
           weight: 100    
   {{- end }}
+test:
+ enabled: {{ .Values.test.enabled }}
+ report:
+    enabled: {{ .Values.test.enabled }}
