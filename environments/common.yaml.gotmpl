@@ -21,7 +21,7 @@ orchestrate:
       username: {{ requiredEnv "REGISTRY_USERNAME" }}
       password: {{ requiredEnv "REGISTRY_PASSWORD" }}
     image:
-      repository: {{ env "ORCHESTRATE_REPOSITORY" | default "docker.consensys.net/priv/orchestrate" }}
+      repository: {{ env "ORCHESTRATE_REPOSITORY" | default "consensys/orchestrate" }}
       tag: {{ env "ORCHESTRATE_TAG" | default $tag | quote }}
     environment: {}
     environmentSecrets: {}
