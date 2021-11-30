@@ -125,13 +125,16 @@ The following tables lists the configurable values for the environments. Some of
 | Parameter                                      | Description                                                                | Default                                                     |
 |------------------------------------------------|----------------------------------------------------------------------------|-------------------------------------------------------------|
 | `orchestrate.namespace`                        | Namespace where Orchestrate will be deployed (env `ORCHESTRATE_NAMESPACE`) | `orchestrate`                                               |
+| `orchestrate.chart.name`                        | This deployment orchestrate chart (env `ORCHESTRATE_CHART`) | `consensys/orchestrate`                                               |
+| `orchestrate.chart.version`                        | Namespace where Orchestrate will be deployed (env `ORCHESTRATE_CHART_VERSION`) | `1.0.6`                                               |
 | `orchestrate.global.imageCredentials.registry` | Docker registry where Orchestrate images are stored (env `REGISTRY_URL`)   | `docker.consensys.net`                                      |
 | `orchestrate.global.imageCredentials.username` | [REQUIRED] Username of the registry (env `REGISTRY_USERNAME`)              |                                                             |
 | `orchestrate.global.imageCredentials.password` | [REQUIRED] Password of the registry (env `REGISTRY_PASSWORD`)              |                                                             |
 | `orchestrate.global.image.repository`          | Path to Orchestrate image (env `ORCHESTRATE_REPOSITORY`)                   | `docker.consensys.net/priv/orchestrate` |
 | `orchestrate.global.image.tag`                 | Orchestrate image tag (env `ORCHESTRATE_TAG`)                              | `v21.1.2`                                                   |
 | `orchestrate.api`                              | Orchestrate API values                                                     |                                                             |
-| `orchestrate.keyManager`                       | Orchestrate Key Manager values                                             |                                                             |
+| `orchestrate.keyManager`                       | Orchestrate Key Manager values, for usage with version 21.1.X                                             |                                                             |
+| `orchestrate.qkm`                       | Orchestrate Key Manager values, for usage with version 21.10.X                                             |                                                             |
 | `orchestrate.txListener`                       | Orchestrate Tx Listener values                                             | `nil`                                                       |
 | `orchestrate.txSender`                         | Orchestrate Tx Sender values                                               | `nil`                                                       |
 | `orchestrate.test.image.repository`            | Path to Orchestrate test image (env `TEST_REPOSITORY`)                     | `nil`                                                       |
@@ -230,9 +233,25 @@ For more information about values defined in values/postgresql.yaml.gotmpl, plea
 |--------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
 | `domainName` | (Option) Domain name registered to the ingress controller of your kubernetes cluster. If not empty Orchestrate API will be exposed to {{orchestrate.namespace}}.{{domainName}}. If the observability stack is enabled grafana.{{domainName}} and prometheus.{{domainName}} will be exposed too (env `DOMAIN_NAME`) | ``      |
 
+
+Values below are useful when deploying orchestrate with version 21.10.X, having possibly a Quorum Key Manager running independently
+
+| Parameter                  | Description                                                           | Default       |
+|----------------------------|-----------------------------------------------------------------------|---------------|
+| `qkm.enabled`              | If true, Quorum Key Manager will be deployed                          | `true`        |
+| `qkm.url`                  | Url where Quorum Key Manager may be reached (env `QKM_URL`)           | `http://quorumkeymanager.orchestrate` |
+| `qkm.namespace`            | Namespace where Quorum Key Manager is deployed (env `QKM_NAMESPACE`)  | `orchestrate` |
+| `qkm.orchestrate.storeName`| Initial and existing eth-account name used by orchestrate             | `eth-accounts` |
+| `qkm.orchestrate.apiKey`   | Existing apiKey used by orchestrate to authenticate                   | `YWRtaW4tdXNlcg==` |
+| `qkm.chart.name`           | Helm chart of your Quorum Key Manager deployment                      | `consensys/quorumkeymanager` |
+| `qkm.chart.version`        | Helm chart version of your Quorum Key Manager deployment              | `1.1.1` |
+| `qkm.port`                 | Port of the Quorum Key Manager service                                | `8080`       |
+
+For more information about values defined in values/qkm.yaml.gotmpl, please refer to https://github.com/ConsenSys/quorum-key-manager-helm
+
 # 3. Hashicorp Vault
 
-This helmfiles deploys [Hashicorp's Vault](https://www.vaultproject.io/) with integrated storage with raft with [Bank-Vaults](https://github.com/banzaicloud/bank-vaults). We deploy first the Vault operator, then the following ressources contained in `values/vault.yaml`:
+This helmfiles optionally deploys [Hashicorp's Vault](https://www.vaultproject.io/) with integrated storage with raft with [Bank-Vaults](https://github.com/banzaicloud/bank-vaults). We deploy first the Vault operator, then the following ressources contained in `values/vault.yaml`:
 - Vault CRD's, including [Vault policy](https://www.vaultproject.io/docs/concepts/policies), [Vault authentication](https://www.vaultproject.io/docs/concepts/auth), and [Orchestrate Hashicorp Vault Plugin](https://github.com/ConsenSys/orchestrate-hashicorp-vault-plugin)
 
 [Vault policy](https://www.vaultproject.io/docs/concepts/policies)
@@ -274,6 +293,8 @@ This helmfiles deploys [Hashicorp's Vault](https://www.vaultproject.io/) with in
 - Service Account
 - RBAC configuration
 
+Note that it is highly recommended to use the `consensys/quorum-hashicorp-vault-plugin` image when deplying a Vault ressource.
+
 # 4. Observability
 
 This helmfile could deploy [Prometheus Operator](https://github.com/coreos/prometheus-operator) and [Prometheus](https://prometheus.io/) based on the [Kube-Prometheus Helm chart](https://github.com/bitnami/charts/tree/master/bitnami/kube-prometheus). It also deploys Grafana with default dashboards for Orchestrate, Kubernetes, Golang, Kafka, Postgres, Redis, and Hashicorp Vault
@@ -296,3 +317,4 @@ kubectl port-forward --namespace $OBSERVABILITY_NAMESPACE svc/grafana 3000:80
 ## 5.1. From Orchestrate v2.5.X to v21.1.X
 
 [Read the steps to upgrade Orchestrate v2.5.X to v21.1.X](docs/upgrades/v21-1-X.md)
+
