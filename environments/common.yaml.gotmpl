@@ -122,4 +122,9 @@ observability:
 
 domainName: {{ env "DOMAIN_NAME" }}
 
-b64Manifests: {{ requiredEnv "B64_MANIFESTS" }}
+
+
+test:
+ enabled: false
+ report:
+    enabled: true
