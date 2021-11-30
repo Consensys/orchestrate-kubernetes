@@ -57,8 +57,11 @@ api:
         http:
           paths:
             - path: /
+              pathType: Prefix
               backend:
-                servicePort: http-svc
+                service:
+                  port:
+                    number: 80
   {{- end }}
   environment:
     {{- range $key, $value := $kafkaEnv }}
