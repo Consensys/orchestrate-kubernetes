@@ -39,17 +39,27 @@ orchestrate:
   txSender:
     environment: {}
     environmentSecrets: {}
+  
+  auth:
+    jwt:
+      issuerUrl: https://consensys.eu.auth0.com
+      audience: https://orchestrate.consensys.net
+      claims: https://api.orchestrate.network
 
 vaultOperator:
+  enabled: false
   namespace: {{ env "VAULT_OPERATOR_NAMESPACE" | default "vault-operator" }}
 
 vault:
+  enabled: false
+  replicaCount: 1
   namespace: {{ env "VAULT_NAMESPACE" | default ( env "ORCHESTRATE_NAMESPACE" | default $defaultNamespace ) }}
   plugin:
-    tag: {{ env "VAULT_PLUGIN_TAG" | default "v0.0.9" }}
-    sha256: {{ env "VAULT_PLUGIN_SHA256SUM" | default "4919a7fcf66fe98b459e6a46f9233aae9fc2f224ccbb6a44049e2f608b9eebf5" }}
+    tag: {{ env "VAULT_PLUGIN_TAG" | default "v1.1.2" }}
+    sha256: {{ env "VAULT_PLUGIN_SHA256SUM" | default "bc6db3332bf9e9e44a6fa4fc34782f771bc98fc067bb88802fbdc8570298eb1b" }}
 
 kafka:
+  enabled: true
   namespace: {{ env "KAFKA_NAMESPACE" | default "kafka" }}
   auth:
     enabled: true
