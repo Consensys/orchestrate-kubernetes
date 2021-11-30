@@ -11,35 +11,40 @@ postgresql:
 
 auth:
   apikey:
-    enabled: true
+    enabled: {{ .Values.qkm.auth.apikey.enabled }}
     file: "/apikey/api-keys.csv"
     contents: |
       {{ readFile "api-key/api-keys.csv" }}
-
   oidc:
-    enabled: false
-    ca: {{ env "QKM_AUTH_OIDC_CA" }}
-    pubKey: {{ env "QKM_AUTH_OIDC_PUB_KEY" }}
-    issuer: {{ env "QKM_AUTH_OIDC_ISSUER_URL" }}
+    enabled: {{ .Values.qkm.auth.oidc.enabled }}
+    ca: {{ .Values.qkm.auth.oidc.ca }}
+    pubKey: {{ .Values.qkm.auth.oidc.pubKey }}
+    issuer: {{ .Values.qkm.auth.oidc.issuer }}
   tls:
-    enabled: false
-    cacert: {{ env "QKM_AUTH_TLS_CA"}}
-    secretName: {{ env "QKM_AUTH_TLS_SECRET_NAME" }}
+    enabled: {{ .Values.qkm.auth.tls.enabled }}
+    cacert: {{ .Values.qkm.auth.tls.cacert }}
+    secretName: {{ .Values.qkm.auth.tls.secretName }}
 
 storage:
+  existingPvc: {{ .Values.qkm.storage.existingPvc }}
   nfs:
-    enabled: true
-    driver: {{ env "QKM_STORAGE_NFS_DRIVER" }}
-    provisioner: {{ env "QKM_STORAGE_NFS_PROVISIONER" }}
-    fsID: {{ env "QKM_STORAGE_NFS_FS_ID" }}
+    enabled: {{ .Values.qkm.storage.nfs.enabled }}
+    driver: {{ .Values.qkm.storage.nfs.driver }}
+    provisioner: {{ .Values.qkm.storage.nfs.provisioner }}
+    fsID: {{ .Values.qkm.storage.nfs.fsID }}
+
+vault:
+  tls:
+    enabled: false
+
 
 environment:
   HTTP_HOST: 0.0.0.0
   LOG_FORMAT: json
-  DB_HOST: postgres-postgresql.{{ .Values.qkm.namespace }}
+  DB_HOST: {{ .Values.qkm.postgresql.host }}.{{ .Values.qkm.namespace }}
   DB_PORT: 5432
   DB_DATABASE: {{ .Values.qkm.postgresql.database }}
-  DB_PASSWORD: {{ .Values.qkm.postgresql.password }}
+  DB_PASSWORD: "1234567890"
   {{ if .Values.qkm.auth.tls.enabled }}
   HTTPS_ENABLED: {{ .Values.qkm.auth.tls.enabled }}
   HTTPS_SERVER_KEY: "/certificates/tls.key"
@@ -63,6 +68,21 @@ environmentSecrets:
   {{- end }}
 
 manifests: |-
-  {{ if .Values.b64Manifests }}
-  {{- toYaml .Values.b64Manifests | b64dec }}
+  {{ if .Values.qkm.b64Manifests }}
+  {{- toYaml .Values.qkm.b64Manifests | b64dec }}
   {{ end }}
+
+migrate:
+  environment:
+    HTTP_HOST: 0.0.0.0
+    LOG_FORMAT: json
+    DB_HOST: {{ .Values.qkm.postgresql.host }}.{{ .Values.qkm.namespace }}
+    DB_PORT: 5432
+    DB_DATABASE: {{ .Values.qkm.postgresql.database }}
+    DB_PASSWORD: "1234567890"
+    {{ if .Values.qkm.postgresql.tls.enabled }}
+    DB_TLS_SSLMODE: "require"
+    DB_TLS_CA: "/postgres/certs/ca.crt"
+    DB_TLS_CERT: "/postgres/certs/client.crt"
+    DB_TLS_KEY: "/postgres/key/client.key"
+    {{ end }}
