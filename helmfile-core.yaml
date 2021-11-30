@@ -9,6 +9,7 @@ releases:
     namespace: {{ .Values.kafka.namespace }}
     values:
       - values/kafka.yaml.gotmpl
+{{- if .Values.vault.enabled }}
   - name: vault
     namespace: {{ .Values.vault.namespace }}
     chart: incubator/raw
@@ -16,6 +17,7 @@ releases:
     atomic: true
     values:
       - values/vault.yaml.gotmpl
+{{- end }}
   - name: redis
     namespace: {{ .Values.redis.namespace }}
     chart: bitnami/redis
@@ -64,6 +66,7 @@ releases:
     namespace: {{ .Values.qkm.namespace }}
     chart: {{ .Values.qkm.chart.name }}
     atomic: true
+    condition: qkm.enabled
     version: {{ .Values.qkm.chart.version }}
     needs:
       - {{ .Values.qkm.namespace }}/qkm-postgresql
