@@ -5,7 +5,9 @@
 {{ $defaultOrchestrateChartVersion := "1.0.6" }}
 {{ $defaultQkmChartVersion := "1.1.1" }}
 {{ $defaultNamespace := "orchestrate" }}
-{{ $tag := "v21.1.10" }}
+{{/* $tag := "v21.10.1-alpha.3" */}}
+{{ $tag := "v21.1.12" }}
+{{ $qkmTag := "v21.9.3" }}
 
 orchestrate:
   namespace: {{ env "ORCHESTRATE_NAMESPACE" | default $defaultNamespace  }}
