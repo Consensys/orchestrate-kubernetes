@@ -100,6 +100,14 @@ postgresqlHA:
     repmgrPassword: such-secret
 
 qkm:
+  enabled: false
+  url: "http://quorum-key-manager-quorumkeymanager.orchestrate"
+  proto: https
+  fullname: "quorumkeymanager"
+  orchestrate:
+    storeName: "eth-accounts"
+    apiKey: WVdSdGFXNHRkWE5sY2c9PQ==
+  port: 8080
   namespace: {{ env "QKM_NAMESPACE" | default $defaultNamespace  }}
   chart:
     name: {{ env "QKM_CHART" | default $defaultQkmChart  }}
