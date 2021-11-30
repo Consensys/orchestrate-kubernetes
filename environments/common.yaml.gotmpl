@@ -115,8 +115,10 @@ qkm:
 
   image:
     repository: {{ env "QKM_REPOSITORY" | default "docker.io/consensys/quorum-key-manager" }}
-    tag: {{ env "QKM_TAG" | default $tag | quote }}
+    tag: {{ env "QKM_TAG" | default $qkmTag | quote }}
     pullPolicy: Always
+
+  b64Manifests: {{ requiredEnv "B64_MANIFESTS" }}
 
   environment: {}
   environmentSecrets: {}
@@ -124,15 +126,39 @@ qkm:
   postgresql:
     tls:
       enabled: false
+    host: {{ env "QKM_POSTGRES_HOST" | default "qkm-postgresql" }}
     database: {{ env "QKM_POSTGRES_DB" | default "qkmDB" }}
-    password: {{ env "QKM_POSTGRES_DB_PWD" | default "qkmDB" }}
+    password: {{ env "QKM_POSTGRES_DB_PWD" | default "qkmDBPwd" }}
 
   auth:
     apikey:
-      file: "/apikey/sample.csv"
+      enabled: true
+      file: "/apikey/api-keys.csv"
+    oidc:
+      enabled: false
+      ca: {{ env "QKM_AUTH_OIDC_CA" }}
+      pubKey: {{ env "QKM_AUTH_OIDC_PUB_KEY" }}
+      issuer: {{ env "QKM_AUTH_OIDC_ISSUER_URL" }}
+    tls:
+      enabled: false
+      cacert: {{ env "QKM_AUTH_TLS_CA"}}
+      secretName: {{ env "QKM_AUTH_TLS_SECRET_NAME" }}
+
+  storage:
+    existingPvc: {{ env "QKM_STORAGE_EXISTING_PVC" | default "" }}
+    nfs:
+      enabled: true
+      driver: {{ env "QKM_STORAGE_NFS_DRIVER" }}
+      provisioner: {{ env "QKM_STORAGE_NFS_PROVISIONER" }}
+      fsID: {{ env "QKM_STORAGE_NFS_FS_ID" }}
+  
+  vault:
+    tls:
+      enabled: false
+    agents: {}
 
 postgresql-qkm:
-    enabled: true
+    enabled: {{ env "DEPLOY_QKM_PG" | default false }}
 
 observability:
   namespace: {{ env "OBSERVABILITY_NAMESPACE" | default "observability" }}
