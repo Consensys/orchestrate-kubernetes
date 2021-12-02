@@ -9,7 +9,7 @@ templates:
     name: vault
   spec:
     size: {{ $replicaCount }}
-    image: vault:1.8.2
+    image: consensys/quorum-hashicorp-vault-plugin:latest
     bankVaultsImage: banzaicloud/bank-vaults:1.14.3
 
     # Vault Pods , Services and TLS Secret annotations
@@ -84,11 +84,6 @@ templates:
             requests:
               storage: 1Gi
 
-    vaultContainerSpec:
-      lifecycle:
-        postStart:
-          exec:
-            command: ["/bin/sh", "-c", "setcap cap_ipc_lock=+ep /vault/plugins/quorum"]
   
     # Describe where you would like to store the Vault unseal keys and root token.
     unsealConfig:
