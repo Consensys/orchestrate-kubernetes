@@ -25,17 +25,23 @@ auth:
     cacert: {{ .Values.qkm.auth.tls.cacert }}
     secretName: {{ .Values.qkm.auth.tls.secretName }}
 
-storage:
-  existingPvc: {{ .Values.qkm.storage.existingPvc }}
-  nfs:
-    enabled: {{ .Values.qkm.storage.nfs.enabled }}
-    driver: {{ .Values.qkm.storage.nfs.driver }}
-    provisioner: {{ .Values.qkm.storage.nfs.provisioner }}
-    fsID: {{ .Values.qkm.storage.nfs.fsID }}
 
 vault:
   tls:
     enabled: false
+  agents:
+    - name: "orchestrate"
+      vaultAddress: "http://vault.orchestrate.svc.cluster.local:8200"
+      image:
+        repository: vault
+        tag: 1.8.2
+      config:
+        wrapTTL: ""
+        role: "orchestrate"
+
+serviceAccount:
+  create: false
+  name: "vault"
 
 
 environment:
