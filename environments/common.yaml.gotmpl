@@ -6,7 +6,7 @@
 {{ $defaultQkmChartVersion := "1.1.1" }}
 {{ $defaultNamespace := "orchestrate" }}
 {{/* $tag := "v21.10.1-alpha.3" */}}
-{{ $tag := "v21.1.12" }}
+{{ $tag := "v21.10.1-alpha.3" }}
 {{ $qkmTag := "v21.9.3" }}
 
 orchestrate:
@@ -53,12 +53,14 @@ vaultOperator:
   namespace: {{ env "VAULT_OPERATOR_NAMESPACE" | default "vault-operator" }}
 
 vault:
-  enabled: false
+  enabled: true
   replicaCount: 1
   namespace: {{ env "VAULT_NAMESPACE" | default ( env "ORCHESTRATE_NAMESPACE" | default $defaultNamespace ) }}
   plugin:
     tag: {{ env "VAULT_PLUGIN_TAG" | default "v1.1.2" }}
-    sha256: {{ env "VAULT_PLUGIN_SHA256SUM" | default "bc6db3332bf9e9e44a6fa4fc34782f771bc98fc067bb88802fbdc8570298eb1b" }}
+    sha256: {{ env "VAULT_PLUGIN_SHA256SUM" | default "4bcf7dc95f8546657357f24da5e377e84112262ad6a38a252421b019941139c7" }}
+  envs:
+    - VAULT_ADDR: vault.orchestrate.svc.cluster.local:8200
 
 kafka:
   enabled: true
@@ -100,13 +102,13 @@ postgresqlHA:
     repmgrPassword: such-secret
 
 qkm:
-  enabled: false
-  url: "http://quorum-key-manager-quorumkeymanager.orchestrate"
+  enabled: true
+  url: "http://quorum-key-manager-quorumkeymanager:8080"
   proto: https
   fullname: "quorumkeymanager"
   orchestrate:
     storeName: "eth-accounts"
-    apiKey: WVdSdGFXNHRkWE5sY2c9PQ==
+    apiKey: YWRtaW4tdXNlcg==
   port: 8080
   namespace: {{ env "QKM_NAMESPACE" | default $defaultNamespace  }}
   chart:
@@ -158,7 +160,7 @@ qkm:
     agents: {}
 
 postgresql-qkm:
-    enabled: {{ env "DEPLOY_QKM_PG" | default false }}
+    enabled: {{ env "DEPLOY_QKM_PG" | default true }}
 
 observability:
   namespace: {{ env "OBSERVABILITY_NAMESPACE" | default "observability" }}
