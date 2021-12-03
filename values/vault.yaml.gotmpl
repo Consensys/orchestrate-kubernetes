@@ -25,40 +25,11 @@ templates:
 
     serviceType: ClusterIP
 
-    vaultInitContainers:
-      - name: quorum-plugin
-        image: alpine:3.13
-        command:
-          - /bin/sh
-          - -c
-          - |
-            wget -q --header='Accept:application/octet-stream' \
-              $PLUGIN_REPO/releases/download/$PLUGIN_VERSION/$PLUGIN_FILE \
-              -O "${PLUGINS_PATH}/quorum"
-            chmod +x ${PLUGINS_PATH}/quorum
-            echo "${PLUGIN_VERSION}/${PLUGIN_FILE} downloaded"
-            echo "File at ${PLUGINS_PATH}/quorum"
-            ls -l ${PLUGINS_PATH}/quorum
-        env: 
-          - name: PLUGIN_VERSION
-            value: {{ .Values.vault.plugin.tag }}
-          - name: PLUGIN_FILE
-            value: quorum-hashicorp-vault-plugin
-          - name: PLUGIN_REPO
-            value: https://github.com/ConsenSys/quorum-hashicorp-vault-plugin
-          - name: PLUGINS_PATH
-            value: /vault/plugins
-          - name: VAULT_ADDR
-            value: "https://vault.{{ .Values.vault.namespace }}.svc.cluster.local:8200"
-        volumeMounts:
-          - name: vault-plugin
-            mountPath: /vault/plugins
+  
 
     # Use local disk to store Vault file data, see config section.
     
     volumeMounts:
-      - name: vault-plugin
-        mountPath: /vault/plugins
       - name: vault-file
         mountPath: /vault/file
 
@@ -75,15 +46,7 @@ templates:
           resources:
             requests:
               storage: 1Gi
-      - metadata:
-          name: vault-plugin
-        spec:
-          accessModes:
-            - ReadWriteOnce
-          resources:
-            requests:
-              storage: 1Gi
-
+  
   
     # Describe where you would like to store the Vault unseal keys and root token.
     unsealConfig:
@@ -129,6 +92,10 @@ templates:
           rules: path "quorum/*" {
             capabilities = ["create", "read", "update", "list"]
             }
+        - name: orchestrate
+          rules: path "orchestrate/*" {
+            capabilities = ["create", "read", "update", "list"]
+            }
       auth:
         - type: kubernetes
           roles:
@@ -156,7 +123,7 @@ templates:
 
       plugins:
         - plugin_name: quorum
-          command: quorum
+          command: quorum-hashicorp-vault-plugin
           sha256: {{ .Values.vault.plugin.sha256 }}
           type: secret
 
