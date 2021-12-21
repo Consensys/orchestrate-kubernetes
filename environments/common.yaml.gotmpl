@@ -134,6 +134,7 @@ qkm:
       enabled: false
     host: {{ env "QKM_POSTGRES_HOST" | default "qkm-postgresql" }}
     database: {{ env "QKM_POSTGRES_DB" | default "qkmDB" }}
+    username: {{ env "QKM_POSTGRES_USER" | default "qkm" }}
     password: {{ env "QKM_POSTGRES_DB_PWD" | default "qkmDBPwd" }}
 
   auth:
