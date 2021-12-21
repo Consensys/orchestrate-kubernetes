@@ -1,3 +1,4 @@
+{{- if .Values.kafka.enabled }}
 {{ $replicaCount := .Values | get "kafka.replicaCount" 1 }}
 
 ---
@@ -115,4 +116,5 @@ zookeeper:
     serverPasswords: {{ .Values.zookeeper.auth.serverPasswords }}
     clientUser: {{ .Values.zookeeper.auth.clientUser }}
     clientPassword: {{ .Values.zookeeper.auth.clientPassword }}
+  {{- end }}
   {{- end }}
