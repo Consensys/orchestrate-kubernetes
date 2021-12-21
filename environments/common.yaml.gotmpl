@@ -90,9 +90,11 @@ redis:
 postgresql:
   enabled: true
   namespace: {{ env "POSTGRES_NAMESPACE" | default ( env "ORCHESTRATE_NAMESPACE" | default $defaultNamespace ) }}
-  username: api
-  password: such-secret
-  database: api
+  host: {{ env "POSTGRES_HOST" | default "postgresql" }}
+  port: 5432
+  username: {{ env "POSTGRES_USER" | default "api"}}
+  password: {{ env "POSTGRES_PWD" | default "such-secret" }}
+  database: {{ env "POSTGRES_DB" | default "api" }}
 
 postgresqlHA:
   enabled: false
