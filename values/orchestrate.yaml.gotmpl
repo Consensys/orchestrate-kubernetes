@@ -8,9 +8,6 @@
 global:
   environment:
     LOG_FORMAT: json
-    TOPIC_TX_SENDER: "{{ .Values.orchestrate.namespace }}-tx-sender"
-    TOPIC_TX_RECOVER: "{{ .Values.orchestrate.namespace }}-tx-recover"
-    TOPIC_TX_DECODED: "{{ .Values.orchestrate.namespace }}-tx-decoded"
     {{- range $key,$value := .Values.orchestrate.global.environment }}
     {{ $key }}: {{ $value | quote }}
     {{- end }}
@@ -42,11 +39,8 @@ global:
   serviceMonitor:
     enabled: {{ .Values.observability.enabled }}
 
-{{/* compliance with 21.1.X versions of orchestrate */}}
-keyManager:
-  enabled: false
-
 api:
+  enabled: true
   replicaCount: {{ $replicaCount }}
   {{- if .Values.domainName }}
   ingress:
@@ -77,6 +71,7 @@ api:
     DB_USER: {{ .Values.postgresqlHA.postgresql.username | quote }}
     {{- else }}
     DB_HOST: "postgresql.{{ .Values.postgresql.namespace }}"
+    DB_PORT: {{ .Values.postgresql.port }}
     DB_DATABASE: {{ .Values.postgresql.database | quote }}
     DB_USER: {{ .Values.postgresql.username | quote }}
     {{- end }}
@@ -120,22 +115,28 @@ migrate:
     DB_DATABASE: {{ .Values.postgresqlHA.postgresql.database | quote }}
     DB_USER: {{ .Values.postgresqlHA.postgresql.username | quote }}
     {{- else }}
-    DB_HOST: "postgresql.{{ .Values.postgresql.namespace }}"
-    DB_DATABASE: {{ .Values.postgresql.database | quote }}
-    DB_USER: {{ .Values.postgresql.username | quote }}
+    DB_HOST: {{ .Values.postgresql.host }}
+    DB_PORT: {{ .Values.postgresql.port }}
+    DB_DATABASE: {{ .Values.postgresql.database }}
+    DB_USER: {{ .Values.postgresql.username }}
+    DB_TLS_SSLMODE: "require"
     {{- end }}
     PROXY_CACHE_TTL: {{ $proxyCacheTTL }}s
     {{- range $key,$value := .Values.orchestrate.api.environment }}
     {{ $key }}: {{ $value | quote }}
     {{- end }}
-  service:
-    sessionAffinityTimeout: {{ $proxyCacheTTL }}
   environmentSecrets:
     {{- if .Values.postgresqlHA.enabled }}
     DB_PASSWORD: {{ .Values.postgresqlHA.postgresql.password | quote }}
     {{- else }}
     DB_PASSWORD: {{ .Values.postgresql.password | quote }}
     {{- end }}
+    {{- range $key,$value := .Values.orchestrate.migrate.environmentSecrets }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+  service:
+    sessionAffinityTimeout: {{ $proxyCacheTTL }}
+  
 
 
 
