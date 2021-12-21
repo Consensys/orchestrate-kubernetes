@@ -12,7 +12,7 @@ postgresql:
 auth:
   apikey:
     enabled: {{ .Values.qkm.auth.apikey.enabled }}
-    file: "/apikey/api-keys.csv"
+    file: {{ .Values.qkm.auth.apikey.file }}
     contents: |
       {{ readFile "api-key/api-keys.csv" }}
   oidc:
