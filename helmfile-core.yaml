@@ -6,6 +6,7 @@ releases:
   - name: kafka-{{ .Environment.Name }}
     chart: bitnami/kafka
     version: 12.7.4
+    condition: kafka.enabled
     namespace: {{ .Values.kafka.namespace }}
     values:
       - values/kafka.yaml.gotmpl
