@@ -2,12 +2,12 @@
 {{ $defaultNamespace := "orchestrate" }}
 {{ $defaultOrchestrateChart := "consensys/orchestrate" }}
 {{ $defaultQkmChart := "consensys/quorumkeymanager" }}
-{{ $defaultOrchestrateChartVersion := "1.0.6" }}
-{{ $defaultQkmChartVersion := "1.1.1" }}
+{{ $defaultOrchestrateChartVersion := "2.0.0" }}
+{{ $defaultQkmChartVersion := "1.1.5" }}
 {{ $defaultNamespace := "orchestrate" }}
 {{/* $tag := "v21.10.1-alpha.3" */}}
-{{ $tag := "v21.10.1-alpha.3" }}
-{{ $qkmTag := "v21.9.3" }}
+{{ $tag := "v21.12.0" }}
+{{ $qkmTag := "v21.12.1" }}
 
 orchestrate:
   namespace: {{ env "ORCHESTRATE_NAMESPACE" | default $defaultNamespace  }}
@@ -27,10 +27,7 @@ orchestrate:
     environmentSecrets: {}
 
   api:
-    environment: {}
-    environmentSecrets: {}
-
-  keyManager:
+    enabled: true
     environment: {}
     environmentSecrets: {}
 
@@ -41,6 +38,11 @@ orchestrate:
   txSender:
     environment: {}
     environmentSecrets: {}
+  
+  migrate:
+    environment: {}
+    environmentSecrets: {}
+
   
   auth:
     jwt:
@@ -108,7 +110,7 @@ qkm:
   fullname: "quorumkeymanager"
   orchestrate:
     storeName: "eth-accounts"
-    apiKey: YWRtaW4tdXNlcg==
+    apiKey: {{ env "QKM_API_KEY" | default "NmwyMCB3YXMgaGVyZQ==" }}
   port: 8080
   namespace: {{ env "QKM_NAMESPACE" | default $defaultNamespace  }}
   chart:
@@ -158,6 +160,10 @@ qkm:
     tls:
       enabled: false
     agents: {}
+
+  sync:
+    enabled: false
+    storeName: {{ env "QKM_SYNC_STORE_NAME" | default "" }}
 
 postgresql-qkm:
     enabled: {{ env "DEPLOY_QKM_PG" | default true }}
