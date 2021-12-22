@@ -1,8 +1,8 @@
 # QKM postgres config starts here
 
-postgresqlUsername: {{ .Values.qkm.postgresql.username }}
-postgresqlPassword: {{ .Values.qkm.postgresql.password }}
-postgresqlDatabase: {{ .Values.qkm.postgresql.database }}
+postgresqlUsername: {{ .Values.qkm.postgresql.username | quote }}
+postgresqlPassword: {{ .Values.qkm.postgresql.password | quote }}
+postgresqlDatabase: {{ .Values.qkm.postgresql.database | quote }}
 
 postgresqlMaxConnections: 100
 tls:

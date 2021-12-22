@@ -7,7 +7,10 @@ postgresql:
       crt: {{ env "QKM_PG_CLIENT_CRT" }}
   tls:
     enabled: false
-  database: testDb
+  database: {{ .Values.qkm.postgresql.database }}
+  host: {{ .Values.qkm.postgresql.host }}
+  user: {{ .Values.qkm.postgresql.username }}
+  password: {{ .Values.qkm.postgresql.password }}
 
 auth:
   apikey:
@@ -50,7 +53,7 @@ environment:
   DB_HOST: {{ .Values.qkm.postgresql.host }}.{{ .Values.qkm.namespace }}
   DB_PORT: 5432
   DB_DATABASE: {{ .Values.qkm.postgresql.database }}
-  DB_PASSWORD: "1234567890"
+  DB_PASSWORD: {{ .Values.qkm.postgresql.password }}
   {{ if .Values.qkm.auth.tls.enabled }}
   HTTPS_ENABLED: {{ .Values.qkm.auth.tls.enabled }}
   HTTPS_SERVER_KEY: "/certificates/tls.key"
@@ -82,10 +85,10 @@ migrate:
   environment:
     HTTP_HOST: 0.0.0.0
     LOG_FORMAT: json
-    DB_HOST: {{ .Values.qkm.postgresql.host }}.{{ .Values.qkm.namespace }}
-    DB_PORT: 5432
+    DB_HOST: {{ .Values.qkm.postgresql.host }}
+    DB_PORT: {{ .Values.qkm.postgresql.port }}
     DB_DATABASE: {{ .Values.qkm.postgresql.database }}
-    DB_PASSWORD: "1234567890"
+    DB_PASSWORD: {{ .Values.qkm.postgresql.password }}
     {{ if .Values.qkm.postgresql.tls.enabled }}
     DB_TLS_SSLMODE: "require"
     DB_TLS_CA: "/postgres/certs/ca.crt"

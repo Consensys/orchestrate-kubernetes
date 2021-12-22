@@ -133,9 +133,10 @@ qkm:
     tls:
       enabled: false
     host: {{ env "QKM_POSTGRES_HOST" | default "qkm-postgresql" }}
+    port: 5432
     database: {{ env "QKM_POSTGRES_DB" | default "qkmDB" }}
     username: {{ env "QKM_POSTGRES_USER" | default "qkm" }}
-    password: {{ env "QKM_POSTGRES_DB_PWD" | default "qkmDBPwd" }}
+    password: {{ env "QKM_POSTGRES_PWD" | default "qkmDBPwd" }}
 
   auth:
     apikey:
