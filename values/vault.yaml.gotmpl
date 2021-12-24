@@ -9,8 +9,10 @@ templates:
     name: vault
   spec:
     size: {{ $replicaCount }}
-    image: consensys/quorum-hashicorp-vault-plugin:latest
+    image: consensys/quorum-hashicorp-vault-plugin:{{ .Values.vault.plugin.tag }}
     bankVaultsImage: banzaicloud/bank-vaults:1.14.3
+
+      
 
     # Vault Pods , Services and TLS Secret annotations
     vaultAnnotations:
@@ -24,6 +26,8 @@ templates:
     serviceAccount: vault
 
     serviceType: ClusterIP
+
+    
 
   
 
@@ -67,6 +71,7 @@ templates:
     # A YAML representation of a final vault config file.
     # See https://www.vaultproject.io/docs/configuration/ for more information.
     config:
+      ui: false
       storage:
         {{- if gt $replicaCount 1 }}
         raft:
@@ -96,12 +101,12 @@ templates:
             }
         {{ end }}
         - name: quorum_key_manager
-          rules: path "quorum/*" {
-            capabilities = ["create", "read", "update", "list"]
+          rules: path "{{ .Values.vault.plugin.name }}/*" {
+            capabilities = ["create", "read", "update", "list", "delete"]
             }
-        - name: orchestrate
-          rules: path "orchestrate/*" {
-            capabilities = ["create", "read", "update", "list"]
+        - name: allow_secrets
+          rules: path "secret/*" {
+            capabilities = ["create", "read", "update", "list", "delete"]
             }
       auth:
         - type: kubernetes
@@ -109,7 +114,8 @@ templates:
             - name: {{ .Values.vault.namespace }}
               bound_service_account_names: ["quorum_key_manager", "vault-secrets-webhook", "vault"]
               bound_service_account_namespaces: ["{{ .Values.vault.namespace }}", "{{ .Values.orchestrate.namespace }}"]
-              policies: quorum_key_manager
+              policies: quorum_key_manager, allow_secrets
+
         {{ if .Values.observability.enabled }}
         - type: kubernetes
           roles:
@@ -120,17 +126,22 @@ templates:
         {{ end }}
 
       secrets:
-        - path: quorum
+        - path: {{ .Values.vault.plugin.name }}
           type: plugin
-          plugin_name: quorum
+          plugin_name: {{ .Values.vault.plugin.name }}
           description: Orchestrate key storage gateway
           config:
             force_no_cache: true
             passthrough_request_headers: ["X-Vault-Namespace"]
+        - path: secret
+          type: kv-v2
+          description: Orchestrate secrets kvv2
+          options:
+            version: 2
 
       plugins:
-        - plugin_name: quorum
-          command: quorum-hashicorp-vault-plugin
+        - plugin_name: {{ .Values.vault.plugin.name }}
+          command: {{ .Values.vault.plugin.filename }}
           sha256: {{ .Values.vault.plugin.sha256 }}
           type: secret
 

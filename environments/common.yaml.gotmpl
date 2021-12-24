@@ -59,10 +59,12 @@ vault:
   replicaCount: 1
   namespace: {{ env "VAULT_NAMESPACE" | default ( env "ORCHESTRATE_NAMESPACE" | default $defaultNamespace ) }}
   plugin:
-    tag: {{ env "VAULT_PLUGIN_TAG" | default "v1.1.2" }}
+    name: {{ env "VAULT_PLUGIN_NAME" | default "quorum" }}
+    tag: {{ env "VAULT_PLUGIN_TAG" | default "v1.1.3" }}
     sha256: {{ env "VAULT_PLUGIN_SHA256SUM" | default "4bcf7dc95f8546657357f24da5e377e84112262ad6a38a252421b019941139c7" }}
+    filename: {{ env "VAULT_PLUGIN_FILENAME" | default "quorum-hashicorp-vault-plugin" }}
   envs:
-    - VAULT_ADDR: vault.orchestrate.svc.cluster.local:8200
+    - VAULT_ADDR: "http://localhost:8200"
 
 kafka:
   enabled: true
