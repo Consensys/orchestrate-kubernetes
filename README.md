@@ -130,6 +130,8 @@ This repository provides few examples of environment values sets:
 
 Note: All the passwords and usernames of every dependendcies are located in `environments/common.yaml.gotmpl`. Do not forget to change, eventually extract, those values depending on how you want to manage those secrets.
 
+Note: The ./values/api-key/api-keys.csv gives an exemple of what you should use for the Quorum Key Manager api-keys when this mode is enabled, provided values MUST be changed in a Prod environment.
+
 The following tables lists the configurable values for the environments. Some of them are directly configurable bia envronement variable:
 
 | Parameter                                      | Description                                                                | Default                                                     |
