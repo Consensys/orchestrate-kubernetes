@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## v6.0.0 (Unreleased)
+
+ * Support latest v21.12.x orchestrate version
+ * Support Hashicorp Vault image with embedded plugin
+ * Remove Key manager and replace it with Quorum Key Manager dependency
+ * Make chart Azure compliant
+ * Updated Ingresses
+ * Made dependencies optional
+
+
 ## v5.1.0 (Unreleased)
 
  * Make Vault, Postgres, Redis Highly Available in Multi-Availability Zones
