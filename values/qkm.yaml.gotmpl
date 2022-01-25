@@ -1,4 +1,26 @@
 
+image:
+  repository: {{ .Values.qkm.image.repository }}
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: {{ .Values.qkm.image.tag }}
+
+environment: {}
+environmentSecrets: {}
+# 'existingSecret' specifies name of externally created secret
+# existingSecret:
+
+nameOverride: ""
+fullnameOverride: ""
+
+imageCredentials:
+  create: true
+  registry: docker.consensys.net
+  username: {{ .Values.orchestrate.global.imageCredentials.username }}
+  password: {{ .Values.orchestrate.global.imageCredentials.password }}
+
+imagePullSecret: qkm-pull-secret
+
 postgresql:
   certs:
     ca: {{ env "QKM_PG_CA" }}
