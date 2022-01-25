@@ -6,7 +6,7 @@
 {{ $defaultQkmChartVersion := "1.1.5" }}
 {{ $defaultNamespace := "orchestrate" }}
 {{/* $tag := "v21.10.1-alpha.3" */}}
-{{ $tag := "v21.12.0" }}
+{{ $tag := "v21.12.1" }}
 {{ $qkmTag := "v21.12.1" }}
 
 orchestrate:
@@ -61,7 +61,7 @@ vault:
   plugin:
     name: {{ env "VAULT_PLUGIN_NAME" | default "quorum" }}
     tag: {{ env "VAULT_PLUGIN_TAG" | default "v1.1.3" }}
-    sha256: {{ env "VAULT_PLUGIN_SHA256SUM" | default "4bcf7dc95f8546657357f24da5e377e84112262ad6a38a252421b019941139c7" }}
+    sha256: {{ env "VAULT_PLUGIN_SHA256SUM" | default "e084800c61749a9c7b51f6e91bb89ab6d5a2678cdb707eaa73f9bef0cf73fc61" }}
     filename: {{ env "VAULT_PLUGIN_FILENAME" | default "quorum-hashicorp-vault-plugin" }}
   envs:
     - VAULT_ADDR: "http://localhost:8200"
