@@ -15,6 +15,7 @@ For more information, refer to the [Orchestrate documentation](https://docs.orch
 <H1>Orchestrate-Kubernetes</H1>
 
 - [Codefi Orchestrate](#codefi-orchestrate)
+- [Deployment overview](#overview)
 - [Compatibility](#compatibility)
 - [1. Requirements](#1-requirements)
   - [1.1. CLI tools](#11-cli-tools)
@@ -32,11 +33,20 @@ For more information, refer to the [Orchestrate documentation](https://docs.orch
 
 This repository contains an implementation example on how to deploy Orchestrate and its dependencies using Kubernetes and Helm charts.
 
+# Overview
+
+Below is a high level diagram of what this chart will help you deploy
+
+
+![overview diagram](./img/overview.png "Overview")
+
+
 # Compatibility
 
 | Orchestrate-kubernetes versions | Orchestrate versions          |
 |---------------------------------|-------------------------------|
-| master/HEAD                     | Orchestrate v21.1.x or higher |
+| master/HEAD                     | Orchestrate v21.12.x or higher |
+| v6.0.0                          | Orchestrate v21.12.x or higher |
 | v5.0.0                          | Orchestrate v21.1.x or higher |
 | v4.0.0                          | Orchestrate v2.5.x            |
 | v3.1.0                          | Orchestrate v2.5.x            |
@@ -153,13 +163,14 @@ For more information about Vault Operator, please see https://github.com/banzaic
 |-----------------------|------------------------------------------------------------------------------------|--------------------------------------------------------------------|
 | `vault.namespace`     | Namespace where Hashicop Vault will be deployed (env `VAULT_NAMESPACE`)            | `orchestrate`                                                      |
 | `vault.replicaCount`  | Number of Vault instance                                                           | `1`                                                                |
-| `vault.plugin.tag`    | Orchestrate Hashicorp Vault Plugin tag (env `VAULT_PLUGIN_TAG`)                    | `v0.0.9`                                                           |
-| `vault.plugin.sha256` | Orchestrate Hashicorp Vault Plugin SHA256 checksum  (env `VAULT_PLUGIN_SHA256SUM`) | `4919a7fcf66fe98b459e6a46f9233aae9fc2f224ccbb6a44049e2f608b9eebf5` |
+| `vault.plugin.tag`    | Orchestrate Hashicorp Vault Plugin tag (env `VAULT_PLUGIN_TAG`)                    | `v1.1.3`                                                           |
+| `vault.plugin.sha256` | Orchestrate Hashicorp Vault Plugin SHA256 checksum  (env `VAULT_PLUGIN_SHA256SUM`) | `e084800c61749a9c7b51f6e91bb89ab6d5a2678cdb707eaa73f9bef0cf73fc61` |
 
 For more information about values defined in values/vault.yaml.gotmpl, please see https://github.com/banzaicloud/bank-vaults/tree/master/operator/deploy and https://github.com/banzaicloud/bank-vaults/tree/master/charts/vault
 
 | Parameter                             | Description                                                                                                                                                                                                                                                               | Default  |
 |---------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------|
+| `kafka.enabled`                     | Use to enable or disable the kafka deployment, might be replaced by an existin EventHub on Azure for instance                                                                                                                                                                                        | `true`      |
 | `kafka.namespace`                     | Namespace where Kafka and Zookeeper Vault will be deployed (env `KAFKA_NAMESPACE`)                                                                                                                                                                                        | `1`      |
 | `kafka.replicaCount`                  | Number of Kafka instance nodes                                                                                                                                                                                                                                            | `1`      |
 | `kafka.numPartitions`                 | The default number of log partitions per topic                                                                                                                                                                                                                            | `1`      |
