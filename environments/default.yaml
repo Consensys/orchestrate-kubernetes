@@ -1,7 +1,8 @@
 observability:
-  enabled: true
+  enabled: false
 
 kafka:
+  enabled: false
   logRetentionHours: 1
   resources:
     requests:
@@ -15,4 +16,3 @@ zookeeper:
       memory: "512Mi"
     limits:
       memory: "1Gi"
-

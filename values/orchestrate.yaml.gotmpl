@@ -8,13 +8,27 @@
 global:
   environment:
     LOG_FORMAT: json
-    TOPIC_TX_SENDER: "{{ .Values.orchestrate.namespace }}-tx-sender"
-    TOPIC_TX_RECOVER: "{{ .Values.orchestrate.namespace }}-tx-recover"
-    TOPIC_TX_DECODED: "{{ .Values.orchestrate.namespace }}-tx-decoded"
     {{- range $key,$value := .Values.orchestrate.global.environment }}
     {{ $key }}: {{ $value | quote }}
     {{- end }}
+    {{- if .Values.qkm.enabled }}
+    KEY_MANAGER_URL: {{ .Values.qkm.fullname }}.{{ .Values.qkm.namespace }}
+    {{- if .Values.qkm.url }}
+    KEY_MANAGER_URL: {{ .Values.qkm.url }}
+    {{- end }}
+    {{- end }}
+    AUTH_JWT_ISSUER_URL: {{ .Values.orchestrate.auth.jwt.issuerUrl }}
+    AUTH_JWT_AUDIENCE: {{ .Values.orchestrate.auth.jwt.audience }}
+    AUTH_JWT_ORCHESTRATE_CLAIMS: {{ .Values.orchestrate.auth.jwt.claims }}
+    KEY_MANAGER_STORE_NAME: {{ .Values.qkm.orchestrate.storeName }}
+    {{- if .Values.qkm.auth.tls.enabled }}
+    KEY_MANAGER_TLS_SKIP_VERIFY: false
+    KEY_MANAGER_CLIENT_TLS_KEY: "/certificates/client.key"
+    KEY_MANAGER_CLIENT_TLS_CERT: "/certificates/client.crt"
+    {{- end }}
+
   environmentSecrets:
+    KEY_MANAGER_API_KEY: {{ .Values.qkm.orchestrate.apiKey }}
     {{- range $key,$value := .Values.orchestrate.global.environmentSecrets }}
     {{ $key }}: {{ $value | quote }}
     {{- end }}
@@ -26,6 +40,7 @@ global:
     enabled: {{ .Values.observability.enabled }}
 
 api:
+  enabled: true
   replicaCount: {{ $replicaCount }}
   {{- if .Values.domainName }}
   ingress:
@@ -40,8 +55,11 @@ api:
         http:
           paths:
             - path: /
+              pathType: Prefix
               backend:
-                servicePort: http-svc
+                service:
+                  port:
+                    number: 80
   {{- end }}
   environment:
     {{- range $key, $value := $kafkaEnv }}
@@ -53,6 +71,7 @@ api:
     DB_USER: {{ .Values.postgresqlHA.postgresql.username | quote }}
     {{- else }}
     DB_HOST: "postgresql.{{ .Values.postgresql.namespace }}"
+    DB_PORT: {{ .Values.postgresql.port }}
     DB_DATABASE: {{ .Values.postgresql.database | quote }}
     DB_USER: {{ .Values.postgresql.username | quote }}
     {{- end }}
@@ -86,39 +105,40 @@ api:
           weight: 100    
   {{- end }}
 
-keyManager:
-  replicaCount: {{ $replicaCount }}
+migrate:
   environment:
-    VAULT_ADDR: http://vault.{{ .Values.vault.namespace }}:8200
-    VAULT_CACERT: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-    VAULT_SKIP_VERIFY: true
-    {{- range $key,$value := .Values.orchestrate.keyManager.environment }}
+    {{- range $key, $value := $kafkaEnv }}
+    {{ $key }}: {{ $value }}
+    {{- end }}
+    {{- if .Values.postgresqlHA.enabled }}
+    DB_HOST: "postgresql-ha-pgpool.{{ .Values.postgresqlHA.namespace }}"
+    DB_DATABASE: {{ .Values.postgresqlHA.postgresql.database | quote }}
+    DB_USER: {{ .Values.postgresqlHA.postgresql.username | quote }}
+    {{- else }}
+    DB_HOST: {{ .Values.postgresql.host }}
+    DB_PORT: {{ .Values.postgresql.port }}
+    DB_DATABASE: {{ .Values.postgresql.database }}
+    DB_USER: {{ .Values.postgresql.username }}
+    DB_TLS_SSLMODE: "require"
+    {{- end }}
+    PROXY_CACHE_TTL: {{ $proxyCacheTTL }}s
+    {{- range $key,$value := .Values.orchestrate.api.environment }}
     {{ $key }}: {{ $value | quote }}
     {{- end }}
   environmentSecrets:
-    {{- range $key,$value := .Values.orchestrate.keyManager.environmentSecrets }}
+    {{- if .Values.postgresqlHA.enabled }}
+    DB_PASSWORD: {{ .Values.postgresqlHA.postgresql.password | quote }}
+    {{- else }}
+    DB_PASSWORD: {{ .Values.postgresql.password | quote }}
+    {{- end }}
+    {{- range $key,$value := .Values.orchestrate.migrate.environmentSecrets }}
     {{ $key }}: {{ $value | quote }}
     {{- end }}
-  vaultAgent:
-    enabled: true
-    role: "orchestrate-key-manager"
-    image:
-      repository: vault
-      tag: 1.6.2
-  {{- if gt $replicaCount 1 }}
-  affinity:
-    podAntiAffinity:
-      preferredDuringSchedulingIgnoredDuringExecution:
-        - podAffinityTerm:
-            labelSelector:
-              matchExpressions:
-                - key: app.kubernetes.io/component
-                  operator: In
-                  values:
-                    - key-manager
-            topologyKey: "topology.kubernetes.io/zone"
-          weight: 100    
-  {{- end }}
+  service:
+    sessionAffinityTimeout: {{ $proxyCacheTTL }}
+  
+
+
 
 txListener:
   environment:
@@ -163,3 +183,7 @@ txSender:
             topologyKey: "topology.kubernetes.io/zone"
           weight: 100    
   {{- end }}
+test:
+ enabled: {{ .Values.test.enabled }}
+ report:
+    enabled: {{ .Values.test.enabled }}

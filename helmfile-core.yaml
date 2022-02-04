@@ -6,9 +6,11 @@ releases:
   - name: kafka-{{ .Environment.Name }}
     chart: bitnami/kafka
     version: 12.7.4
+    condition: kafka.enabled
     namespace: {{ .Values.kafka.namespace }}
     values:
       - values/kafka.yaml.gotmpl
+{{- if .Values.vault.enabled }}
   - name: vault
     namespace: {{ .Values.vault.namespace }}
     chart: incubator/raw
@@ -16,6 +18,7 @@ releases:
     atomic: true
     values:
       - values/vault.yaml.gotmpl
+{{- end }}
   - name: redis
     namespace: {{ .Values.redis.namespace }}
     chart: bitnami/redis
@@ -42,9 +45,9 @@ releases:
       - values/postgresql-ha.yaml.gotmpl
   - name: orchestrate
     namespace: {{ .Values.orchestrate.namespace }}
-    chart: consensys/orchestrate
+    chart: {{ .Values.orchestrate.chart.name }}
     atomic: true
-    version: 1.0.2
+    version: {{ .Values.orchestrate.chart.version }}
     needs:
       - {{ .Values.kafka.namespace }}/kafka-{{ .Environment.Name }}
       - {{ .Values.vault.namespace }}/vault
@@ -52,3 +55,21 @@ releases:
       - {{ .Values.postgresql.namespace }}/postgresql
     values:
       - values/orchestrate.yaml.gotmpl
+  - name: qkm-postgresql
+    namespace: {{ .Values.qkm.namespace }}
+    chart: bitnami/postgresql
+    version: 10.9.5
+    atomic: true
+    condition: postgresql-qkm.enabled
+    values:
+      - values/qkm-postgres.yaml.gotmpl
+  - name: quorum-key-manager
+    namespace: {{ .Values.qkm.namespace }}
+    chart: {{ .Values.qkm.chart.name }}
+    atomic: true
+    condition: qkm.enabled
+    version: {{ .Values.qkm.chart.version }}
+    needs:
+      - {{ .Values.qkm.namespace }}/qkm-postgresql
+    values:
+      - values/qkm.yaml.gotmpl

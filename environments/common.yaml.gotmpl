@@ -1,9 +1,19 @@
 ---
 {{ $defaultNamespace := "orchestrate" }}
-{{ $tag := "v21.1.3" }}
+{{ $defaultOrchestrateChart := "consensys/orchestrate" }}
+{{ $defaultQkmChart := "consensys/quorumkeymanager" }}
+{{ $defaultOrchestrateChartVersion := "2.0.0" }}
+{{ $defaultQkmChartVersion := "1.1.5" }}
+{{ $defaultNamespace := "orchestrate" }}
+{{/* $tag := "v21.10.1-alpha.3" */}}
+{{ $tag := "v21.12.1" }}
+{{ $qkmTag := "v21.12.1" }}
 
 orchestrate:
   namespace: {{ env "ORCHESTRATE_NAMESPACE" | default $defaultNamespace  }}
+  chart: 
+    name: {{ env "ORCHESTRATE_CHART" | default $defaultOrchestrateChart  }}
+    version: {{ env "ORCHESTRATE_CHART_VERSION" | default $defaultOrchestrateChartVersion  }}
 
   global:
     imageCredentials:
@@ -11,16 +21,13 @@ orchestrate:
       username: {{ requiredEnv "REGISTRY_USERNAME" }}
       password: {{ requiredEnv "REGISTRY_PASSWORD" }}
     image:
-      repository: {{ env "ORCHESTRATE_REPOSITORY" | default "docker.consensys.net/priv/orchestrate" }}
+      repository: {{ env "ORCHESTRATE_REPOSITORY" | default "consensys/orchestrate" }}
       tag: {{ env "ORCHESTRATE_TAG" | default $tag | quote }}
     environment: {}
     environmentSecrets: {}
 
   api:
-    environment: {}
-    environmentSecrets: {}
-
-  keyManager:
+    enabled: true
     environment: {}
     environmentSecrets: {}
 
@@ -31,17 +38,36 @@ orchestrate:
   txSender:
     environment: {}
     environmentSecrets: {}
+  
+  migrate:
+    environment: {}
+    environmentSecrets: {}
+
+  
+  auth:
+    jwt:
+      issuerUrl: https://consensys.eu.auth0.com
+      audience: https://orchestrate.consensys.net
+      claims: https://api.orchestrate.network
 
 vaultOperator:
+  enabled: false
   namespace: {{ env "VAULT_OPERATOR_NAMESPACE" | default "vault-operator" }}
 
 vault:
+  enabled: true
+  replicaCount: 1
   namespace: {{ env "VAULT_NAMESPACE" | default ( env "ORCHESTRATE_NAMESPACE" | default $defaultNamespace ) }}
   plugin:
-    tag: {{ env "VAULT_PLUGIN_TAG" | default "v0.0.9" }}
-    sha256: {{ env "VAULT_PLUGIN_SHA256SUM" | default "4919a7fcf66fe98b459e6a46f9233aae9fc2f224ccbb6a44049e2f608b9eebf5" }}
+    name: {{ env "VAULT_PLUGIN_NAME" | default "quorum" }}
+    tag: {{ env "VAULT_PLUGIN_TAG" | default "v1.1.3" }}
+    sha256: {{ env "VAULT_PLUGIN_SHA256SUM" | default "e084800c61749a9c7b51f6e91bb89ab6d5a2678cdb707eaa73f9bef0cf73fc61" }}
+    filename: {{ env "VAULT_PLUGIN_FILENAME" | default "quorum-hashicorp-vault-plugin" }}
+  envs:
+    - VAULT_ADDR: "http://localhost:8200"
 
 kafka:
+  enabled: true
   namespace: {{ env "KAFKA_NAMESPACE" | default "kafka" }}
   auth:
     enabled: true
@@ -66,9 +92,11 @@ redis:
 postgresql:
   enabled: true
   namespace: {{ env "POSTGRES_NAMESPACE" | default ( env "ORCHESTRATE_NAMESPACE" | default $defaultNamespace ) }}
-  username: api
-  password: such-secret
-  database: api
+  host: {{ env "POSTGRES_HOST" | default "postgresql" }}
+  port: 5432
+  username: {{ env "POSTGRES_USER" | default "api"}}
+  password: {{ env "POSTGRES_PWD" | default "such-secret" }}
+  database: {{ env "POSTGRES_DB" | default "api" }}
 
 postgresqlHA:
   enabled: false
@@ -79,6 +107,73 @@ postgresqlHA:
     database: api
     repmgrPassword: such-secret
 
+qkm:
+  enabled: true
+  url: "http://quorum-key-manager-quorumkeymanager:8080"
+  proto: https
+  fullname: "quorumkeymanager"
+  orchestrate:
+    storeName: "eth-accounts"
+    apiKey: {{ env "QKM_API_KEY" | default "NmwyMCB3YXMgaGVyZQ==" }}
+  port: 8080
+  namespace: {{ env "QKM_NAMESPACE" | default $defaultNamespace  }}
+  chart:
+    name: {{ env "QKM_CHART" | default $defaultQkmChart  }}
+    version: {{ env "QKM_CHART_VERSION" | default $defaultQkmChartVersion  }}
+
+  image:
+    repository: {{ env "QKM_REPOSITORY" | default "docker.io/consensys/quorum-key-manager" }}
+    tag: {{ env "QKM_TAG" | default $qkmTag | quote }}
+    pullPolicy: Always
+
+  b64Manifests: {{ requiredEnv "B64_MANIFESTS" }}
+
+  environment: {}
+  environmentSecrets: {}
+
+  postgresql:
+    tls:
+      enabled: false
+    host: {{ env "QKM_POSTGRES_HOST" | default "qkm-postgresql" }}
+    port: 5432
+    database: {{ env "QKM_POSTGRES_DB" | default "qkmDB" }}
+    username: {{ env "QKM_POSTGRES_USER" | default "qkm" }}
+    password: {{ env "QKM_POSTGRES_PWD" | default "qkmDBPwd" }}
+
+  auth:
+    apikey:
+      enabled: true
+      file: "/apikey/api-keys.csv"
+    oidc:
+      enabled: false
+      ca: {{ env "QKM_AUTH_OIDC_CA" }}
+      pubKey: {{ env "QKM_AUTH_OIDC_PUB_KEY" }}
+      issuer: {{ env "QKM_AUTH_OIDC_ISSUER_URL" }}
+    tls:
+      enabled: false
+      cacert: {{ env "QKM_AUTH_TLS_CA"}}
+      secretName: {{ env "QKM_AUTH_TLS_SECRET_NAME" }}
+
+  storage:
+    existingPvc: {{ env "QKM_STORAGE_EXISTING_PVC" | default "" }}
+    nfs:
+      enabled: true
+      driver: {{ env "QKM_STORAGE_NFS_DRIVER" }}
+      provisioner: {{ env "QKM_STORAGE_NFS_PROVISIONER" }}
+      fsID: {{ env "QKM_STORAGE_NFS_FS_ID" }}
+  
+  vault:
+    tls:
+      enabled: false
+    agents: {}
+
+  sync:
+    enabled: false
+    storeName: {{ env "QKM_SYNC_STORE_NAME" | default "" }}
+
+postgresql-qkm:
+    enabled: {{ env "DEPLOY_QKM_PG" | default true }}
+
 observability:
   namespace: {{ env "OBSERVABILITY_NAMESPACE" | default "observability" }}
   grafana:
@@ -86,3 +181,10 @@ observability:
     password: frenchfries
 
 domainName: {{ env "DOMAIN_NAME" }}
+
+
+
+test:
+ enabled: false
+ report:
+    enabled: true

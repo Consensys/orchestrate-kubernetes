@@ -1,0 +1,119 @@
+
+image:
+  repository: {{ .Values.qkm.image.repository }}
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: {{ .Values.qkm.image.tag }}
+
+environment: {}
+environmentSecrets: {}
+# 'existingSecret' specifies name of externally created secret
+# existingSecret:
+
+nameOverride: ""
+fullnameOverride: ""
+
+imageCredentials:
+  create: true
+  registry: docker.consensys.net
+  username: {{ .Values.orchestrate.global.imageCredentials.username }}
+  password: {{ .Values.orchestrate.global.imageCredentials.password }}
+
+imagePullSecret: qkm-pull-secret
+
+postgresql:
+  certs:
+    ca: {{ env "QKM_PG_CA" }}
+    client:
+      key: {{ env "QKM_PG_CLIENT_KEY" }}
+      crt: {{ env "QKM_PG_CLIENT_CRT" }}
+  tls:
+    enabled: false
+  database: {{ .Values.qkm.postgresql.database }}
+  host: {{ .Values.qkm.postgresql.host }}
+  user: {{ .Values.qkm.postgresql.username }}
+  password: {{ .Values.qkm.postgresql.password }}
+
+auth:
+  apikey:
+    enabled: {{ .Values.qkm.auth.apikey.enabled }}
+    file: {{ .Values.qkm.auth.apikey.file }}
+    contents: |
+      {{ readFile "api-key/api-keys.csv" }}
+  oidc:
+    enabled: {{ .Values.qkm.auth.oidc.enabled }}
+    ca: {{ .Values.qkm.auth.oidc.ca }}
+    pubKey: {{ .Values.qkm.auth.oidc.pubKey }}
+    issuer: {{ .Values.qkm.auth.oidc.issuer }}
+  tls:
+    enabled: {{ .Values.qkm.auth.tls.enabled }}
+    cacert: {{ .Values.qkm.auth.tls.cacert }}
+    secretName: {{ .Values.qkm.auth.tls.secretName }}
+
+
+vault:
+  tls:
+    enabled: false
+  agents:
+    - name: "orchestrate"
+      vaultAddress: "http://vault.orchestrate.svc.cluster.local:8200"
+      image:
+        repository: vault
+        tag: 1.8.2
+      config:
+        wrapTTL: ""
+        role: "orchestrate"
+
+serviceAccount:
+  create: false
+  name: "vault"
+
+
+environment:
+  HTTP_HOST: 0.0.0.0
+  LOG_FORMAT: json
+  DB_HOST: {{ .Values.qkm.postgresql.host }}.{{ .Values.qkm.namespace }}
+  DB_PORT: 5432
+  DB_DATABASE: {{ .Values.qkm.postgresql.database }}
+  DB_PASSWORD: {{ .Values.qkm.postgresql.password }}
+  {{ if .Values.qkm.auth.tls.enabled }}
+  HTTPS_ENABLED: {{ .Values.qkm.auth.tls.enabled }}
+  HTTPS_SERVER_KEY: "/certificates/tls.key"
+  HTTPS_SERVER_CERT: "/certificates/tls.crt"
+  AUTH_TLS_CA: "/certificates/ca.crt"
+  {{ end }}
+  {{ if .Values.qkm.auth.apikey.enabled }}
+  AUTH_API_KEY_FILE: {{ .Values.qkm.auth.apikey.file }}
+  {{ end }}
+  {{ if .Values.qkm.auth.oidc.enabled }}
+  AUTH_OIDC_CA_CERT: "/oidc_certs/ca.crt"
+  AUTH_OIDC_PUB_KEY: "/oidc_certs/oidc.pub"
+  AUTH_OIDC_ISSUER_URL: {{ .Values.qkm.auth.oidc.issuer }}
+  {{ end }}
+  {{- range $key,$value := .Values.qkm.environment }}
+  {{ $key }}: {{ $value | quote }}
+  {{- end }}
+environmentSecrets:
+  {{- range $key,$value := .Values.qkm.environmentSecrets }}
+  {{ $key }}: {{ $value | quote }}
+  {{- end }}
+
+manifests: |-
+  {{ if .Values.qkm.b64Manifests }}
+  {{- toYaml .Values.qkm.b64Manifests | b64dec }}
+  {{ end }}
+
+migrate:
+  environment:
+    HTTP_HOST: 0.0.0.0
+    LOG_FORMAT: json
+    DB_HOST: {{ .Values.qkm.postgresql.host }}
+    DB_PORT: {{ .Values.qkm.postgresql.port }}
+    DB_DATABASE: {{ .Values.qkm.postgresql.database }}
+    DB_PASSWORD: {{ .Values.qkm.postgresql.password }}
+    {{ if .Values.qkm.postgresql.tls.enabled }}
+    DB_TLS_SSLMODE: "require"
+    DB_TLS_CA: "/postgres/certs/ca.crt"
+    DB_TLS_CERT: "/postgres/certs/client.crt"
+    DB_TLS_KEY: "/postgres/key/client.key"
+    {{ end }}

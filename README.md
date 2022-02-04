@@ -15,6 +15,7 @@ For more information, refer to the [Orchestrate documentation](https://docs.orch
 <H1>Orchestrate-Kubernetes</H1>
 
 - [Codefi Orchestrate](#codefi-orchestrate)
+- [Deployment overview](#overview)
 - [Compatibility](#compatibility)
 - [1. Requirements](#1-requirements)
   - [1.1. CLI tools](#11-cli-tools)
@@ -32,11 +33,20 @@ For more information, refer to the [Orchestrate documentation](https://docs.orch
 
 This repository contains an implementation example on how to deploy Orchestrate and its dependencies using Kubernetes and Helm charts.
 
+# Overview
+
+Below is a high level diagram of what this chart will help you deploy
+
+
+![overview diagram](./img/overview.png "Overview")
+
+
 # Compatibility
 
 | Orchestrate-kubernetes versions | Orchestrate versions          |
 |---------------------------------|-------------------------------|
-| master/HEAD                     | Orchestrate v21.1.x or higher |
+| master/HEAD                     | Orchestrate v21.12.x or higher |
+| v6.0.0                          | Orchestrate v21.12.x or higher |
 | v5.0.0                          | Orchestrate v21.1.x or higher |
 | v4.0.0                          | Orchestrate v2.5.x            |
 | v3.1.0                          | Orchestrate v2.5.x            |
@@ -120,18 +130,23 @@ This repository provides few examples of environment values sets:
 
 Note: All the passwords and usernames of every dependendcies are located in `environments/common.yaml.gotmpl`. Do not forget to change, eventually extract, those values depending on how you want to manage those secrets.
 
+Note: The ./values/api-key/api-keys.csv gives an exemple of what you should use for the Quorum Key Manager api-keys when this mode is enabled, provided values MUST be changed in a Prod environment.
+
 The following tables lists the configurable values for the environments. Some of them are directly configurable bia envronement variable:
 
 | Parameter                                      | Description                                                                | Default                                                     |
 |------------------------------------------------|----------------------------------------------------------------------------|-------------------------------------------------------------|
 | `orchestrate.namespace`                        | Namespace where Orchestrate will be deployed (env `ORCHESTRATE_NAMESPACE`) | `orchestrate`                                               |
+| `orchestrate.chart.name`                        | This deployment orchestrate chart (env `ORCHESTRATE_CHART`) | `consensys/orchestrate`                                               |
+| `orchestrate.chart.version`                        | Namespace where Orchestrate will be deployed (env `ORCHESTRATE_CHART_VERSION`) | `1.0.6`                                               |
 | `orchestrate.global.imageCredentials.registry` | Docker registry where Orchestrate images are stored (env `REGISTRY_URL`)   | `docker.consensys.net`                                      |
 | `orchestrate.global.imageCredentials.username` | [REQUIRED] Username of the registry (env `REGISTRY_USERNAME`)              |                                                             |
 | `orchestrate.global.imageCredentials.password` | [REQUIRED] Password of the registry (env `REGISTRY_PASSWORD`)              |                                                             |
 | `orchestrate.global.image.repository`          | Path to Orchestrate image (env `ORCHESTRATE_REPOSITORY`)                   | `docker.consensys.net/priv/orchestrate` |
 | `orchestrate.global.image.tag`                 | Orchestrate image tag (env `ORCHESTRATE_TAG`)                              | `v21.1.2`                                                   |
 | `orchestrate.api`                              | Orchestrate API values                                                     |                                                             |
-| `orchestrate.keyManager`                       | Orchestrate Key Manager values                                             |                                                             |
+| `orchestrate.keyManager`                       | Orchestrate Key Manager values, for usage with version 21.1.X                                             |                                                             |
+| `orchestrate.qkm`                       | Orchestrate Key Manager values, for usage with version 21.10.X                                             |                                                             |
 | `orchestrate.txListener`                       | Orchestrate Tx Listener values                                             | `nil`                                                       |
 | `orchestrate.txSender`                         | Orchestrate Tx Sender values                                               | `nil`                                                       |
 | `orchestrate.test.image.repository`            | Path to Orchestrate test image (env `TEST_REPOSITORY`)                     | `nil`                                                       |
@@ -150,13 +165,14 @@ For more information about Vault Operator, please see https://github.com/banzaic
 |-----------------------|------------------------------------------------------------------------------------|--------------------------------------------------------------------|
 | `vault.namespace`     | Namespace where Hashicop Vault will be deployed (env `VAULT_NAMESPACE`)            | `orchestrate`                                                      |
 | `vault.replicaCount`  | Number of Vault instance                                                           | `1`                                                                |
-| `vault.plugin.tag`    | Orchestrate Hashicorp Vault Plugin tag (env `VAULT_PLUGIN_TAG`)                    | `v0.0.9`                                                           |
-| `vault.plugin.sha256` | Orchestrate Hashicorp Vault Plugin SHA256 checksum  (env `VAULT_PLUGIN_SHA256SUM`) | `4919a7fcf66fe98b459e6a46f9233aae9fc2f224ccbb6a44049e2f608b9eebf5` |
+| `vault.plugin.tag`    | Orchestrate Hashicorp Vault Plugin tag (env `VAULT_PLUGIN_TAG`)                    | `v1.1.3`                                                           |
+| `vault.plugin.sha256` | Orchestrate Hashicorp Vault Plugin SHA256 checksum  (env `VAULT_PLUGIN_SHA256SUM`) | `e084800c61749a9c7b51f6e91bb89ab6d5a2678cdb707eaa73f9bef0cf73fc61` |
 
 For more information about values defined in values/vault.yaml.gotmpl, please see https://github.com/banzaicloud/bank-vaults/tree/master/operator/deploy and https://github.com/banzaicloud/bank-vaults/tree/master/charts/vault
 
 | Parameter                             | Description                                                                                                                                                                                                                                                               | Default  |
 |---------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------|
+| `kafka.enabled`                     | Use to enable or disable the kafka deployment, might be replaced by an existin EventHub on Azure for instance                                                                                                                                                                                        | `true`      |
 | `kafka.namespace`                     | Namespace where Kafka and Zookeeper Vault will be deployed (env `KAFKA_NAMESPACE`)                                                                                                                                                                                        | `1`      |
 | `kafka.replicaCount`                  | Number of Kafka instance nodes                                                                                                                                                                                                                                            | `1`      |
 | `kafka.numPartitions`                 | The default number of log partitions per topic                                                                                                                                                                                                                            | `1`      |
@@ -230,9 +246,25 @@ For more information about values defined in values/postgresql.yaml.gotmpl, plea
 |--------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
 | `domainName` | (Option) Domain name registered to the ingress controller of your kubernetes cluster. If not empty Orchestrate API will be exposed to {{orchestrate.namespace}}.{{domainName}}. If the observability stack is enabled grafana.{{domainName}} and prometheus.{{domainName}} will be exposed too (env `DOMAIN_NAME`) | ``      |
 
+
+Values below are useful when deploying orchestrate with version 21.10.X, having possibly a Quorum Key Manager running independently
+
+| Parameter                  | Description                                                           | Default       |
+|----------------------------|-----------------------------------------------------------------------|---------------|
+| `qkm.enabled`              | If true, Quorum Key Manager will be deployed                          | `true`        |
+| `qkm.url`                  | Url where Quorum Key Manager may be reached (env `QKM_URL`)           | `http://quorumkeymanager.orchestrate` |
+| `qkm.namespace`            | Namespace where Quorum Key Manager is deployed (env `QKM_NAMESPACE`)  | `orchestrate` |
+| `qkm.orchestrate.storeName`| Initial and existing eth-account name used by orchestrate             | `eth-accounts` |
+| `qkm.orchestrate.apiKey`   | Existing apiKey used by orchestrate to authenticate                   | `YWRtaW4tdXNlcg==` |
+| `qkm.chart.name`           | Helm chart of your Quorum Key Manager deployment                      | `consensys/quorumkeymanager` |
+| `qkm.chart.version`        | Helm chart version of your Quorum Key Manager deployment              | `1.1.1` |
+| `qkm.port`                 | Port of the Quorum Key Manager service                                | `8080`       |
+
+For more information about values defined in values/qkm.yaml.gotmpl, please refer to https://github.com/ConsenSys/quorum-key-manager-helm
+
 # 3. Hashicorp Vault
 
-This helmfiles deploys [Hashicorp's Vault](https://www.vaultproject.io/) with integrated storage with raft with [Bank-Vaults](https://github.com/banzaicloud/bank-vaults). We deploy first the Vault operator, then the following ressources contained in `values/vault.yaml`:
+This helmfiles optionally deploys [Hashicorp's Vault](https://www.vaultproject.io/) with integrated storage with raft with [Bank-Vaults](https://github.com/banzaicloud/bank-vaults). We deploy first the Vault operator, then the following ressources contained in `values/vault.yaml`:
 - Vault CRD's, including [Vault policy](https://www.vaultproject.io/docs/concepts/policies), [Vault authentication](https://www.vaultproject.io/docs/concepts/auth), and [Orchestrate Hashicorp Vault Plugin](https://github.com/ConsenSys/orchestrate-hashicorp-vault-plugin)
 
 [Vault policy](https://www.vaultproject.io/docs/concepts/policies)
@@ -274,6 +306,8 @@ This helmfiles deploys [Hashicorp's Vault](https://www.vaultproject.io/) with in
 - Service Account
 - RBAC configuration
 
+Note that it is highly recommended to use the `consensys/quorum-hashicorp-vault-plugin` image when deplying a Vault ressource.
+
 # 4. Observability
 
 This helmfile could deploy [Prometheus Operator](https://github.com/coreos/prometheus-operator) and [Prometheus](https://prometheus.io/) based on the [Kube-Prometheus Helm chart](https://github.com/bitnami/charts/tree/master/bitnami/kube-prometheus). It also deploys Grafana with default dashboards for Orchestrate, Kubernetes, Golang, Kafka, Postgres, Redis, and Hashicorp Vault
@@ -296,3 +330,4 @@ kubectl port-forward --namespace $OBSERVABILITY_NAMESPACE svc/grafana 3000:80
 ## 5.1. From Orchestrate v2.5.X to v21.1.X
 
 [Read the steps to upgrade Orchestrate v2.5.X to v21.1.X](docs/upgrades/v21-1-X.md)
+

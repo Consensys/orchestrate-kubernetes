@@ -1,3 +1,4 @@
+{{- if .Values.vault.enabled }}
 {{ $replicaCount := .Values | get "vault.replicaCount" 1 }}
 
 templates:
@@ -8,8 +9,10 @@ templates:
     name: vault
   spec:
     size: {{ $replicaCount }}
-    image: vault:1.6.2
-    bankVaultsImage: banzaicloud/bank-vaults:1.8.0
+    image: consensys/quorum-hashicorp-vault-plugin:{{ .Values.vault.plugin.tag }}
+    bankVaultsImage: banzaicloud/bank-vaults:1.14.3
+
+      
 
     # Vault Pods , Services and TLS Secret annotations
     vaultAnnotations:
@@ -24,37 +27,13 @@ templates:
 
     serviceType: ClusterIP
 
-    vaultInitContainers:
-      - name: orchestrate-plugin
-        image: alpine:3.13
-        command:
-          - /bin/sh
-          - -c
-          - |
-            wget -q --header='Accept:application/octet-stream' \
-              $PLUGIN_REPO/releases/download/$PLUGIN_VERSION/$PLUGIN_FILE \
-              -O "${PLUGINS_PATH}/orchestrate"
-            chmod +x ${PLUGINS_PATH}/orchestrate
-            echo "${PLUGIN_VERSION}/${PLUGIN_FILE} downloaded"
-            echo "File at ${PLUGINS_PATH}/orchestrate"
-        env: 
-          - name: PLUGIN_VERSION
-            value: {{ .Values.vault.plugin.tag }}
-          - name: PLUGIN_FILE
-            value: orchestrate-hashicorp-vault-plugin
-          - name: PLUGIN_REPO
-            value: https://github.com/ConsenSys/orchestrate-hashicorp-vault-plugin
-          - name: PLUGINS_PATH
-            value: /vault/plugins
-        volumeMounts:
-          - name: vault-plugin
-            mountPath: /vault/plugins
+    
+
+  
 
     # Use local disk to store Vault file data, see config section.
     
     volumeMounts:
-      - name: vault-plugin
-        mountPath: /vault/plugins
       - name: vault-file
         mountPath: /vault/file
 
@@ -71,20 +50,14 @@ templates:
           resources:
             requests:
               storage: 1Gi
-      - metadata:
-          name: vault-plugin
-        spec:
-          accessModes:
-            - ReadWriteOnce
-          resources:
-            requests:
-              storage: 1Gi
-
+    
     vaultContainerSpec:
+      name: "vault"
       lifecycle:
         postStart:
           exec:
-            command: ["/bin/sh", "-c", "setcap cap_ipc_lock=+ep /vault/plugins/orchestrate"]
+            command: ["/bin/sh", "-c", "setcap cap_ipc_lock=+ep /vault/plugins/quorum-hashicorp-vault-plugin"]
+
   
     # Describe where you would like to store the Vault unseal keys and root token.
     unsealConfig:
@@ -98,6 +71,7 @@ templates:
     # A YAML representation of a final vault config file.
     # See https://www.vaultproject.io/docs/configuration/ for more information.
     config:
+      ui: false
       storage:
         {{- if gt $replicaCount 1 }}
         raft:
@@ -110,7 +84,7 @@ templates:
           address: 0.0.0.0:8200
           tls_disable: true
       plugin_directory: /vault/plugins
-      api_addr: http://localhost:8200
+      api_addr: "http://vault.{{ .Values.vault.namespace }}.svc.cluster.local:8200"
       cluster_addr: http://${.Env.POD_NAME}:8201
       {{ if .Values.observability.enabled }}
       telemetry:
@@ -126,17 +100,22 @@ templates:
             capabilities = ["list", "read"]
             }
         {{ end }}
-        - name: orchestrate_key_manager
-          rules: path "orchestrate/*" {
-            capabilities = ["create", "read", "update", "list"]
+        - name: quorum_key_manager
+          rules: path "{{ .Values.vault.plugin.name }}/*" {
+            capabilities = ["create", "read", "update", "list", "delete"]
+            }
+        - name: allow_secrets
+          rules: path "secret/*" {
+            capabilities = ["create", "read", "update", "list", "delete"]
             }
       auth:
         - type: kubernetes
           roles:
-            - name: orchestrate-key-manager
-              bound_service_account_names: ["orchestrate-key-manager", "vault-secrets-webhook", "vault"]
+            - name: {{ .Values.vault.namespace }}
+              bound_service_account_names: ["quorum_key_manager", "vault-secrets-webhook", "vault"]
               bound_service_account_namespaces: ["{{ .Values.vault.namespace }}", "{{ .Values.orchestrate.namespace }}"]
-              policies: orchestrate_key_manager
+              policies: quorum_key_manager, allow_secrets
+
         {{ if .Values.observability.enabled }}
         - type: kubernetes
           roles:
@@ -147,17 +126,22 @@ templates:
         {{ end }}
 
       secrets:
-        - path: orchestrate
+        - path: {{ .Values.vault.plugin.name }}
           type: plugin
-          plugin_name: orchestrate
+          plugin_name: {{ .Values.vault.plugin.name }}
           description: Orchestrate key storage gateway
           config:
             force_no_cache: true
             passthrough_request_headers: ["X-Vault-Namespace"]
+        - path: secret
+          type: kv-v2
+          description: Orchestrate secrets kvv2
+          options:
+            version: 2
 
       plugins:
-        - plugin_name: orchestrate
-          command: orchestrate
+        - plugin_name: {{ .Values.vault.plugin.name }}
+          command: {{ .Values.vault.plugin.filename }}
           sha256: {{ .Values.vault.plugin.sha256 }}
           type: secret
 
@@ -206,6 +190,4 @@ templates:
     - kind: ServiceAccount
       name: vault
       namespace: {{ .Values.vault.namespace }}
-    - kind: ServiceAccount
-      name: vault
-      namespace: {{ .Values.orchestrate.namespace }}
+{{- end }}
