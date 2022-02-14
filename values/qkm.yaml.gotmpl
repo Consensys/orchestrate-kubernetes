@@ -1,4 +1,6 @@
 
+{{ $qkmVaultTls := .Values | get "qkm.vault.tls.enabled" false }}
+
 image:
   repository: {{ .Values.qkm.image.repository }}
   pullPolicy: IfNotPresent
@@ -53,16 +55,24 @@ auth:
 
 vault:
   tls:
-    enabled: false
+    enabled: {{ $qkmVaultTls }}
   agents:
-    - name: "orchestrate"
-      vaultAddress: "http://vault.orchestrate.svc.cluster.local:8200"
+  {{- range .Values.qkm.vault.agents }}
+    - name: {{ .name }}
+      vaultAddress: {{ .vaultAddress }}
       image:
         repository: vault
         tag: 1.8.2
       config:
         wrapTTL: ""
-        role: "orchestrate"
+        role: {{ .config.role }}
+  {{- if $qkmVaultTls }}
+      ca: {{ .ca }}
+      key: {{ .key }}
+      crt: {{ .crt }}
+  {{- end }}
+      mountPath: /vault/token
+  {{- end }}
 
 serviceAccount:
   create: false
