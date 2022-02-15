@@ -33,6 +33,6 @@ qkm:
       enabled: false
     agents:
       - name: orchestrate
-        vaultAddress: http://vault.orchestrate:8200
+        vaultAddress: http://vault.qa:8200
         config:
-          role: orchestrate
+          role: qa
