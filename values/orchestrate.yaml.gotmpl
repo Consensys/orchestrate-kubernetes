@@ -60,6 +60,9 @@ api:
                 service:
                   port:
                     number: 80
+    tls:
+    - hosts:
+      - {{ .Values.orchestrate.namespace }}.orchestrate.{{ .Values.domainName }}
   {{- end }}
   environment:
     {{- range $key, $value := $kafkaEnv }}
