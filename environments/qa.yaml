@@ -25,3 +25,14 @@ zookeeper:
       memory: "512Mi"
     limits:
       memory: "2Gi"
+
+qkm:
+  enabled: true
+  vault:
+    tls:
+      enabled: false
+    agents:
+      - name: orchestrate
+        vaultAddress: http://vault.qa:8200
+        config:
+          role: qa
