@@ -1,5 +1,3 @@
-{{ $kafkaURL := printf "kafka-%s.%s:9092" .Environment.Name .Values.kafka.namespace }}
-{{ $kafkaEnv := ternary (dict "KAFKA_URL" $kafkaURL "KAFKA_SASL_ENABLED" true "KAFKA_SASL_MECHANISM" "PLAIN" "KAFKA_SASL_USER" .Values.kafka.auth.username "KAFKA_SASL_PASSWORD" .Values.kafka.auth.password) (dict "KAFKA_URL" $kafkaURL) .Values.kafka.auth.enabled }}
 {{ $replicaCount := .Values | get "orchestrate.replicaCount" 1 }}
 {{/* API Proxy cache TTL */}}
 {{ $proxyCacheTTL := "2" }}
@@ -65,9 +63,6 @@ api:
       - {{ .Values.orchestrate.namespace }}.orchestrate.{{ .Values.domainName }}
   {{- end }}
   environment:
-    {{- range $key, $value := $kafkaEnv }}
-    {{ $key }}: {{ $value }}
-    {{- end }}
     {{- if .Values.postgresqlHA.enabled }}
     DB_HOST: "postgresql-ha-pgpool.{{ .Values.postgresqlHA.namespace }}"
     DB_DATABASE: {{ .Values.postgresqlHA.postgresql.database | quote }}
@@ -110,9 +105,6 @@ api:
 
 migrate:
   environment:
-    {{- range $key, $value := $kafkaEnv }}
-    {{ $key }}: {{ $value }}
-    {{- end }}
     {{- if .Values.postgresqlHA.enabled }}
     DB_HOST: "postgresql-ha-pgpool.{{ .Values.postgresqlHA.namespace }}"
     DB_DATABASE: {{ .Values.postgresqlHA.postgresql.database | quote }}
@@ -145,9 +137,6 @@ migrate:
 
 txListener:
   environment:
-    {{- range $key, $value := $kafkaEnv }}
-    {{ $key }}: {{ $value }}
-    {{- end }}
     {{- range $key,$value := .Values.orchestrate.txListener.environment }}
     {{ $key }}: {{ $value | quote }}
     {{- end }}
@@ -159,9 +148,6 @@ txListener:
 txSender:
   replicaCount: {{ $replicaCount }}
   environment:
-    {{- range $key, $value := $kafkaEnv }}
-    {{ $key }}: {{ $value }}
-    {{- end }}
     REDIS_HOST: "redis-master.{{ .Values.redis.namespace }}"
     REDIS_PORT: "6379"
     REDIS_PASSWORD: {{ .Values.redis.password | quote }}
