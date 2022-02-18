@@ -32,7 +32,7 @@ orchestrate:
     environment:
       KAFKA_TLS_ENABLED: true
       KAFKA_URL: {{ requiredEnv "KAFKA_URL" }}
-      KAFKA_SASL_ENABLED: true
+      KAFKA_SASL_ENABLED: false
       KAFKA_TLS_INSECURE_SKIP_VERIFY: true
       KAFKA_SASL_USER: "$ConnectionString"
       KAFKA_SASL_PASSWORD: {{ requiredEnv "KAFKA_SASL_PASSWORD" }}
@@ -47,8 +47,8 @@ orchestrate:
   txListener:
     environment:
       KAFKA_TLS_ENABLED: true
-      KAFKA_URL: "tanuki.servicebus.windows.net:9093"
-      KAFKA_SASL_ENABLED: true
+      KAFKA_URL: {{ requiredEnv "KAFKA_URL" }}
+      KAFKA_SASL_ENABLED: false
       KAFKA_TLS_INSECURE_SKIP_VERIFY: true
       KAFKA_SASL_USER: "$ConnectionString"
       KAFKA_SASL_PASSWORD: {{ requiredEnv "KAFKA_SASL_PASSWORD" }}
@@ -58,8 +58,8 @@ orchestrate:
   txSender:
     environment:
       KAFKA_TLS_ENABLED: true
-      KAFKA_URL: "tanuki.servicebus.windows.net:9093"
-      KAFKA_SASL_ENABLED: true
+      KAFKA_URL: {{ requiredEnv "KAFKA_URL" }}
+      KAFKA_SASL_ENABLED: false
       KAFKA_TLS_INSECURE_SKIP_VERIFY: true
       KAFKA_SASL_USER: "$ConnectionString"
       KAFKA_SASL_PASSWORD: {{ requiredEnv "KAFKA_SASL_PASSWORD" }}
