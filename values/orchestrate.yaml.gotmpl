@@ -148,9 +148,6 @@ txListener:
 txSender:
   replicaCount: {{ $replicaCount }}
   environment:
-    REDIS_HOST: "redis-master.{{ .Values.redis.namespace }}"
-    REDIS_PORT: "6379"
-    REDIS_PASSWORD: {{ .Values.redis.password | quote }}
     {{- range $key,$value := .Values.orchestrate.txSender.environment }}
     {{ $key }}: {{ $value | quote }}
     {{- end }}

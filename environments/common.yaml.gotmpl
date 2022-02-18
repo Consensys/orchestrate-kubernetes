@@ -21,20 +21,55 @@ orchestrate:
     image:
       repository: {{ env "ORCHESTRATE_REPOSITORY" | default "consensys/orchestrate" }}
       tag: {{ env "ORCHESTRATE_TAG" | default $tag | quote }}
-    environment: {}
-    environmentSecrets: {}
+    environment: 
+      DB_USER: {{ requiredEnv "TANUKI_PG_USER" }}
+      DB_HOST: {{ requiredEnv "TANUKI_PG_HOST" }}
+      DB_DATABASE: {{ env "TANUKI_PG_DB" | default "postgres" }}
+      DB_TLS_SSLMODE: "require"
+      
+    environmentSecrets:
+      DB_PASSWORD: {{ requiredEnv "TANUKI_PG_PWD" }}
 
   api:
     enabled: true
-    environment: {}
-    environmentSecrets: {}
+    environment:
+      KAFKA_TLS_ENABLED: true
+      KAFKA_URL: {{ requiredEnv "KAFKA_URL" }}
+      KAFKA_SASL_ENABLED: true
+      KAFKA_TLS_INSECURE_SKIP_VERIFY: true
+      KAFKA_SASL_USER: "$ConnectionString"
+      KAFKA_SASL_PASSWORD: {{ requiredEnv "KAFKA_SASL_PASSWORD" }}
+      KAFKA_SASL_MECHANISM: "PLAIN"
+      DB_USER: {{ requiredEnv "TANUKI_PG_USER" }}
+      DB_HOST: {{ requiredEnv "TANUKI_PG_HOST" }}
+      DB_DATABASE: {{ env "TANUKI_PG_DB" | default "postgres" }}
+      DB_TLS_SSLMODE: "require"  
+    environmentSecrets:
+      DB_PASSWORD: {{ requiredEnv "TANUKI_PG_PWD" }} 
 
   txListener:
-    environment: {}
+    environment:
+      KAFKA_TLS_ENABLED: true
+      KAFKA_URL: "tanuki.servicebus.windows.net:9093"
+      KAFKA_SASL_ENABLED: true
+      KAFKA_TLS_INSECURE_SKIP_VERIFY: true
+      KAFKA_SASL_USER: "$ConnectionString"
+      KAFKA_SASL_PASSWORD: {{ requiredEnv "KAFKA_SASL_PASSWORD" }}
+      KAFKA_SASL_MECHANISM: "PLAIN"
     environmentSecrets: {}
 
   txSender:
-    environment: {}
+    environment:
+      KAFKA_TLS_ENABLED: true
+      KAFKA_URL: "tanuki.servicebus.windows.net:9093"
+      KAFKA_SASL_ENABLED: true
+      KAFKA_TLS_INSECURE_SKIP_VERIFY: true
+      KAFKA_SASL_USER: "$ConnectionString"
+      KAFKA_SASL_PASSWORD: {{ requiredEnv "KAFKA_SASL_PASSWORD" }}
+      KAFKA_SASL_MECHANISM: "PLAIN"
+      REDIS_HOST: {{ requiredEnv "TANUKI_REDIS_ENDPOINT" }}
+      REDIS_PORT: {{ env "TANUKI_REDIS_PORT" | default "6379" }}
+
     environmentSecrets: {}
   
   migrate:
@@ -64,28 +99,6 @@ vault:
   envs:
     - VAULT_ADDR: "http://localhost:8200"
 
-kafka:
-  enabled: true
-  namespace: {{ env "KAFKA_NAMESPACE" | default "kafka" }}
-  auth:
-    enabled: true
-    username: user1
-    password: secret
-  externalAccess:
-    enabled: {{ env "KAFKA_EXTERNAL_ACCESS" | default false }}
-
-zookeeper:
-  auth:
-    enabled: true
-    serverUsers: zookeeperUser
-    serverPasswords: zookeeperPassword
-    clientUser: zookeeperClientUser
-    clientPassword: zookeeperClientPassword
-
-redis:
-  enabled: true
-  namespace: {{ env "REDIS_NAMESPACE" | default ( env "ORCHESTRATE_NAMESPACE" | default $defaultNamespace ) }}
-  password: such-secret
 
 postgresql:
   enabled: true

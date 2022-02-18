@@ -12,14 +12,6 @@ releases:
     values:
       - values/vault.yaml.gotmpl
 {{- end }}
-  - name: redis
-    namespace: {{ .Values.redis.namespace }}
-    chart: bitnami/redis
-    version: 10.6.0
-    atomic: true
-    condition: redis.enabled
-    values:
-      - values/redis.yaml.gotmpl
   - name: postgresql
     namespace: {{ .Values.postgresql.namespace }}
     chart: bitnami/postgresql
@@ -43,7 +35,6 @@ releases:
     version: {{ .Values.orchestrate.chart.version }}
     needs: 
       - {{ .Values.vault.namespace }}/vault
-      - {{ .Values.redis.namespace }}/redis
       - {{ .Values.postgresql.namespace }}/postgresql
     values:
       - values/orchestrate.yaml.gotmpl
