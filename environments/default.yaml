@@ -1,18 +1,4 @@
 observability:
   enabled: false
-
-kafka:
-  enabled: false
-  logRetentionHours: 1
-  resources:
-    requests:
-      memory: "1Gi"
-    limits:
-      memory: "2Gi"
-
-zookeeper:
-  resources:
-    requests:
-      memory: "512Mi"
-    limits:
-      memory: "1Gi"
+qkm:
+  url: quorum-key-manager-quorumkeymanager.qa-qkm

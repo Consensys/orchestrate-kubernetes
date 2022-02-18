@@ -12,22 +12,6 @@ releases:
     values:
       - values/vault.yaml.gotmpl
 {{- end }}
-  - name: postgresql
-    namespace: {{ .Values.postgresql.namespace }}
-    chart: bitnami/postgresql
-    atomic: true
-    condition: postgresql.enabled
-    version: 8.6.12
-    values:
-      - values/postgresql.yaml.gotmpl
-  - name: postgresql-ha
-    namespace: {{ .Values.postgresqlHA.namespace }}
-    chart: bitnami/postgresql-ha
-    atomic: true
-    condition: postgresqlHA.enabled
-    version: 6.5.2
-    values:
-      - values/postgresql-ha.yaml.gotmpl
   - name: orchestrate
     namespace: {{ .Values.orchestrate.namespace }}
     chart: {{ .Values.orchestrate.chart.name }}
@@ -35,24 +19,5 @@ releases:
     version: {{ .Values.orchestrate.chart.version }}
     needs: 
       - {{ .Values.vault.namespace }}/vault
-      - {{ .Values.postgresql.namespace }}/postgresql
     values:
       - values/orchestrate.yaml.gotmpl
-  - name: qkm-postgresql
-    namespace: {{ .Values.qkm.namespace }}
-    chart: bitnami/postgresql
-    version: 10.9.5
-    atomic: true
-    condition: postgresql-qkm.enabled
-    values:
-      - values/qkm-postgres.yaml.gotmpl
-  - name: quorum-key-manager
-    namespace: {{ .Values.qkm.namespace }}
-    chart: {{ .Values.qkm.chart.name }}
-    atomic: true
-    condition: qkm.enabled
-    version: {{ .Values.qkm.chart.version }}
-    needs:
-      - {{ .Values.qkm.namespace }}/qkm-postgresql
-    values:
-      - values/qkm.yaml.gotmpl

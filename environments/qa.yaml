@@ -10,29 +10,5 @@ orchestrate:
 observability:
   enabled: false
 
-kafka:
-  numPartitions: 3
-  logRetentionHours: 12
-  resources:
-    requests:
-      memory: "1Gi"
-    limits:
-      memory: "2Gi"
-
-zookeeper:
-  resources:
-    requests:
-      memory: "512Mi"
-    limits:
-      memory: "2Gi"
-
 qkm:
-  enabled: true
-  vault:
-    tls:
-      enabled: false
-    agents:
-      - name: orchestrate
-        vaultAddress: http://vault.qa:8200
-        config:
-          role: qa
+  url: quorum-key-manager-quorumkeymanager.qa-qkm
