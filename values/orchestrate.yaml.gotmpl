@@ -10,8 +10,10 @@ global:
     {{ $key }}: {{ $value | quote }}
     {{- end }}
     {{- if .Values.qkm.url }}
-    KEY_MANAGER_URL: {{ .Values.qkm.url }}
+    KEY_MANAGER_URL: {{ .Values.qkm.url }} 
     {{- end }}
+    KEY_MANAGER_STORE_NAME: {{ .Values.qkm.orchestrate.storeName }}
+    KEY_MANAGER_TLS_SKIP_VERIFY: true
     AUTH_JWT_ISSUER_URL: {{ .Values.orchestrate.auth.jwt.issuerUrl }}
     AUTH_JWT_AUDIENCE: {{ .Values.orchestrate.auth.jwt.audience }}
     AUTH_JWT_ORCHESTRATE_CLAIMS: {{ .Values.orchestrate.auth.jwt.claims }}
@@ -48,7 +50,7 @@ api:
               backend:
                 service:
                   port:
-                    number: 80
+                    number: 8081
     tls:
     - hosts:
       - {{ .Values.orchestrate.namespace }}.orchestrate.{{ .Values.domainName }}
