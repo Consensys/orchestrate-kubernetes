@@ -11,4 +11,4 @@ observability:
   enabled: false
 
 qkm:
-  url: quorum-key-manager-quorumkeymanager.qa-qkm
+  url: https://qa-qkm.ops.consensys.net
