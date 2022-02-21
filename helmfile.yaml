@@ -3,6 +3,4 @@ bases:
   - helmfile-common.yaml
 ---
 helmfiles:
-  - helmfile-operators.yaml
-  - helmfile-observability.yaml
   - helmfile-core.yaml
