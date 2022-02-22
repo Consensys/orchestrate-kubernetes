@@ -25,13 +25,23 @@ For more information, refer to the [Orchestrate documentation](https://docs.orch
   - [2.2. Delete Orchestrate](#22-delete-orchestrate)
   - [2.3. Advanced configuration](#23-advanced-configuration)
 - [3. Hashicorp Vault](#3-hashicorp-vault)
-- [4. Observability](#4-observability)
-  - [4.1. Prometheus dashboard](#41-prometheus-dashboard)
-  - [4.2. Grafana](#42-grafana)
-- [5. Upgrading](#5-upgrading)
-  - [5.1. From Orchestrate v2.5.X to v21.1.X](#51-from-orchestrate-v25x-to-v211x)
+- [4. Upgrading](#5-upgrading)
+  - [4.1. From Orchestrate v2.5.X to v21.1.X](#51-from-orchestrate-v25x-to-v211x)
 
-This repository contains an implementation example on how to deploy Orchestrate and its dependencies using Kubernetes and Helm charts.
+This repository contains an implementation example on how to deploy Orchestrate and an optional Vault server using Kubernetes and Helm charts.
+
+This chart used to help deploy Orchestrate dependencies :
+
+- Kafka
+- Postgres
+- Redis
+- Quorum-key-manager
+- Vault-operator
+
+It is now your responsibility to deploy all these separately.
+You will find relevant information related to these deployments or managed solutions via your prefered cloud provider platforms.
+
+For Vault-operator it is mandatory to rely on https://github.com/banzaicloud/bank-vaults/tree/master/charts/vault-operator
 
 # Overview
 
@@ -46,6 +56,7 @@ Below is a high level diagram of what this chart will help you deploy
 | Orchestrate-kubernetes versions | Orchestrate versions          |
 |---------------------------------|-------------------------------|
 | master/HEAD                     | Orchestrate v21.12.x or higher |
+| v7.0.0                          | Orchestrate v21.12.x or higher |
 | v6.0.0                          | Orchestrate v21.12.x or higher |
 | v5.0.0                          | Orchestrate v21.1.x or higher |
 | v4.0.0                          | Orchestrate v2.5.x            |
@@ -79,7 +90,7 @@ export REGISTRY_PASSWORD=<PASSWORD>
 
 ## 2.1. Quickstart
 
-1. To deploy a simple Orchestrate (not production ready) and its dependencies, run the following command:
+1. To deploy a simple Orchestrate (not production ready), run the following command:
 
 ```bash
 helmfile apply --suppress-secrets
@@ -102,16 +113,6 @@ helmfile delete --purge
 kubectl delete namespace orchestrate
 ```
 
-If you have deployed the observability stack, you have to delete the following
-```bash
-kubectl delete crd prometheuses.monitoring.coreos.com
-kubectl delete crd prometheusrules.monitoring.coreos.com
-kubectl delete crd servicemonitors.monitoring.coreos.com
-kubectl delete crd podmonitors.monitoring.coreos.com
-kubectl delete crd alertmanagers.monitoring.coreos.com
-kubectl delete crd thanosrulers.monitoring.coreos.com
-```
-
 ## 2.3. Advanced configuration
 
 This repository provides few examples of environment values sets:
@@ -120,19 +121,12 @@ This repository provides few examples of environment values sets:
   - One partition per Kafka topic 
 - `environments/qa.yaml`: `helmfile -e qa apply`
   - Deploy a Orchestrate services with multitenancy
-  - 3 partitions per Kafka topic
 - `environments/staging.yaml`: `helmfile -e staging apply`
   - Deploy a 3-replica of Orchestrate services with multitenancy distributed accros Availability-Zones
-  - 3-replica of Kafka and Zookeeper with 3 partitions per Kafka topic
-  - Postgres cluster with 1 master and 2 slaves. With PGPool-II and Repmgr 
-  - Redis in cluter mode with 1 master and 2 slaves
-  - 3 Hashicorp Vault with raft integrated storage
 
-Note: All the passwords and usernames of every dependendcies are located in `environments/common.yaml.gotmpl`. Do not forget to change, eventually extract, those values depending on how you want to manage those secrets.
+Note: All the passwords and usernames of every dependency are located in `environments/common.yaml.gotmpl`. Do not forget to change,  extract, those values depending on your needs / environment.
 
-Note: The ./values/api-key/api-keys.csv gives an exemple of what you should use for the Quorum Key Manager api-keys when this mode is enabled, provided values MUST be changed in a Prod environment.
-
-The following tables lists the configurable values for the environments. Some of them are directly configurable bia envronement variable:
+The following tables lists the configurable values for the environments. Some of them are directly configurable via environement variable:
 
 | Parameter                                      | Description                                                                | Default                                                     |
 |------------------------------------------------|----------------------------------------------------------------------------|-------------------------------------------------------------|
@@ -145,21 +139,13 @@ The following tables lists the configurable values for the environments. Some of
 | `orchestrate.global.image.repository`          | Path to Orchestrate image (env `ORCHESTRATE_REPOSITORY`)                   | `docker.consensys.net/priv/orchestrate` |
 | `orchestrate.global.image.tag`                 | Orchestrate image tag (env `ORCHESTRATE_TAG`)                              | `v21.1.2`                                                   |
 | `orchestrate.api`                              | Orchestrate API values                                                     |                                                             |
-| `orchestrate.keyManager`                       | Orchestrate Key Manager values, for usage with version 21.1.X                                             |                                                             |
-| `orchestrate.qkm`                       | Orchestrate Key Manager values, for usage with version 21.10.X                                             |                                                             |
+| `orchestrate.qkm`                       | Orchestrate Key Manager values, for usage with version 21.10.X and above                                            |                                                             |
 | `orchestrate.txListener`                       | Orchestrate Tx Listener values                                             | `nil`                                                       |
 | `orchestrate.txSender`                         | Orchestrate Tx Sender values                                               | `nil`                                                       |
 | `orchestrate.test.image.repository`            | Path to Orchestrate test image (env `TEST_REPOSITORY`)                     | `nil`                                                       |
 | `orchestrate.test.image.tag`                   | Orchestrate test image tag (env `TEST_TAG`)                                | `nil`                                                       |
 
 For more information about values defined in values/orchestrate.yaml.gotmpl, please see https://github.com/ConsenSys/orchestrate-helm
-
-
-| Parameter                 | Description                                                                          | Default          |
-|---------------------------|--------------------------------------------------------------------------------------|------------------|
-| `vaultOperator.namespace` | Namespace where the Vault Operator will be deployed (env `VAULT_OPERATOR_NAMESPACE`) | `vault-operator` |
-
-For more information about Vault Operator, please see https://github.com/banzaicloud/bank-vaults/tree/master/charts/vault-operator
 
 | Parameter             | Description                                                                        | Default                                                            |
 |-----------------------|------------------------------------------------------------------------------------|--------------------------------------------------------------------|
@@ -170,77 +156,6 @@ For more information about Vault Operator, please see https://github.com/banzaic
 
 For more information about values defined in values/vault.yaml.gotmpl, please see https://github.com/banzaicloud/bank-vaults/tree/master/operator/deploy and https://github.com/banzaicloud/bank-vaults/tree/master/charts/vault
 
-| Parameter                             | Description                                                                                                                                                                                                                                                               | Default  |
-|---------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------|
-| `kafka.enabled`                     | Use to enable or disable the kafka deployment, might be replaced by an existin EventHub on Azure for instance                                                                                                                                                                                        | `true`      |
-| `kafka.namespace`                     | Namespace where Kafka and Zookeeper Vault will be deployed (env `KAFKA_NAMESPACE`)                                                                                                                                                                                        | `1`      |
-| `kafka.replicaCount`                  | Number of Kafka instance nodes                                                                                                                                                                                                                                            | `1`      |
-| `kafka.numPartitions`                 | The default number of log partitions per topic                                                                                                                                                                                                                            | `1`      |
-| `kafka.logRetentionHours`             | The minimum age of a log file to be eligible for deletion due to age                                                                                                                                                                                                      | `24`     |
-| `kafka.persistence.enabled`           | Enabled Kafka data persistence                                                                                                                                                                                                                                            | `true`   |
-| `kafka.persistence.size`              | Kafka data persistence size PVC                                                                                                                                                                                                                                           | `4Gi`    |
-| `kafka.resources.requests.memory`     | Memory requested for Kafka containers                                                                                                                                                                                                                                     | `4Gi`    |
-| `kafka.resources.requests.cpu`        | CPU requested for Kafka containers                                                                                                                                                                                                                                        | `100m`   |
-| `kafka.resources.limits.memory`       | Memory limit for Kafka containers                                                                                                                                                                                                                                         | `8Gi`    |
-| `kafka.resources.limits.cpu`          | CPU limit for Kafka containers                                                                                                                                                                                                                                            | `500m`   |
-| `kafka.auth.enabled`                  | Enable SASL PLAINTEXT authentification                                                                                                                                                                                                                                    | `true`   |
-| `kafka.auth.username`                 | Kafka client username                                                                                                                                                                                                                                                     | `user1`  |
-| `kafka.auth.password`                 | Kafka client password                                                                                                                                                                                                                                                     | `secret` |
-| `kafka.externalAccess.enabled`        | Enable external access to kafka through a new load balancer (env `KAFKA_EXTERNAL_ACCESS`). If enabled, you use external-dns, and `domainName` is provided, then each kafka brokers will be reachable in kafka-{{environement}}-$i.{{kafka.namespace}}.{{domainName}}:9094 | `false`  |
-| `zookeeper.replicaCount`              | Number of Zookeeper nodes                                                                                                                                                                                                                                                 | `1`      |
-| `zookeeper.persistence`               | Zookeeper data persistence using PVC                                                                                                                                                                                                                                      |          |
-| `zookeeper.resources.requests.memory` | Memory requested for Zookeeper containers                                                                                                                                                                                                                                 | `512Mi`  |
-| `zookeeper.resources.requests.cpu`    | CPU requested for Zookeeper containers                                                                                                                                                                                                                                    | `100m`   |
-| `zookeeper.resources.limits.memory`   | Memory limit for Zookeeper containers                                                                                                                                                                                                                                     | `1Gi`    |
-| `zookeeper.resources.limits.cpu`      | CPU limit for Zookeeper containers                                                                                                                                                                                                                                        | `300m`   |
-
-For more information about values defined in values/kafka.yaml.gotmpl, please see https://github.com/bitnami/charts/tree/master/bitnami/kafka
-
-
-| Parameter                  | Description                                                    | Default       |
-|----------------------------|----------------------------------------------------------------|---------------|
-| `redis.enabled`            | If true, Redis will be deployed                                | `true`        |
-| `redis.namespace`          | Namespace where Redis will be deployed (env `REDIS_NAMESPACE`) | `orchestrate` |
-| `redis.password`           | Redis password                                                 | `such-secret` |
-| `redis.cluster.enabled`    | Use master-slave topology                                      | `false`       |
-| `redis.cluster.slaveCount` | Number of slaves                                               | `0`           |
-
-For more information about values defined in values/redis.yaml.gotmpl, please see https://github.com/bitnami/charts/tree/master/bitnami/redis
-
-| Parameter                             | Description                                                          | Default       |
-|---------------------------------------|----------------------------------------------------------------------|---------------|
-| `postgresql.enabled`                  | If true, Postgres will be deployed                                   | `true`        |
-| `postgresql.namespace`                | Namespace where Postgres will be deployed (env `POSTGRES_NAMESPACE`) | `orchestrate` |
-| `postgresql.username`                 | Username of Postgres                                                 | `api`         |
-| `postgresql.password`                 | Password of Postgres                                                 | `such-secret` |
-| `postgresql.database`                 | Database name                                                        | `api`         |
-| `postgresql.replication.enabled`      | Enable replication                                                   | `false`       |
-| `postgresql.replication.readReplicas` | Number of read replicas                                              | `1`           |
-| `postgresql.persistence.size`         | PVC storage request size                                             | `8Gi`         |
-
-For more information about values defined in values/postgresql.yaml.gotmpl, please see https://github.com/bitnami/charts/tree/master/bitnami/postgresql
-
-| Parameter                                | Description                                                             | Default       |
-|------------------------------------------|-------------------------------------------------------------------------|---------------|
-| `postgresqlHA.enabled`                   | If true, Postgres HA will be deployed                                   | `false`       |
-| `postgresqlHA.namespace`                 | Namespace where Postgres HA will be deployed (env `POSTGRES_NAMESPACE`) | `orchestrate` |
-| `postgresqlHA.postgresql.username`       | Username of Postgres                                                    | `api`         |
-| `postgresqlHA.postgresql.password`       | Password of Postgres                                                    | `such-secret` |
-| `postgresqlHA.postgresql.database`       | Database name                                                           | `api`         |
-| `postgresqlHA.postgresql.repmgrPassword` | Repmgr password                                                         | `api`         |
-| `postgresqlHA.postgresql.replicaCount`   | Number of replicas                                                      | `1`           |
-| `postgresqlHA.persistence.size`          | PVC storage request size                                                | `8Gi`         |
-| `postgresqlHA.pgpool.replicaCount`       | Number of PGPool-II replicas                                            | `1`           |
-
-For more information about values defined in values/postgresql.yaml.gotmpl, please see https://github.com/bitnami/charts/tree/master/bitnami/postgresql-ha
-
-
-| Parameter                        | Description                                                                                                 | Default         |
-|----------------------------------|-------------------------------------------------------------------------------------------------------------|-----------------|
-| `observability.enabled`          | If true, The Observability stack will be deployed as well as the service monitors and the metrics exporters | `false`         |
-| `observability.namespace`        | Namespace where the observability stack will be deployed  (env `OBSERVABILITY_NAMESPACE`)                   | `observability` |
-| `observability.grafana.user`     | Root user name                                                                                              | `admin`         |
-| `observability.grafana.password` | Root user password                                                                                          | `frenchfries`   |
 
 | Parameter    | Description                                                                                                                                                                                                                                                                                                        | Default |
 |--------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
@@ -256,9 +171,6 @@ Values below are useful when deploying orchestrate with version 21.10.X, having 
 | `qkm.namespace`            | Namespace where Quorum Key Manager is deployed (env `QKM_NAMESPACE`)  | `orchestrate` |
 | `qkm.orchestrate.storeName`| Initial and existing eth-account name used by orchestrate             | `eth-accounts` |
 | `qkm.orchestrate.apiKey`   | Existing apiKey used by orchestrate to authenticate                   | `YWRtaW4tdXNlcg==` |
-| `qkm.chart.name`           | Helm chart of your Quorum Key Manager deployment                      | `consensys/quorumkeymanager` |
-| `qkm.chart.version`        | Helm chart version of your Quorum Key Manager deployment              | `1.1.1` |
-| `qkm.port`                 | Port of the Quorum Key Manager service                                | `8080`       |
 
 For more information about values defined in values/qkm.yaml.gotmpl, please refer to https://github.com/ConsenSys/quorum-key-manager-helm
 
@@ -308,26 +220,10 @@ This helmfiles optionally deploys [Hashicorp's Vault](https://www.vaultproject.i
 
 Note that it is highly recommended to use the `consensys/quorum-hashicorp-vault-plugin` image when deplying a Vault ressource.
 
-# 4. Observability
 
-This helmfile could deploy [Prometheus Operator](https://github.com/coreos/prometheus-operator) and [Prometheus](https://prometheus.io/) based on the [Kube-Prometheus Helm chart](https://github.com/bitnami/charts/tree/master/bitnami/kube-prometheus). It also deploys Grafana with default dashboards for Orchestrate, Kubernetes, Golang, Kafka, Postgres, Redis, and Hashicorp Vault
+# 4. Upgrading
 
-## 4.1. Prometheus dashboard
-
-```shell
-kubectl port-forward --namespace $OBSERVABILITY_NAMESPACE svc/prometheus-kube-prometheus-prometheus 9090:9090
-```
-
-## 4.2. Grafana
-
-```shell
-kubectl port-forward --namespace $OBSERVABILITY_NAMESPACE svc/grafana 3000:80
-```
-
-
-# 5. Upgrading
-
-## 5.1. From Orchestrate v2.5.X to v21.1.X
+## 4.1. From Orchestrate v2.5.X to v21.1.X
 
 [Read the steps to upgrade Orchestrate v2.5.X to v21.1.X](docs/upgrades/v21-1-X.md)
 

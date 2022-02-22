@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## v7.0.0 (Unreleased)
+
+ * Remove everything not orchestrate and Vault
+ * QKM deployment now relies on quorum-key-manager chart only
+ * Everything infra is moved to orchestrate-infra
+
 ## v6.0.0 (Unreleased)
 
  * Support latest v21.12.x orchestrate version
