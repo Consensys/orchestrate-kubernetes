@@ -4,11 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ## v7.0.0 (Unreleased)
 
- * Remove everything not orchestrate and Vault
- * QKM deployment now relies on quorum-key-manager chart only
- * Everything infra is moved to orchestrate-infra
+ * Removed Kafka deployment
+ * Removed Postgres deployment
+ * Removed Redis deployment
+ * Removed quorum-key-manager deployment
+ * Moved observability stack (prometheus - grafana) to orchestrate-infra
 
-## v6.0.0 (Unreleased)
+## v6.0.0 (2022-02-22)
 
  * Support latest v21.12.x orchestrate version
  * Support Hashicorp Vault image with embedded plugin

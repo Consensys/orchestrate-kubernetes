@@ -13,4 +13,4 @@ vault:
   replicaCount: 3
 
 qkm:
-  url: https://qa-qkm.ops.consensys.net
+  url: https://staging-qkm.ops.consensys.net
