@@ -35,7 +35,7 @@ orchestrate:
       KAFKA_SASL_ENABLED: false
       KAFKA_TLS_INSECURE_SKIP_VERIFY: true
       KAFKA_SASL_USER: "$ConnectionString"
-      KAFKA_SASL_PASSWORD: {{ requiredEnv "KAFKA_SASL_PASSWORD" }}
+      KAFKA_SASL_PASSWORD: {{ env "KAFKA_SASL_PASSWORD" }}
       KAFKA_SASL_MECHANISM: "PLAIN"
       DB_USER: {{ requiredEnv "TANUKI_PG_USER" }}
       DB_HOST: {{ requiredEnv "TANUKI_PG_HOST" }}
@@ -51,7 +51,7 @@ orchestrate:
       KAFKA_SASL_ENABLED: false
       KAFKA_TLS_INSECURE_SKIP_VERIFY: true
       KAFKA_SASL_USER: "$ConnectionString"
-      KAFKA_SASL_PASSWORD: {{ requiredEnv "KAFKA_SASL_PASSWORD" }}
+      KAFKA_SASL_PASSWORD: {{ env "KAFKA_SASL_PASSWORD" }}
       KAFKA_SASL_MECHANISM: "PLAIN"
     environmentSecrets: {}
 
@@ -62,7 +62,7 @@ orchestrate:
       KAFKA_SASL_ENABLED: false
       KAFKA_TLS_INSECURE_SKIP_VERIFY: true
       KAFKA_SASL_USER: "$ConnectionString"
-      KAFKA_SASL_PASSWORD: {{ requiredEnv "KAFKA_SASL_PASSWORD" }}
+      KAFKA_SASL_PASSWORD: {{ env "KAFKA_SASL_PASSWORD" }}
       KAFKA_SASL_MECHANISM: "PLAIN"
       REDIS_HOST: {{ requiredEnv "TANUKI_REDIS_ENDPOINT" }}
       REDIS_PORT: {{ env "TANUKI_REDIS_PORT" | default "6379" }}
