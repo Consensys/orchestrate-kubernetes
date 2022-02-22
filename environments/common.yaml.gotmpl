@@ -1,11 +1,8 @@
 ---
 {{ $defaultNamespace := "orchestrate" }}
 {{ $defaultOrchestrateChart := "consensys/orchestrate" }}
-{{ $defaultQkmChart := "consensys/quorumkeymanager" }}
 {{ $defaultOrchestrateChartVersion := "2.0.0" }}
-{{ $defaultQkmChartVersion := "1.1.7" }}
-{{ $tag := "v21.12.1" }}
-{{ $qkmTag := "v21.12.1" }}
+{{ $tag := "v21.12.2" }}
 
 orchestrate:
   namespace: {{ env "ORCHESTRATE_NAMESPACE" | default $defaultNamespace  }}
@@ -21,25 +18,61 @@ orchestrate:
     image:
       repository: {{ env "ORCHESTRATE_REPOSITORY" | default "consensys/orchestrate" }}
       tag: {{ env "ORCHESTRATE_TAG" | default $tag | quote }}
-    environment: {}
-    environmentSecrets: {}
+    environment: 
+      DB_USER: {{ requiredEnv "TANUKI_PG_USER" }}
+      DB_HOST: {{ requiredEnv "TANUKI_PG_HOST" }}
+      DB_DATABASE: {{ env "TANUKI_PG_DB" | default "postgres" }}
+      DB_TLS_SSLMODE: "require"
+      
+    environmentSecrets:
+      DB_PASSWORD: {{ requiredEnv "TANUKI_PG_PWD" }}
 
   api:
     enabled: true
-    environment: {}
-    environmentSecrets: {}
+    environment:
+      KAFKA_TLS_ENABLED: true
+      KAFKA_URL: {{ requiredEnv "KAFKA_URL" }}
+      KAFKA_SASL_ENABLED: false
+      KAFKA_TLS_INSECURE_SKIP_VERIFY: true
+      KAFKA_SASL_USER: "$ConnectionString"
+      KAFKA_SASL_PASSWORD: {{ env "KAFKA_SASL_PASSWORD" }}
+      KAFKA_SASL_MECHANISM: "PLAIN"
+      DB_USER: {{ requiredEnv "TANUKI_PG_USER" }}
+      DB_HOST: {{ requiredEnv "TANUKI_PG_HOST" }}
+      DB_DATABASE: {{ env "TANUKI_PG_DB" | default "postgres" }}
+      DB_TLS_SSLMODE: "require"  
+    environmentSecrets:
+      DB_PASSWORD: {{ requiredEnv "TANUKI_PG_PWD" }} 
 
   txListener:
-    environment: {}
+    environment:
+      KAFKA_TLS_ENABLED: true
+      KAFKA_URL: {{ requiredEnv "KAFKA_URL" }}
+      KAFKA_SASL_ENABLED: false
+      KAFKA_TLS_INSECURE_SKIP_VERIFY: true
+      KAFKA_SASL_USER: "$ConnectionString"
+      KAFKA_SASL_PASSWORD: {{ env "KAFKA_SASL_PASSWORD" }}
+      KAFKA_SASL_MECHANISM: "PLAIN"
     environmentSecrets: {}
 
   txSender:
-    environment: {}
+    environment:
+      KAFKA_TLS_ENABLED: true
+      KAFKA_URL: {{ requiredEnv "KAFKA_URL" }}
+      KAFKA_SASL_ENABLED: false
+      KAFKA_TLS_INSECURE_SKIP_VERIFY: true
+      KAFKA_SASL_USER: "$ConnectionString"
+      KAFKA_SASL_PASSWORD: {{ env "KAFKA_SASL_PASSWORD" }}
+      KAFKA_SASL_MECHANISM: "PLAIN"
+      REDIS_HOST: {{ requiredEnv "TANUKI_REDIS_ENDPOINT" }}
+      REDIS_PORT: {{ env "TANUKI_REDIS_PORT" | default "6379" }}
+
     environmentSecrets: {}
   
   migrate:
     environment: {}
-    environmentSecrets: {}
+    environmentSecrets:
+      DB_PASSWORD: {{ requiredEnv "TANUKI_PG_PWD" }}
 
   
   auth:
@@ -64,114 +97,12 @@ vault:
   envs:
     - VAULT_ADDR: "http://localhost:8200"
 
-kafka:
-  enabled: true
-  namespace: {{ env "KAFKA_NAMESPACE" | default "kafka" }}
-  auth:
-    enabled: true
-    username: user1
-    password: secret
-  externalAccess:
-    enabled: {{ env "KAFKA_EXTERNAL_ACCESS" | default false }}
-
-zookeeper:
-  auth:
-    enabled: true
-    serverUsers: zookeeperUser
-    serverPasswords: zookeeperPassword
-    clientUser: zookeeperClientUser
-    clientPassword: zookeeperClientPassword
-
-redis:
-  enabled: true
-  namespace: {{ env "REDIS_NAMESPACE" | default ( env "ORCHESTRATE_NAMESPACE" | default $defaultNamespace ) }}
-  password: such-secret
-
-postgresql:
-  enabled: true
-  namespace: {{ env "POSTGRES_NAMESPACE" | default ( env "ORCHESTRATE_NAMESPACE" | default $defaultNamespace ) }}
-  host: {{ env "POSTGRES_HOST" | default "postgresql" }}
-  port: 5432
-  username: {{ env "POSTGRES_USER" | default "api"}}
-  password: {{ env "POSTGRES_PWD" | default "such-secret" }}
-  database: {{ env "POSTGRES_DB" | default "api" }}
-
-postgresqlHA:
-  enabled: false
-  namespace: {{ env "POSTGRES_NAMESPACE" | default ( env "ORCHESTRATE_NAMESPACE" | default $defaultNamespace ) }}
-  postgresql:
-    username: api
-    password: such-secret
-    database: api
-    repmgrPassword: such-secret
-
 qkm:
-  enabled: true
-  url: "http://quorum-key-manager-quorumkeymanager:8080"
-  proto: https
-  fullname: "quorumkeymanager"
   orchestrate:
     storeName: "eth-accounts"
-    apiKey: {{ env "QKM_API_KEY" | default "NmwyMCB3YXMgaGVyZQ==" }}
+    apiKey: {{ env "QKM_API_KEY" }}
   port: 8080
-  namespace: {{ env "QKM_NAMESPACE" | default $defaultNamespace  }}
-  chart:
-    name: {{ env "QKM_CHART" | default $defaultQkmChart  }}
-    version: {{ env "QKM_CHART_VERSION" | default $defaultQkmChartVersion  }}
-
-  image:
-    repository: {{ env "QKM_REPOSITORY" | default "docker.io/consensys/quorum-key-manager" }}
-    tag: {{ env "QKM_TAG" | default $qkmTag | quote }}
-    pullPolicy: Always
-
-  b64Manifests: {{ requiredEnv "B64_MANIFESTS" }}
-
-  environment: {}
-  environmentSecrets: {}
-
-  postgresql:
-    tls:
-      enabled: false
-    host: {{ env "QKM_POSTGRES_HOST" | default "qkm-postgresql" }}
-    port: 5432
-    database: {{ env "QKM_POSTGRES_DB" | default "qkmDB" }}
-    username: {{ env "QKM_POSTGRES_USER" | default "qkm" }}
-    password: {{ env "QKM_POSTGRES_PWD" | default "qkmDBPwd" }}
-
-  auth:
-    apikey:
-      enabled: true
-      file: "/apikey/api-keys.csv"
-    oidc:
-      enabled: false
-      ca: {{ env "QKM_AUTH_OIDC_CA" }}
-      pubKey: {{ env "QKM_AUTH_OIDC_PUB_KEY" }}
-      issuer: {{ env "QKM_AUTH_OIDC_ISSUER_URL" }}
-    tls:
-      enabled: false
-      cacert: {{ env "QKM_AUTH_TLS_CA"}}
-      secretName: {{ env "QKM_AUTH_TLS_SECRET_NAME" }}
-
-  storage:
-    existingPvc: {{ env "QKM_STORAGE_EXISTING_PVC" | default "" }}
-    nfs:
-      enabled: true
-      driver: {{ env "QKM_STORAGE_NFS_DRIVER" }}
-      provisioner: {{ env "QKM_STORAGE_NFS_PROVISIONER" }}
-      fsID: {{ env "QKM_STORAGE_NFS_FS_ID" }}
   
-  vault:
-    tls:
-      enabled: false
-    agents: {}
-
-  sync:
-    enabled: false
-    storeName: {{ env "QKM_SYNC_STORE_NAME" | default "" }}
-
-postgresql-qkm:
-    enabled: {{ env "DEPLOY_QKM_PG" | default true }}
-
 observability:
   namespace: {{ env "OBSERVABILITY_NAMESPACE" | default "observability" }}
   grafana:

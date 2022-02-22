@@ -19,6 +19,10 @@ environments:
     values:
       - environments/common.yaml.gotmpl
       - environments/default.yaml
+  load:
+    values:
+      - environments/common.yaml.gotmpl
+      - environments/load.yaml
 repositories:
   - name: consensys
     url: https://artifacts.consensys.net/public/helm/helm/charts/

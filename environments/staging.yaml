@@ -9,33 +9,8 @@ orchestrate:
 observability:
   enabled: false
 
-kafka:
-  enabled: true
-  replicaCount: 3
-  numPartitions: 3
-  logRetentionHours: 10
-
-zookeeper:
-  replicaCount: 3
-
-postgresql:
-  enabled: false
-
-postgresqlHA:
-  enabled: true
-  postgresql:
-    replicaCount: 3
-  pgpool:
-    replicaCount: 3
-
-redis:
-  cluster:
-    enabled: true
-    slaveCount: 2
-
 vault:
   replicaCount: 3
 
 qkm:
-  enabled: true
-  replicaCount: 3
+  url: https://staging-qkm.ops.consensys.net

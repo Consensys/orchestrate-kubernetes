@@ -1,5 +1,3 @@
-{{ $kafkaURL := printf "kafka-%s.%s:9092" .Environment.Name .Values.kafka.namespace }}
-{{ $kafkaEnv := ternary (dict "KAFKA_URL" $kafkaURL "KAFKA_SASL_ENABLED" true "KAFKA_SASL_MECHANISM" "PLAIN" "KAFKA_SASL_USER" .Values.kafka.auth.username "KAFKA_SASL_PASSWORD" .Values.kafka.auth.password) (dict "KAFKA_URL" $kafkaURL) .Values.kafka.auth.enabled }}
 {{ $replicaCount := .Values | get "orchestrate.replicaCount" 1 }}
 {{/* API Proxy cache TTL */}}
 {{ $proxyCacheTTL := "2" }}
@@ -11,22 +9,15 @@ global:
     {{- range $key,$value := .Values.orchestrate.global.environment }}
     {{ $key }}: {{ $value | quote }}
     {{- end }}
-    {{- if .Values.qkm.enabled }}
-    KEY_MANAGER_URL: {{ .Values.qkm.fullname }}.{{ .Values.qkm.namespace }}
     {{- if .Values.qkm.url }}
-    KEY_MANAGER_URL: {{ .Values.qkm.url }}
+    KEY_MANAGER_URL: {{ .Values.qkm.url }} 
     {{- end }}
-    {{- end }}
+    KEY_MANAGER_STORE_NAME: {{ .Values.qkm.orchestrate.storeName }}
+    KEY_MANAGER_TLS_SKIP_VERIFY: true
     AUTH_JWT_ISSUER_URL: {{ .Values.orchestrate.auth.jwt.issuerUrl }}
     AUTH_JWT_AUDIENCE: {{ .Values.orchestrate.auth.jwt.audience }}
     AUTH_JWT_ORCHESTRATE_CLAIMS: {{ .Values.orchestrate.auth.jwt.claims }}
-    KEY_MANAGER_STORE_NAME: {{ .Values.qkm.orchestrate.storeName }}
-    {{- if .Values.qkm.auth.tls.enabled }}
-    KEY_MANAGER_TLS_SKIP_VERIFY: false
-    KEY_MANAGER_CLIENT_TLS_KEY: "/certificates/client.key"
-    KEY_MANAGER_CLIENT_TLS_CERT: "/certificates/client.crt"
-    {{- end }}
-
+   
   environmentSecrets:
     KEY_MANAGER_API_KEY: {{ .Values.qkm.orchestrate.apiKey }}
     {{- range $key,$value := .Values.orchestrate.global.environmentSecrets }}
@@ -59,25 +50,12 @@ api:
               backend:
                 service:
                   port:
-                    number: 80
+                    number: 8081
     tls:
     - hosts:
       - {{ .Values.orchestrate.namespace }}.orchestrate.{{ .Values.domainName }}
   {{- end }}
   environment:
-    {{- range $key, $value := $kafkaEnv }}
-    {{ $key }}: {{ $value }}
-    {{- end }}
-    {{- if .Values.postgresqlHA.enabled }}
-    DB_HOST: "postgresql-ha-pgpool.{{ .Values.postgresqlHA.namespace }}"
-    DB_DATABASE: {{ .Values.postgresqlHA.postgresql.database | quote }}
-    DB_USER: {{ .Values.postgresqlHA.postgresql.username | quote }}
-    {{- else }}
-    DB_HOST: "postgresql.{{ .Values.postgresql.namespace }}"
-    DB_PORT: {{ .Values.postgresql.port }}
-    DB_DATABASE: {{ .Values.postgresql.database | quote }}
-    DB_USER: {{ .Values.postgresql.username | quote }}
-    {{- end }}
     PROXY_CACHE_TTL: {{ $proxyCacheTTL }}s
     {{- range $key,$value := .Values.orchestrate.api.environment }}
     {{ $key }}: {{ $value | quote }}
@@ -85,11 +63,6 @@ api:
   service:
     sessionAffinityTimeout: {{ $proxyCacheTTL }}
   environmentSecrets:
-    {{- if .Values.postgresqlHA.enabled }}
-    DB_PASSWORD: {{ .Values.postgresqlHA.postgresql.password | quote }}
-    {{- else }}
-    DB_PASSWORD: {{ .Values.postgresql.password | quote }}
-    {{- end }}
     {{- range $key,$value := .Values.orchestrate.api.environmentSecrets }}
     {{ $key }}: {{ $value | quote }}
     {{- end }}
@@ -110,30 +83,11 @@ api:
 
 migrate:
   environment:
-    {{- range $key, $value := $kafkaEnv }}
-    {{ $key }}: {{ $value }}
-    {{- end }}
-    {{- if .Values.postgresqlHA.enabled }}
-    DB_HOST: "postgresql-ha-pgpool.{{ .Values.postgresqlHA.namespace }}"
-    DB_DATABASE: {{ .Values.postgresqlHA.postgresql.database | quote }}
-    DB_USER: {{ .Values.postgresqlHA.postgresql.username | quote }}
-    {{- else }}
-    DB_HOST: {{ .Values.postgresql.host }}
-    DB_PORT: {{ .Values.postgresql.port }}
-    DB_DATABASE: {{ .Values.postgresql.database }}
-    DB_USER: {{ .Values.postgresql.username }}
-    DB_TLS_SSLMODE: "require"
-    {{- end }}
     PROXY_CACHE_TTL: {{ $proxyCacheTTL }}s
     {{- range $key,$value := .Values.orchestrate.api.environment }}
     {{ $key }}: {{ $value | quote }}
     {{- end }}
   environmentSecrets:
-    {{- if .Values.postgresqlHA.enabled }}
-    DB_PASSWORD: {{ .Values.postgresqlHA.postgresql.password | quote }}
-    {{- else }}
-    DB_PASSWORD: {{ .Values.postgresql.password | quote }}
-    {{- end }}
     {{- range $key,$value := .Values.orchestrate.migrate.environmentSecrets }}
     {{ $key }}: {{ $value | quote }}
     {{- end }}
@@ -145,9 +99,6 @@ migrate:
 
 txListener:
   environment:
-    {{- range $key, $value := $kafkaEnv }}
-    {{ $key }}: {{ $value }}
-    {{- end }}
     {{- range $key,$value := .Values.orchestrate.txListener.environment }}
     {{ $key }}: {{ $value | quote }}
     {{- end }}
@@ -159,12 +110,6 @@ txListener:
 txSender:
   replicaCount: {{ $replicaCount }}
   environment:
-    {{- range $key, $value := $kafkaEnv }}
-    {{ $key }}: {{ $value }}
-    {{- end }}
-    REDIS_HOST: "redis-master.{{ .Values.redis.namespace }}"
-    REDIS_PORT: "6379"
-    REDIS_PASSWORD: {{ .Values.redis.password | quote }}
     {{- range $key,$value := .Values.orchestrate.txSender.environment }}
     {{ $key }}: {{ $value | quote }}
     {{- end }}
