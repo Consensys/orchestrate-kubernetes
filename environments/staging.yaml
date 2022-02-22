@@ -13,5 +13,4 @@ vault:
   replicaCount: 3
 
 qkm:
-  url: quorum-key-manager-quorumkeymanager.qa-qkm
-  replicaCount: 3
+  url: https://qa-qkm.ops.consensys.net
