@@ -1,7 +1,7 @@
 ---
 {{ $defaultNamespace := "orchestrate" }}
 {{ $defaultOrchestrateChart := "consensys/orchestrate" }}
-{{ $defaultOrchestrateChartVersion := "2.0.0" }}
+{{ $defaultOrchestrateChartVersion := "2.0.1" }}
 {{ $tag := "v21.12.2" }}
 
 orchestrate:
@@ -32,9 +32,9 @@ orchestrate:
     environment:
       KAFKA_TLS_ENABLED: true
       KAFKA_URL: {{ requiredEnv "KAFKA_URL" }}
-      KAFKA_SASL_ENABLED: false
+      KAFKA_SASL_ENABLED: {{ env "KAFKA_SASL_ENABLED" }}
       KAFKA_TLS_INSECURE_SKIP_VERIFY: true
-      KAFKA_SASL_USER: "$ConnectionString"
+      KAFKA_SASL_USER: {{ env "KAFKA_SASL_USER" }}
       KAFKA_SASL_PASSWORD: {{ env "KAFKA_SASL_PASSWORD" }}
       KAFKA_SASL_MECHANISM: "PLAIN"
       DB_USER: {{ requiredEnv "TANUKI_PG_USER" }}
@@ -48,9 +48,9 @@ orchestrate:
     environment:
       KAFKA_TLS_ENABLED: true
       KAFKA_URL: {{ requiredEnv "KAFKA_URL" }}
-      KAFKA_SASL_ENABLED: false
+      KAFKA_SASL_ENABLED: {{ env "KAFKA_SASL_ENABLED" }}
       KAFKA_TLS_INSECURE_SKIP_VERIFY: true
-      KAFKA_SASL_USER: "$ConnectionString"
+      KAFKA_SASL_USER: {{ env "KAFKA_SASL_USER" }}
       KAFKA_SASL_PASSWORD: {{ env "KAFKA_SASL_PASSWORD" }}
       KAFKA_SASL_MECHANISM: "PLAIN"
     environmentSecrets: {}
@@ -59,9 +59,9 @@ orchestrate:
     environment:
       KAFKA_TLS_ENABLED: true
       KAFKA_URL: {{ requiredEnv "KAFKA_URL" }}
-      KAFKA_SASL_ENABLED: false
+      KAFKA_SASL_ENABLED: {{ env "KAFKA_SASL_ENABLED" }}
       KAFKA_TLS_INSECURE_SKIP_VERIFY: true
-      KAFKA_SASL_USER: "$ConnectionString"
+      KAFKA_SASL_USER: {{ env "KAFKA_SASL_USER" }}
       KAFKA_SASL_PASSWORD: {{ env "KAFKA_SASL_PASSWORD" }}
       KAFKA_SASL_MECHANISM: "PLAIN"
       REDIS_HOST: {{ requiredEnv "TANUKI_REDIS_ENDPOINT" }}
