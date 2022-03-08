@@ -21,7 +21,6 @@ orchestrate:
     environment: 
       DB_USER: {{ requiredEnv "TANUKI_PG_USER" }}
       DB_HOST: {{ requiredEnv "TANUKI_PG_HOST" }}
-      DB_DATABASE: {{ env "TANUKI_PG_DB" | default "postgres" }}
       DB_TLS_SSLMODE: "require"
       
     environmentSecrets:
@@ -39,7 +38,6 @@ orchestrate:
       KAFKA_SASL_MECHANISM: "PLAIN"
       DB_USER: {{ requiredEnv "TANUKI_PG_USER" }}
       DB_HOST: {{ requiredEnv "TANUKI_PG_HOST" }}
-      DB_DATABASE: {{ env "TANUKI_PG_DB" | default "postgres" }}
       DB_TLS_SSLMODE: "require"  
     environmentSecrets:
       DB_PASSWORD: {{ requiredEnv "TANUKI_PG_PWD" }} 

@@ -7,6 +7,7 @@ orchestrate:
       TOPIC_TX_DECODED: qa-tx-decoded
       TOPIC_TX_RECOVER: qa-tx-recover
       TOPIC_TX_SENDER: qa-tx-sender
+      DB_DATABASE: orchestrate_qa
     environmentSecrets:
       AUTH_API_KEY: with-key
 
