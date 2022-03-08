@@ -3,6 +3,10 @@ orchestrate:
   global:
     environment:
       MULTI_TENANCY_ENABLED: true
+      TOPIC_TX_DECODED: staging-tx-decoded
+      TOPIC_TX_RECOVER: staging-tx-recover
+      TOPIC_TX_SENDER: staging-tx-sender
+      DB_DATABASE: orchestrate_staging
     environmentSecrets:
       AUTH_API_KEY: with-key
 
