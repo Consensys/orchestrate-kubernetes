@@ -11,7 +11,7 @@ orchestrate:
       AUTH_API_KEY: with-key
 
 observability:
-  enabled: false
+  enabled: true
 
 vault:
   replicaCount: 3
