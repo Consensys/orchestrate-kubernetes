@@ -12,7 +12,7 @@ orchestrate:
       AUTH_API_KEY: with-key
 
 observability:
-  enabled: false
+  enabled: true
 
 qkm:
   url: https://qa-qkm.ops.consensys.net
