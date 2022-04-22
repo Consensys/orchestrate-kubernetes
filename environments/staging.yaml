@@ -12,6 +12,8 @@ orchestrate:
 
 observability:
   enabled: true
+drop:
+  enabled: false
 
 vault:
   replicaCount: 3

@@ -46,11 +46,8 @@ api:
         http:
           paths:
             - path: /
-              pathType: Prefix
-              backend:
-                service:
-                  port:
-                    number: 8081
+              pathType: ImplementationSpecific
+              
     tls:
     - hosts:
       - {{ .Values.orchestrate.namespace }}.orchestrate.{{ .Values.domainName }}
@@ -62,6 +59,8 @@ api:
     {{- end }}
   service:
     sessionAffinityTimeout: {{ $proxyCacheTTL }}
+    http:
+      port: 8081
   environmentSecrets:
     {{- range $key,$value := .Values.orchestrate.api.environmentSecrets }}
     {{ $key }}: {{ $value | quote }}
@@ -94,7 +93,8 @@ migrate:
   service:
     sessionAffinityTimeout: {{ $proxyCacheTTL }}
   
-
+drop:
+  enabled: {{ .Values.drop.enabled }}
 
 
 txListener:
