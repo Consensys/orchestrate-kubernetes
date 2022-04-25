@@ -1,4 +1,6 @@
 observability:
   enabled: false
+drop:
+  enabled: false
 qkm:
   url: https://qa-qkm.ops.consensys.net
