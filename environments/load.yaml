@@ -34,6 +34,5 @@ vault:
   replicaCount: 0
 
 qkm:
-  url: https://load-qkm.ops.consensys.net
   vault:
     agents: {}

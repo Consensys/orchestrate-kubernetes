@@ -99,6 +99,7 @@ qkm:
   orchestrate:
     storeName: "eth-accounts"
     apiKey: {{ env "QKM_API_KEY" }}
+  url: {{ requiredEnv "QKM_URL" }}
   port: 8080
   
 observability:
