@@ -15,7 +15,7 @@ spec:
       volumeMounts:
         - name: config-volume
           mountPath: /vegeta
-      args: ["cd /vegeta; cat test | vegeta attack -format=http -duration=1m30s -rate=300/s -connections 50 | vegeta report"]
+      args: ["cd /vegeta; cat test | vegeta attack -format=http -duration=1m30s -rate=500/s -connections 75 | vegeta report"]
 ---
 apiVersion: v1
 kind: ConfigMap
