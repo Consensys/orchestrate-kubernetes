@@ -9,6 +9,7 @@ orchestrate:
       TOPIC_TX_RECOVER: topic-tx-recover
       TOPIC_TX_SENDER: topic-tx-sender
       DB_DATABASE: orchestrate_load
+      DB_POOLSIZE: 750
     environmentSecrets:
       AUTH_API_KEY: with-key
       
