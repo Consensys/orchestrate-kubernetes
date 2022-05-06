@@ -14,6 +14,9 @@ commands:
             [ "<< pipeline.parameters.registry_url >>" ] && echo 'export REGISTRY_URL=<< pipeline.parameters.registry_url >>' >> $BASH_ENV
             [ "<< pipeline.parameters.registry_username >>" ] && echo 'export REGISTRY_USERNAME=<< pipeline.parameters.registry_username >>' >> $BASH_ENV
             [ "<< pipeline.parameters.registry_password >>" ] && echo 'export REGISTRY_PASSWORD=<< pipeline.parameters.registry_password >>' >> $BASH_ENV
+            [ "<< pipeline.parameters.kafka_url >>" ] && echo 'export $KAFKA_URL=<< pipeline.parameters.kafka_url >>' >> $BASH_ENV
+            [ "<< pipeline.parameters.kafka_sasl_password >>" ] && echo 'export KAFKA_SASL_PASSWORD=<< pipeline.parameters.kafka_sasl_password >>' >> $BASH_ENV
+
             source $BASH_ENV || true
       - checkout
       - kubernetes/install
@@ -53,6 +56,12 @@ parameters:
     type: string
     default: ""
   registry_password:
+    type: string
+    default: ""
+  kafka_url:
+    type: string
+    default: ""
+  kafka_sasl_password:
     type: string
     default: ""
 
