@@ -2,7 +2,7 @@
 {{ $defaultNamespace := "orchestrate" }}
 {{ $defaultOrchestrateChart := "consensys/orchestrate" }}
 {{ $defaultOrchestrateChartVersion := "2.0.4" }}
-{{ $tag := "v21.12.5" }}
+{{ $tag := "v21.12.6" }}
 
 orchestrate:
   namespace: {{ env "ORCHESTRATE_NAMESPACE" | default $defaultNamespace  }}
@@ -105,7 +105,7 @@ observability:
   namespace: {{ env "OBSERVABILITY_NAMESPACE" | default "observability" }}
   grafana:
     user: admin
-    password: frenchfries
+    password: {{ env "GRAFANA_PWD" }}
 
 domainName: {{ env "DOMAIN_NAME" }}
 
