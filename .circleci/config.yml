@@ -1,3 +1,4 @@
+version: 2.1
 
 commands:
   init:
@@ -24,10 +25,10 @@ commands:
 parameters:
   orchestrate-namespace:
     type: string
-    default: qa
+    default: ""
   orchestrate-tag:
     type: string
-    default: v21.12.6
+    default: ""
   
 
 jobs:
@@ -102,12 +103,14 @@ workflows:
                 - master
           requires: 
             - lint
-            
+
   circleci-api-qa:
     when: 
       equal: [ qa, << pipeline.parameters.orchestrate-namespace >> ]
     jobs:
       - deploy:
+          context:
+            - cloudsmith-tanuki-rw
           kafka-sasl-password: ${QA_KAFKA_SASL_PASSWORD}
           docker-password: ${CLOUDSMITH_PASS_RW}
           docker-user: ${CLOUDSMITH_USER_RW}
@@ -118,6 +121,8 @@ workflows:
       equal: [ staging, << pipeline.parameters.orchestrate-namespace >> ]
     jobs:
       - deploy:
+          context:
+            - cloudsmith-tanuki-rw
           kafka-sasl-password: ${STAGING_KAFKA_SASL_PASSWORD}
           docker-password: ${CLOUDSMITH_PASS_RW}
           docker-user: ${CLOUDSMITH_USER_RW}
