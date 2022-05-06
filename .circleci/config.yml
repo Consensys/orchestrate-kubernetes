@@ -29,7 +29,7 @@ parameters:
   orchestrate-tag:
     type: string
     default: ""
-  
+
 
 jobs:
   lint:
@@ -91,11 +91,11 @@ workflows:
             branches:
               ignore:
                 - master
-          requires: 
+          requires:
             - lint
 
   circleci-api-qa:
-    when: 
+    when:
       equal: [ qa, << pipeline.parameters.orchestrate-namespace >> ]
     jobs:
       - deploy:
@@ -107,7 +107,7 @@ workflows:
           docker-image-registry: ${CLOUDSMITH_DEV_REPO}
 
   circleci-api-staging:
-    when: 
+    when:
       equal: [ staging, << pipeline.parameters.orchestrate-namespace >> ]
     jobs:
       - deploy:
