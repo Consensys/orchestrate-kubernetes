@@ -86,8 +86,6 @@ orbs:
   kubernetes: circleci/kubernetes@0.11.1
   helm: circleci/helm@1.2.0
 
-version: 2.1
-
 workflows:
   default:
     jobs:
