@@ -46,6 +46,7 @@ jobs:
       - run:
           name: helmfile dry-run
           command: helmfile -e ${ENVIRONMENT_VALUES} -f helmfile-core.yaml apply --args --dry-run --suppress-secrets --detailed-exitcode=false
+
   deploy:
     executor: aws-eks/python3
     parameters:
@@ -71,14 +72,6 @@ jobs:
           export ORCHESTRATE_NAMESPACE="<< pipeline.parameters.orchestrate-namespace >>"
           export ENVIRONMENT_VALUES="<< pipeline.parameters.orchestrate-namespace >>"
           helmfile -e << pipeline.parameters.orchestrate-namespace >> -f helmfile-core.yaml apply --suppress-secrets --detailed-exitcode=false --concurrency 1
-      
-  clean-namespaces:
-    executor: aws-eks/python3
-    steps:
-      - init
-      - run:
-          name: Delete namespaces
-          command: kubectl get ns -o go-template --template='{{range .items}}{{if .metadata.annotations.disposable}}{{if eq .metadata.annotations.disposable "true"}}{{.metadata.name}} {{.metadata.creationTimestamp}}{{"\n"}}{{end}}{{end}}{{end}}' | awk '$2 <= "'$(date -d'now-2 days' -Ins --utc | sed 's/+0000/Z/')'" { print $1 }' | xargs -r kubectl delete ns --grace-period=0 --force
 
 orbs:
   aws-eks: circleci/aws-eks@1.0.0
@@ -124,15 +117,3 @@ workflows:
           docker-password: ${CLOUDSMITH_PASS_RW}
           docker-user: ${CLOUDSMITH_USER_RW}
           docker-image-registry: ${CLOUDSMITH_DEV_REPO}
-    
-          
-  schedule-clean-namespaces:
-    triggers:
-      - schedule:
-          cron: "0 5 * * *"
-          filters:
-            branches:
-              only:
-                - master
-    jobs:
-      - clean-namespaces
