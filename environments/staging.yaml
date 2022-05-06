@@ -7,6 +7,7 @@ orchestrate:
       TOPIC_TX_RECOVER: staging-tx-recover
       TOPIC_TX_SENDER: staging-tx-sender
       DB_DATABASE: orchestrate_staging
+      KAFKA_URL: orchestrate.servicebus.windows.net:9093
     environmentSecrets:
       AUTH_API_KEY: with-key
 

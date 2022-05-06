@@ -30,7 +30,6 @@ orchestrate:
     enabled: true
     environment:
       KAFKA_TLS_ENABLED: true
-      KAFKA_URL: {{ requiredEnv "KAFKA_URL" }}
       KAFKA_SASL_ENABLED: {{ env "KAFKA_SASL_ENABLED" }}
       KAFKA_TLS_INSECURE_SKIP_VERIFY: true
       KAFKA_SASL_USER: {{ env "KAFKA_SASL_USER" }}
@@ -45,7 +44,6 @@ orchestrate:
   txListener:
     environment:
       KAFKA_TLS_ENABLED: true
-      KAFKA_URL: {{ requiredEnv "KAFKA_URL" }}
       KAFKA_SASL_ENABLED: {{ env "KAFKA_SASL_ENABLED" }}
       KAFKA_TLS_INSECURE_SKIP_VERIFY: true
       KAFKA_SASL_USER: {{ env "KAFKA_SASL_USER" }}
@@ -56,7 +54,6 @@ orchestrate:
   txSender:
     environment:
       KAFKA_TLS_ENABLED: true
-      KAFKA_URL: {{ requiredEnv "KAFKA_URL" }}
       KAFKA_SASL_ENABLED: {{ env "KAFKA_SASL_ENABLED" }}
       KAFKA_TLS_INSECURE_SKIP_VERIFY: true
       KAFKA_SASL_USER: {{ env "KAFKA_SASL_USER" }}

@@ -53,14 +53,11 @@ jobs:
         type: string
       docker-password:
         type: string
-      kafka-url:
-        type: string
       kafka-sasl-password:
         type: string
 
     executor: aws-eks/python3
     environment:
-      KAFKA_URL: << parameters.kafka-url >>
       KAFKA_SASL_PASSWORD: << parameters.kafka-sasl-password >>
       REGISTRY_URL: << parameters.docker-image-registry >>
       REGISTRY_USERNAME: << parameters.docker-user >>
@@ -105,12 +102,12 @@ workflows:
                 - master
           requires: 
             - lint
+            
   circleci-api-qa:
     when: 
       equal: [ qa, << pipeline.parameters.orchestrate-namespace >> ]
     jobs:
       - deploy:
-          kafka-url: ${QA_KAFKA_URL}
           kafka-sasl-password: ${QA_KAFKA_SASL_PASSWORD}
           docker-password: ${CLOUDSMITH_PASS_RW}
           docker-user: ${CLOUDSMITH_USER_RW}
@@ -121,7 +118,6 @@ workflows:
       equal: [ staging, << pipeline.parameters.orchestrate-namespace >> ]
     jobs:
       - deploy:
-          kafka-url: ${STAGING_KAFKA_URL}
           kafka-sasl-password: ${STAGING_KAFKA_SASL_PASSWORD}
           docker-password: ${CLOUDSMITH_PASS_RW}
           docker-user: ${CLOUDSMITH_USER_RW}
