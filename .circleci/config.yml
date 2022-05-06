@@ -63,15 +63,15 @@ jobs:
       - run:
           name: helmfile apply
           command: |
-          export KAFKA_SASL_PASSWORD="<< parameters.kafka-sasl-password >>"
-          export REGISTRY_URL="<< parameters.docker-image-registry >>"
-          export REGISTRY_USERNAME="<< parameters.docker-user >>"
-          export REGISTRY_PASSWORD="<< parameters.docker-password >>"
-          export ORCHESTRATE_TAG="<< pipeline.parameters.orchestrate-tag >>"
-          export ORCHESTRATE_REPOSITORY="<< parameters.docker-image-registry >>/orchestrate"
-          export ORCHESTRATE_NAMESPACE="<< pipeline.parameters.orchestrate-namespace >>"
-          export ENVIRONMENT_VALUES="<< pipeline.parameters.orchestrate-namespace >>"
-          helmfile -e << pipeline.parameters.orchestrate-namespace >> -f helmfile-core.yaml apply --suppress-secrets --detailed-exitcode=false --concurrency 1
+            export KAFKA_SASL_PASSWORD="<< parameters.kafka-sasl-password >>"
+            export REGISTRY_URL="<< parameters.docker-image-registry >>"
+            export REGISTRY_USERNAME="<< parameters.docker-user >>"
+            export REGISTRY_PASSWORD="<< parameters.docker-password >>"
+            export ORCHESTRATE_TAG="<< pipeline.parameters.orchestrate-tag >>"
+            export ORCHESTRATE_REPOSITORY="<< parameters.docker-image-registry >>/orchestrate"
+            export ORCHESTRATE_NAMESPACE="<< pipeline.parameters.orchestrate-namespace >>"
+            export ENVIRONMENT_VALUES="<< pipeline.parameters.orchestrate-namespace >>"
+            helmfile -e << pipeline.parameters.orchestrate-namespace >> -f helmfile-core.yaml apply --suppress-secrets --detailed-exitcode=false --concurrency 1
 
 orbs:
   aws-eks: circleci/aws-eks@1.0.0
