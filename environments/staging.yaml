@@ -20,3 +20,6 @@ vault:
 
 qkm:
   url: https://staging-qkm.ops.consensys.net
+
+nodeSelector:
+  enabled: false
