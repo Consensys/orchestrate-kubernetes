@@ -1,7 +1,8 @@
 version: 2.1
 
 orbs:
-  aws-eks: circleci/aws-eks@1.0.0
+  go: circleci/go@1.5.0
+  aws-eks: circleci/aws-eks@2.2.0
   kubernetes: circleci/kubernetes@1.3.0
   helm: circleci/helm@1.2.0
 
@@ -39,14 +40,18 @@ parameters:
 
 jobs:
   lint:
-    executor: aws-eks/python3
+    executor:
+      name: go/default
+      tag: '1.16.8'
     steps:
       - init
       - run:
           name: helmfile lint
           command: helmfile -e ${ENVIRONMENT_VALUES} -f helmfile-core.yaml lint
   validate:
-    executor: aws-eks/python3
+    executor:
+      name: go/default
+      tag: '1.16.8'
     steps:
       - init
       - run:
@@ -54,7 +59,9 @@ jobs:
           command: helmfile -e ${ENVIRONMENT_VALUES} -f helmfile-core.yaml template --validate
 
   deploy:
-    executor: aws-eks/python3
+    executor:
+      name: go/default
+      tag: '1.16.8'
     parameters:
       docker-image-registry:
         type: string
