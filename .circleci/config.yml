@@ -1,3 +1,9 @@
+version: 2.1
+
+orbs:
+  go: circleci/go@1.5.0
+  aws-eks: circleci/aws-eks@2.2.0
+  helm: circleci/helm@2.0.0
 
 commands:
   init:
@@ -19,9 +25,9 @@ commands:
 
             source $BASH_ENV || true
       - checkout
-      - kubernetes/install
       - aws-eks/update-kubeconfig-with-authenticator:
-          authenticator-release-tag: v0.5.1
+          authenticator-release-tag: v0.5.3
+          install-kubectl: true
           cluster-name: ${AWS_EKS_CLUSTER_NAME}
           cluster-authentication-role-arn: ${AWS_EKS_ROLE_ARN}
       - helm/install-helm-client:
@@ -67,21 +73,27 @@ parameters:
 
 jobs:
   lint:
-    executor: aws-eks/python3
+    executor:
+      name: go/default
+      tag: '1.16.8'
     steps:
       - init
       - run:
           name: helmfile lint
           command: helmfile -e ${ENVIRONMENT_VALUES} -f helmfile-core.yaml lint
   validate:
-    executor: aws-eks/python3
+    executor:
+      name: go/default
+      tag: '1.16.8'
     steps:
       - init
       - run:
           name: helmfile dry-run
           command: helmfile -e ${ENVIRONMENT_VALUES} -f helmfile-core.yaml apply --args --dry-run --suppress-secrets --detailed-exitcode=false
   deploy:
-    executor: aws-eks/python3
+    executor:
+      name: go/default
+      tag: '1.16.8'
     steps:
       - init
       - run:
@@ -95,19 +107,16 @@ jobs:
                 name: Annotate as disposable environement
                 command: kubectl annotate --overwrite ns ${ORCHESTRATE_NAMESPACE} disposable=true
   clean-namespaces:
-    executor: aws-eks/python3
+    executor:
+      name: go/default
+      tag: '1.16.8'
     steps:
       - init
       - run:
           name: Delete namespaces
           command: kubectl get ns -o go-template --template='{{range .items}}{{if .metadata.annotations.disposable}}{{if eq .metadata.annotations.disposable "true"}}{{.metadata.name}} {{.metadata.creationTimestamp}}{{"\n"}}{{end}}{{end}}{{end}}' | awk '$2 <= "'$(date -d'now-2 days' -Ins --utc | sed 's/+0000/Z/')'" { print $1 }' | xargs -r kubectl delete ns --grace-period=0 --force
 
-orbs:
-  aws-eks: circleci/aws-eks@1.0.0
-  kubernetes: circleci/kubernetes@0.11.1
-  helm: circleci/helm@1.2.0
 
-version: 2.1
 
 workflows:
   default:
