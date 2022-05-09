@@ -44,8 +44,8 @@ jobs:
     steps:
       - init
       - run:
-          name: helmfile dry-run
-          command: helmfile -e ${ENVIRONMENT_VALUES} -f helmfile-core.yaml apply --args --dry-run --suppress-secrets --detailed-exitcode=false
+          name: helmfile validate
+          command: helmfile -e ${ENVIRONMENT_VALUES} -f helmfile-core.yaml template --validate
 
   deploy:
     executor: aws-eks/python3
