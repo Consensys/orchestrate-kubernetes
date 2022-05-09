@@ -2,7 +2,7 @@ version: 2.1
 
 orbs:
   go: circleci/go@1.5.0
-  aws-eks: circleci/aws-eks@1.1.0
+  aws-eks: circleci/aws-eks@1.0.0
   helm: circleci/helm@2.0.0
 
 commands:
