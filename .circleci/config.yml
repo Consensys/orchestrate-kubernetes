@@ -11,9 +11,9 @@ commands:
     description: "Install"
     steps:
       - checkout
-      - kubernetes/install-kubectl:
-          kubectl-version: v1.21.3
       - aws-eks/update-kubeconfig-with-authenticator:
+          authenticator-release-tag: 0.5.3
+          install-kubectl: true
           cluster-name: ${AWS_EKS_CLUSTER_NAME}
           cluster-authentication-role-arn: ${AWS_EKS_ROLE_ARN}
       - helm/install-helm-client:
