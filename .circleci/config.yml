@@ -26,10 +26,9 @@ commands:
             source $BASH_ENV || true
       - checkout
       - aws-eks/update-kubeconfig-with-authenticator:
-          authenticator-release-tag: v0.5.3
+          authenticator-release-tag: v0.5.1
           install-kubectl: true
           cluster-name: ${AWS_EKS_CLUSTER_NAME}
-          cluster-authentication-role-arn: ${AWS_EKS_ROLE_ARN}
       - helm/install-helm-client:
           version: v3.3.4
       - run:
