@@ -21,6 +21,9 @@ commands:
             curl -L --fail --retry 3 -o ./helmfile  https://github.com/roboll/helmfile/releases/download/v0.130.0/helmfile_linux_amd64
             chmod +x ./helmfile
             sudo mv ./helmfile /usr/local/bin/helmfile
+      - run:
+          name: Kube config trick (authenticator fix)
+          command: sed -i 's/v1beta1/v1alpha1/' ~/.kube/config
 
 parameters:
   orchestrate-namespace:
