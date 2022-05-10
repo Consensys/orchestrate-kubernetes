@@ -28,7 +28,6 @@ commands:
       - aws-eks/update-kubeconfig-with-authenticator:
           authenticator-release-tag: v0.5.6
           install-kubectl: true
-          kubectl-version: 1.21.3
           cluster-name: ${AWS_EKS_CLUSTER_NAME}
       - helm/install-helm-client:
           version: v3.3.4
