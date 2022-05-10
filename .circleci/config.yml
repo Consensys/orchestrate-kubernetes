@@ -2,7 +2,7 @@ version: 2.1
 
 orbs:
   go: circleci/go@1.5.0
-  aws-eks: circleci/aws-eks@1.0.0
+  aws-eks: circleci/aws-eks@2.2.0
   helm: circleci/helm@2.0.0
 
 commands:
@@ -90,8 +90,8 @@ jobs:
     steps:
       - init
       - run:
-          name: helmfile dry-run
-          command: helmfile -e ${ENVIRONMENT_VALUES} -f helmfile-core.yaml apply --args --dry-run --suppress-secrets --detailed-exitcode=false
+          name: helmfile validate
+          command: helmfile -e ${ENVIRONMENT_VALUES} -f helmfile-core.yaml template --validate
   deploy:
     executor:
       name: go/default
