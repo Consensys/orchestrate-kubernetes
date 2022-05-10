@@ -9,21 +9,6 @@ commands:
   init:
     description: "Install"
     steps:
-      - run:
-          name: Import parameters
-          # Inspired by https://circleci.com/docs/2.0/env-vars/#setting-an-environment-variable-in-a-shell-command
-          command: |
-            [ "<< pipeline.parameters.environment_values >>" ] && echo 'export ENVIRONMENT_VALUES=<< pipeline.parameters.environment_values >>' >> $BASH_ENV
-            [ "<< pipeline.parameters.orchestrate_namespace >>" ] && echo 'export ORCHESTRATE_NAMESPACE=<< pipeline.parameters.orchestrate_namespace >>' >> $BASH_ENV
-            [ "<< pipeline.parameters.orchestrate_tag >>" ] && echo 'export ORCHESTRATE_TAG=<< pipeline.parameters.orchestrate_tag >>' >> $BASH_ENV
-            [ "<< pipeline.parameters.orchestrate_repository >>" ] && echo 'export ORCHESTRATE_REPOSITORY=<< pipeline.parameters.orchestrate_repository >>' >> $BASH_ENV
-            [ "<< pipeline.parameters.registry_url >>" ] && echo 'export REGISTRY_URL=<< pipeline.parameters.registry_url >>' >> $BASH_ENV
-            [ "<< pipeline.parameters.registry_username >>" ] && echo 'export REGISTRY_USERNAME=<< pipeline.parameters.registry_username >>' >> $BASH_ENV
-            [ "<< pipeline.parameters.registry_password >>" ] && echo 'export REGISTRY_PASSWORD=<< pipeline.parameters.registry_password >>' >> $BASH_ENV
-            [ "<< pipeline.parameters.kafka_url >>" ] && echo 'export $KAFKA_URL=<< pipeline.parameters.kafka_url >>' >> $BASH_ENV
-            [ "<< pipeline.parameters.kafka_sasl_password >>" ] && echo 'export KAFKA_SASL_PASSWORD=<< pipeline.parameters.kafka_sasl_password >>' >> $BASH_ENV
-
-            source $BASH_ENV || true
       - checkout
       - aws-eks/update-kubeconfig-with-authenticator:
           install-kubectl: true
@@ -44,31 +29,10 @@ commands:
           command: sed -i 's/v1beta1/v1alpha1/' ~/.kube/config
 
 parameters:
-  environment_values:
-    type: string
-    default: ""  
-  orchestrate_namespace:
+  orchestrate-namespace:
     type: string
     default: ""
-  orchestrate_tag:
-    type: string
-    default: ""
-  orchestrate_repository:
-    type: string
-    default: ""
-  registry_url:
-    type: string
-    default: ""
-  registry_username:
-    type: string
-    default: ""
-  registry_password:
-    type: string
-    default: ""
-  kafka_url:
-    type: string
-    default: ""
-  kafka_sasl_password:
+  orchestrate-tag:
     type: string
     default: ""
 
@@ -95,18 +59,30 @@ jobs:
     executor:
       name: go/default
       tag: '1.16.8'
+    parameters:
+      docker-image-registry:
+        type: string
+      docker-user:
+        type: string
+      docker-password:
+        type: string
+      kafka-sasl-password:
+        type: string
     steps:
       - init
       - run:
           name: helmfile apply
-          command: helmfile -e ${ENVIRONMENT_VALUES} -f helmfile-core.yaml apply --suppress-secrets --detailed-exitcode=false --concurrency 1
-      - when:
-          condition:
-            equal: [ default, << pipeline.parameters.environment_values >> ]
-          steps:
-            - run: 
-                name: Annotate as disposable environement
-                command: kubectl annotate --overwrite ns ${ORCHESTRATE_NAMESPACE} disposable=true
+          command: |
+            export KAFKA_SASL_PASSWORD="<< parameters.kafka-sasl-password >>"
+            export REGISTRY_URL="<< parameters.docker-image-registry >>"
+            export REGISTRY_USERNAME="<< parameters.docker-user >>"
+            export REGISTRY_PASSWORD="<< parameters.docker-password >>"
+            export ORCHESTRATE_TAG="<< pipeline.parameters.orchestrate-tag >>"
+            export ORCHESTRATE_REPOSITORY="<< parameters.docker-image-registry >>/orchestrate"
+            export ORCHESTRATE_NAMESPACE="<< pipeline.parameters.orchestrate-namespace >>"
+            export ENVIRONMENT_VALUES="<< pipeline.parameters.orchestrate-namespace >>"
+            helmfile -e << pipeline.parameters.orchestrate-namespace >> -f helmfile-core.yaml apply --suppress-secrets --detailed-exitcode=false --concurrency 1
+
   clean-namespaces:
     executor:
       name: go/default
@@ -134,17 +110,32 @@ workflows:
                 - master
           requires: 
             - lint
-  circleci-api:
-    when: 
-      and: 
-        - << pipeline.parameters.environment_values >>
-        - << pipeline.parameters.orchestrate_namespace >>
+  circleci-api-qa:
+    when:
+      equal: [ qa, << pipeline.parameters.orchestrate-namespace >> ]
     jobs:
       - deploy:
-          filters:
-            branches:
-              only:
-                - master
+          context:
+            - cloudsmith-tanuki-rw
+            - tanuki-deps-<< pipeline.parameters.orchestrate-namespace >>-rw
+          kafka-sasl-password: ${QA_KAFKA_SASL_PASSWORD}
+          docker-password: ${CLOUDSMITH_PASS_RW}
+          docker-user: ${CLOUDSMITH_USER_RW}
+          docker-image-registry: ${CLOUDSMITH_DEV_REPO}
+
+  circleci-api-staging:
+    when:
+      equal: [ staging, << pipeline.parameters.orchestrate-namespace >> ]
+    jobs:
+      - deploy:
+          context:
+            - cloudsmith-tanuki-rw
+            - tanuki-deps-<< pipeline.parameters.orchestrate-namespace >>-rw
+          kafka-sasl-password: ${STAGING_KAFKA_SASL_PASSWORD}
+          docker-password: ${CLOUDSMITH_PASS_RW}
+          docker-user: ${CLOUDSMITH_USER_RW}
+          docker-image-registry: ${CLOUDSMITH_DEV_REPO}
+
   schedule-clean-namespaces:
     triggers:
       - schedule:
