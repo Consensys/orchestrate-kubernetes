@@ -110,28 +110,17 @@ workflows:
                 - master
           requires: 
             - lint
-  circleci-api-qa:
+  circleci-api:
     when:
-      equal: [ qa, << pipeline.parameters.orchestrate-namespace >> ]
+      or:
+        - equal: [ qa, << pipeline.parameters.orchestrate-namespace >> ]
+        - equal: [ staging, << pipeline.parameters.orchestrate-namespace >> ]
     jobs:
       - deploy:
           context:
             - cloudsmith-tanuki-rw
-            - tanuki-deps-<< pipeline.parameters.orchestrate-namespace >>-rw
-          kafka-sasl-password: ${QA_KAFKA_SASL_PASSWORD}
-          docker-password: ${CLOUDSMITH_PASS_RW}
-          docker-user: ${CLOUDSMITH_USER_RW}
-          docker-image-registry: ${CLOUDSMITH_DEV_REPO}
-
-  circleci-api-staging:
-    when:
-      equal: [ staging, << pipeline.parameters.orchestrate-namespace >> ]
-    jobs:
-      - deploy:
-          context:
-            - cloudsmith-tanuki-rw
-            - tanuki-deps-<< pipeline.parameters.orchestrate-namespace >>-rw
-          kafka-sasl-password: ${STAGING_KAFKA_SASL_PASSWORD}
+            - tanuki-orchestrate-<< pipeline.parameters.orchestrate-namespace >>
+          kafka-sasl-password: ${KAFKA_SASL_PASSWORD}
           docker-password: ${CLOUDSMITH_PASS_RW}
           docker-user: ${CLOUDSMITH_USER_RW}
           docker-image-registry: ${CLOUDSMITH_DEV_REPO}
