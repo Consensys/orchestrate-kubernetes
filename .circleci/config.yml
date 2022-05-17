@@ -110,7 +110,20 @@ workflows:
                 - master
           requires: 
             - lint
-  circleci-api:
+  circleci-api-undeploy:
+    when:
+      equal: [ qa, << pipeline.parameters.orchestrate-namespace >> ]
+    jobs:
+      - undeploy:
+          context:
+            - cloudsmith-tanuki-rw
+            - tanuki-orchestrate-<< pipeline.parameters.orchestrate-namespace >>
+          kafka-sasl-password: ${KAFKA_SASL_PASSWORD}
+          docker-password: ${CLOUDSMITH_PASS_RW}
+          docker-user: ${CLOUDSMITH_USER_RW}
+          docker-image-registry: ${CLOUDSMITH_DEV_REPO}
+          
+  circleci-api-deploy:
     when:
       or:
         - equal: [ qa, << pipeline.parameters.orchestrate-namespace >> ]
