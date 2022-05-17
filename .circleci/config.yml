@@ -55,6 +55,20 @@ jobs:
       - run:
           name: helmfile validate
           command: helmfile -e ${ENVIRONMENT_VALUES} -f helmfile-core.yaml template --validate
+  undeploy:
+    executor:
+      name: go/default
+      tag: '1.16.8'
+    
+    steps:
+      - init
+      - run:
+          name: helmfile apply
+          command: |
+            export ORCHESTRATE_NAMESPACE="<< pipeline.parameters.orchestrate-namespace >>"
+            export ENVIRONMENT_VALUES="<< pipeline.parameters.orchestrate-namespace >>"
+            helmfile -e << pipeline.parameters.orchestrate-namespace >> delete --purge
+
   deploy:
     executor:
       name: go/default
@@ -114,15 +128,8 @@ workflows:
     when:
       equal: [ qa, << pipeline.parameters.orchestrate-namespace >> ]
     jobs:
-      - undeploy:
-          context:
-            - cloudsmith-tanuki-rw
-            - tanuki-orchestrate-<< pipeline.parameters.orchestrate-namespace >>
-          kafka-sasl-password: ${KAFKA_SASL_PASSWORD}
-          docker-password: ${CLOUDSMITH_PASS_RW}
-          docker-user: ${CLOUDSMITH_USER_RW}
-          docker-image-registry: ${CLOUDSMITH_DEV_REPO}
-          
+      - undeploy
+
   circleci-api-deploy:
     when:
       or:
