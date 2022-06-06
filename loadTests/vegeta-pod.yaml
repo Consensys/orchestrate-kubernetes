@@ -15,7 +15,7 @@ spec:
       volumeMounts:
         - name: config-volume
           mountPath: /vegeta
-      args: ["cd /vegeta; cat test | vegeta attack -format=http -duration=1m30s -rate=600/s -connections 75 | vegeta report"]
+      args: ["cd /vegeta; cat test | vegeta attack -format=http -duration=1m30s -rate=500/s -connections 75 | vegeta report"]
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -28,24 +28,14 @@ data:
     Content-Type: application/json
     @body.json
   body.json: |
-    {
+     {
       "chain": "besu",
       "params": {
-          "from": "0xfe3b557e8fb62b89f4916b721be55ceb828dbd73",
-          "to": "0x627306090abaB3A6e1400e9345bC60c78a8BEf57",
-          "value": "0x44300E0",
-          "gas": 21000,
-          "gasPrice": "0x0",
-          "gasPricePolicy": {
-              "priority": "very-high",
-              "retryPolicy": {
-                  "increment": 0.05,
-                  "interval": "2m",
-                  "limit": 0.5
-              }
-          },
-          "transactionType": "legacy"
-      },
-      "labels": {}
-    }
+        "methodSignature": "increment(uint256)",
+        "args": ["1"],
+        "to": "0xb3f3054bdf200886773dadfeab85ece6690ede8f",
+        "gasPrice": "0",
+        "gas": "25000",
+        "oneTimeKey": true
+      }
 ---
