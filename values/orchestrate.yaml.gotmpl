@@ -32,6 +32,10 @@ global:
 
 api:
   enabled: true
+  {{- if .Values.nodeSelector.enabled }}
+  nodeSelector:
+  {{ toYaml .Values.nodeSelector.value | indent 4 }}
+  {{- end }}
   replicaCount: {{ $replicaCount }}
   {{- if .Values.domainName }}
   ingress:

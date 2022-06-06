@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: vegeta
+spec:
+  restartPolicy: Never
+  volumes:
+    - name: config-volume
+      configMap:
+        name: vegeta-configmap
+  containers:
+    - name: vegeta1
+      image: peterevans/vegeta:6.9.1
+      command: ["/bin/sh", "-c"]
+      volumeMounts:
+        - name: config-volume
+          mountPath: /vegeta
+      args: ["cd /vegeta; cat test | vegeta attack -format=http -duration=1m30s -rate=600/s -connections 75 | vegeta report"]
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vegeta-configmap
+data:
+  test: |
+    POST http://orchestrate-api:8081/transactions/transfer
+    x-api-key: with-key
+    Content-Type: application/json
+    @body.json
+  body.json: |
+    {
+      "chain": "besu",
+      "params": {
+          "from": "0xfe3b557e8fb62b89f4916b721be55ceb828dbd73",
+          "to": "0x627306090abaB3A6e1400e9345bC60c78a8BEf57",
+          "value": "0x44300E0",
+          "gas": 21000,
+          "gasPrice": "0x0",
+          "gasPricePolicy": {
+              "priority": "very-high",
+              "retryPolicy": {
+                  "increment": 0.05,
+                  "interval": "2m",
+                  "limit": 0.5
+              }
+          },
+          "transactionType": "legacy"
+      },
+      "labels": {}
+    }
+---
