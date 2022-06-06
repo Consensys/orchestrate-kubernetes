@@ -4,3 +4,5 @@ drop:
   enabled: false
 qkm:
   url: https://qa-qkm.ops.consensys.net
+nodeSelector:
+  enabled: false
