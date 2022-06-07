@@ -23,7 +23,7 @@ metadata:
   name: vegeta-configmap
 data:
   test: |
-    POST http://orchestrate-api:8081/transactions/transfer
+    POST http://orchestrate-api:8081/transactions/send
     x-api-key: with-key
     Content-Type: application/json
     @body.json
@@ -32,10 +32,13 @@ data:
       "chain": "besu",
       "params": {
         "methodSignature": "increment(uint256)",
-        "args": ["1"],
-        "to": "0xb3f3054bdf200886773dadfeab85ece6690ede8f",
-        "gasPrice": "0",
-        "gas": "25000",
-        "oneTimeKey": true
+        "args": [1],
+        "to": "0x42699a7612a82f1d9c36148af9c77354759b210b",
+        "gasPrice": "0x0",
+        "gas": 25000,
+        "oneTimeKey": true,
+        "contractName": "increment",
+        "contractTag": "v1.0.0"
+        }
       }
 ---
