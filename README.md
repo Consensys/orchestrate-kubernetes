@@ -227,3 +227,7 @@ Note that it is highly recommended to use the `consensys/quorum-hashicorp-vault-
 
 [Read the steps to upgrade Orchestrate v2.5.X to v21.1.X](docs/upgrades/v21-1-X.md)
 
+## 4.1. From Orchestrate v21.1.X to v21.12.X
+
+[Read the steps to upgrade Orchestrate v21.1.X to v21.12.X](docs/upgrades/v21-12-X.md)
+
