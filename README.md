@@ -67,7 +67,7 @@ Below is a high level diagram of what this chart will help you deploy
 
 ## 1.1. CLI tools
 
-- [Kubernetes](https://kubernetes.io/) version 1.16 or upper;
+- [Kubernetes](https://kubernetes.io/) version 1.19 or upper;
 - [Helm](https://helm.sh/) version 3 or upper;
 - [Helmfile](https://github.com/roboll/helmfile);
 - [Helm diff plugin](https://github.com/databus23/helm-diff).
