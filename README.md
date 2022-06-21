@@ -25,8 +25,8 @@ For more information, refer to the [Orchestrate documentation](https://docs.orch
   - [2.3. Advanced configuration](#23-advanced-configuration)
 - [3. Hashicorp Vault](#3-hashicorp-vault)
 - [4. Upgrading](#5-upgrading)
-  - [4.1. From Orchestrate v2.5.X to v21.1.X](#51-from-orchestrate-v25x-to-v211x)
-  - [4.2. From Orchestrate v2.1.X to v21.12.X](#51-from-orchestrate-v211x-to-v2112x)
+  - [4.1. From Orchestrate v2.5.X to v21.1.X](#41-from-orchestrate-v25x-to-v211x)
+  - [4.2. From Orchestrate v2.1.X to v21.12.X](#42-from-orchestrate-v211x-to-v2112x)
 
 This repository contains an implementation example on how to deploy Orchestrate and an optional Vault server using Kubernetes and Helm charts.
 
