@@ -26,6 +26,7 @@ For more information, refer to the [Orchestrate documentation](https://docs.orch
 - [3. Hashicorp Vault](#3-hashicorp-vault)
 - [4. Upgrading](#5-upgrading)
   - [4.1. From Orchestrate v2.5.X to v21.1.X](#51-from-orchestrate-v25x-to-v211x)
+  - [4.2. From Orchestrate v2.1.X to v21.12.X](#51-from-orchestrate-v211x-to-v2112x)
 
 This repository contains an implementation example on how to deploy Orchestrate and an optional Vault server using Kubernetes and Helm charts.
 
@@ -212,7 +213,7 @@ Note that it is highly recommended to use the `consensys/quorum-hashicorp-vault-
 
 [Read the steps to upgrade Orchestrate v2.5.X to v21.1.X](docs/upgrades/v21-1-X.md)
 
-## 4.1. From Orchestrate v21.1.X to v21.12.X
+## 4.2. From Orchestrate v21.1.X to v21.12.X
 
 [Read the steps to upgrade Orchestrate v21.1.X to v21.12.X](docs/upgrades/v21-12-X.md)
 
