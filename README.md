@@ -19,7 +19,6 @@ For more information, refer to the [Orchestrate documentation](https://docs.orch
 - [Compatibility](#compatibility)
 - [1. Requirements](#1-requirements)
   - [1.1. CLI tools](#11-cli-tools)
-  - [1.2. Credentials](#12-credentials)
 - [2. Installing Orchestrate](#2-installing-orchestrate)
   - [2.1. Quickstart](#21-quickstart)
   - [2.2. Delete Orchestrate](#22-delete-orchestrate)
@@ -67,24 +66,10 @@ Below is a high level diagram of what this chart will help you deploy
 
 ## 1.1. CLI tools
 
-- [Kubernetes](https://kubernetes.io/) version 1.16 or upper;
+- [Kubernetes](https://kubernetes.io/) version 1.19 or upper;
 - [Helm](https://helm.sh/) version 3 or upper;
 - [Helmfile](https://github.com/roboll/helmfile);
 - [Helm diff plugin](https://github.com/databus23/helm-diff).
-
-## 1.2. Credentials
-
-- Credentials to pull Orchestrate's Docker images;
-
-!!! Note: 
-  To get a free trial please contact [orchestrate@consensys.net](mailto:orchestrate@consensys.net).
-
-Set your Orchestrate Docker images' credentials setting the following environment variable `$REGISTRY_USERNAME`, `$REGISTRY_PASSWORD` and optionally `$REGISTRY_URL`
-
-```bash
-export REGISTRY_USERNAME=<USER>
-export REGISTRY_PASSWORD=<PASSWORD>
-```
 
 # 2. Installing Orchestrate
 
@@ -226,4 +211,8 @@ Note that it is highly recommended to use the `consensys/quorum-hashicorp-vault-
 ## 4.1. From Orchestrate v2.5.X to v21.1.X
 
 [Read the steps to upgrade Orchestrate v2.5.X to v21.1.X](docs/upgrades/v21-1-X.md)
+
+## 4.1. From Orchestrate v21.1.X to v21.12.X
+
+[Read the steps to upgrade Orchestrate v21.1.X to v21.12.X](docs/upgrades/v21-12-X.md)
 
