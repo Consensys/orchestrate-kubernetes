@@ -1,0 +1,39 @@
+orchestrate:
+  replicaCount: 3
+  global:
+    environment:
+      MULTI_TENANCY_ENABLED: true
+      DB_DATABASE: orchestrate_load
+      DB_POOLSIZE: 750
+    environmentSecrets:
+      AUTH_API_KEY: with-key
+  
+observability:
+  enabled: true
+
+drop:
+  enabled: false
+
+kafka:
+  enabled: false
+
+postgresql:
+  enabled: false
+  tls:
+    enabled: true
+postgresqlHA:
+  enabled: false
+
+vault:
+  enabled: false
+  replicaCount: 0
+
+qkm:
+  url: https://staging-qkm.ops.consensys.net
+  vault:
+    agents: {}
+
+nodeSelector:
+  enabled: true
+  value:
+    benchmark-orchestrate: "true"
