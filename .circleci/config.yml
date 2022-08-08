@@ -55,7 +55,35 @@ jobs:
       - run:
           name: helmfile validate
           command: helmfile -e ${ENVIRONMENT_VALUES} -f helmfile-core.yaml template --validate
-  deploy:
+  deploy-qa:
+    executor:
+      name: go/default
+      tag: '1.16.8'
+    parameters:
+      docker-image-registry:
+        type: string
+      docker-user:
+        type: string
+      docker-password:
+        type: string
+      kafka-sasl-password:
+        type: string
+    steps:
+      - init
+      - run:
+          name: helmfile sync
+          command: |
+            export KAFKA_SASL_PASSWORD="<< parameters.kafka-sasl-password >>"
+            export REGISTRY_URL="<< parameters.docker-image-registry >>"
+            export REGISTRY_USERNAME="<< parameters.docker-user >>"
+            export REGISTRY_PASSWORD="<< parameters.docker-password >>"
+            export ORCHESTRATE_TAG="<< pipeline.parameters.orchestrate-tag >>"
+            export ORCHESTRATE_REPOSITORY="<< parameters.docker-image-registry >>/orchestrate"
+            export ORCHESTRATE_NAMESPACE="<< pipeline.parameters.orchestrate-namespace >>"
+            export ENVIRONMENT_VALUES="<< pipeline.parameters.orchestrate-namespace >>"
+            helmfile -e << pipeline.parameters.orchestrate-namespace >> -f helmfile-core.yaml sync
+
+  deploy-staging:
     executor:
       name: go/default
       tag: '1.16.8'
@@ -110,13 +138,23 @@ workflows:
                 - master
           requires: 
             - lint
-  circleci-api:
+  circleci-api-qa:
     when:
-      or:
-        - equal: [ qa, << pipeline.parameters.orchestrate-namespace >> ]
-        - equal: [ staging, << pipeline.parameters.orchestrate-namespace >> ]
+      equal: [ qa, << pipeline.parameters.orchestrate-namespace >> ]      
     jobs:
-      - deploy:
+      - deploy-qa:
+          context:
+            - cloudsmith-tanuki-rw
+            - tanuki-orchestrate-<< pipeline.parameters.orchestrate-namespace >>
+          kafka-sasl-password: ${KAFKA_SASL_PASSWORD}
+          docker-password: ${CLOUDSMITH_PASS_RW}
+          docker-user: ${CLOUDSMITH_USER_RW}
+          docker-image-registry: ${CLOUDSMITH_DEV_REPO}
+  circleci-api-staging:
+    when:
+      equal: [ staging, << pipeline.parameters.orchestrate-namespace >> ]      
+    jobs:
+      - deploy-staging:
           context:
             - cloudsmith-tanuki-rw
             - tanuki-orchestrate-<< pipeline.parameters.orchestrate-namespace >>
