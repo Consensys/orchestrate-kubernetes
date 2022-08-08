@@ -1,7 +1,6 @@
 orchestrate:
   global:
     environment:
-      MULTI_TENANCY_ENABLED: false
       DB_DATABASE: orchestrate_qa
     environmentSecrets:
       AUTH_API_KEY: with-key
