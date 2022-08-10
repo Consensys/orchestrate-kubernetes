@@ -16,7 +16,7 @@ global:
     KEY_MANAGER_TLS_SKIP_VERIFY: true
     AUTH_OIDC_ISSUER_URL: {{ .Values.orchestrate.auth.jwt.issuerUrl }}
     AUTH_OIDC_AUDIENCE: {{ .Values.orchestrate.auth.jwt.audience }}
-    AUTH_OIDC_ORCHESTRATE_CLAIMS: {{ .Values.orchestrate.auth.jwt.claims }}
+    AUTH_OIDC_CUSTOM_CLAIMS: {{ .Values.orchestrate.auth.jwt.claims }}
    
   environmentSecrets:
     KEY_MANAGER_API_KEY: {{ .Values.qkm.orchestrate.apiKey }}
