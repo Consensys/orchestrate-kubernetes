@@ -15,7 +15,6 @@ global:
     KEY_MANAGER_STORE_NAME: {{ .Values.qkm.orchestrate.storeName }}
     KEY_MANAGER_TLS_SKIP_VERIFY: true
     AUTH_OIDC_ISSUER_URL: {{ .Values.orchestrate.auth.jwt.issuerUrl }}
-    AUTH_OIDC_AUDIENCE: {{ .Values.orchestrate.auth.jwt.audience }}
     AUTH_OIDC_CUSTOM_CLAIMS: {{ .Values.orchestrate.auth.jwt.claims }}
    
   environmentSecrets:
