@@ -22,9 +22,18 @@ orchestrate:
       DB_USER: {{ requiredEnv "TANUKI_PG_USER" }}
       DB_HOST: {{ requiredEnv "TANUKI_PG_HOST" }}
       DB_TLS_SSLMODE: "require"
+      NATS_URLS: {{ requiredEnv "NATS_URLS" }}
+      NATS_PING_INTERVAL: {{ env "NATS_PING_INTERVAL" }}
+      NATS_AUTH_USERNAME: {{ env "NATS_AUTH_USERNAME" }}
+      NATS_CREDS_FILE: {{ env "NATS_CREDS_FILE" }}
+      NATS_TLS_KEY: {{ env "NATS_TLS_KEY" }}
+      NATS_TLS_CERT: {{ env "NATS_TLS_CERT" }}
+      NATS_TLS_CA: {{ env "NATS_TLS_CA" }}
       
     environmentSecrets:
       DB_PASSWORD: {{ requiredEnv "TANUKI_PG_PWD" }}
+      NATS_AUTH_PASSWORD: {{ env "NATS_AUTH_PASSWORD" }}
+      NATS_AUTH_TOKEN: {{ env "NATS_AUTH_TOKEN" }}
 
   api:
     enabled: true
