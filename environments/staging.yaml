@@ -12,8 +12,5 @@ observability:
 drop:
   enabled: false
 
-vault:
-  replicaCount: 3
-
 qkm:
   url: https://staging-qkm.ops.consensys.net

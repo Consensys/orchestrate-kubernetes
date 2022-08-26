@@ -79,22 +79,6 @@ orchestrate:
       issuerUrl: https://consensys.eu.auth0.com/      
       claims: https://api.orchestrate.network
 
-vaultOperator:
-  enabled: false
-  namespace: {{ env "VAULT_OPERATOR_NAMESPACE" | default "vault-operator" }}
-
-vault:
-  enabled: true
-  replicaCount: 1
-  namespace: {{ env "VAULT_NAMESPACE" | default ( env "ORCHESTRATE_NAMESPACE" | default $defaultNamespace ) }}
-  plugin:
-    name: {{ env "VAULT_PLUGIN_NAME" | default "quorum" }}
-    tag: {{ env "VAULT_PLUGIN_TAG" | default "v1.1.3" }}
-    sha256: {{ env "VAULT_PLUGIN_SHA256SUM" | default "e084800c61749a9c7b51f6e91bb89ab6d5a2678cdb707eaa73f9bef0cf73fc61" }}
-    filename: {{ env "VAULT_PLUGIN_FILENAME" | default "quorum-hashicorp-vault-plugin" }}
-  envs:
-    - VAULT_ADDR: "http://localhost:8200"
-
 qkm:
   orchestrate:
     storeName: "eth-accounts"

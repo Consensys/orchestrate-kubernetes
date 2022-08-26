@@ -3,21 +3,10 @@ bases:
   - helmfile-common.yaml
 ---
 releases:
-{{- if .Values.vault.enabled }}
-  - name: vault
-    namespace: {{ .Values.vault.namespace }}
-    chart: incubator/raw
-    version: 0.2.3
-    atomic: true
-    values:
-      - values/vault.yaml.gotmpl
-{{- end }}
   - name: orchestrate
     namespace: {{ .Values.orchestrate.namespace }}
     chart: {{ .Values.orchestrate.chart.name }}
     atomic: true
-    version: {{ .Values.orchestrate.chart.version }}
-    needs: 
-      - {{ .Values.vault.namespace }}/vault
+    version: {{ .Values.orchestrate.chart.version }}    
     values:
       - values/orchestrate.yaml.gotmpl
