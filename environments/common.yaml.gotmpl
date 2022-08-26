@@ -31,9 +31,7 @@ orchestrate:
       NATS_TLS_CA: {{ env "NATS_TLS_CA" }}
       
     environmentSecrets:
-      DB_PASSWORD: {{ requiredEnv "TANUKI_PG_PWD" }}
-      NATS_AUTH_PASSWORD: {{ env "NATS_AUTH_PASSWORD" }}
-      NATS_AUTH_TOKEN: {{ env "NATS_AUTH_TOKEN" }}
+      DB_PASSWORD: {{ requiredEnv "TANUKI_PG_PWD" }}      
 
   api:
     enabled: true
