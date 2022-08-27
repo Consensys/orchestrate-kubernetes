@@ -44,6 +44,7 @@ orchestrate:
       DB_PASSWORD: {{ requiredEnv "TANUKI_PG_PWD" }} 
 
   txListener:
+    environment: {}
     environmentSecrets: {}
 
   txSender:
@@ -58,7 +59,6 @@ orchestrate:
     environmentSecrets:
       DB_PASSWORD: {{ requiredEnv "TANUKI_PG_PWD" }}
 
-  
   auth:
     jwt:
       issuerUrl: https://consensys.eu.auth0.com/      
@@ -93,8 +93,6 @@ observability:
     password: {{ env "GRAFANA_PWD" }}
 
 domainName: {{ env "DOMAIN_NAME" }}
-
-
 
 test:
  enabled: false
