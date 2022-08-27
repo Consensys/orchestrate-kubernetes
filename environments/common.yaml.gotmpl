@@ -19,7 +19,6 @@ orchestrate:
       repository: {{ env "ORCHESTRATE_REPOSITORY" | default "consensys/orchestrate" }}
       tag: {{ env "ORCHESTRATE_TAG" | default $tag | quote }}
     environment: 
-      API_URL: {{ requiredEnv "API_URL" }}
       DB_USER: {{ requiredEnv "TANUKI_PG_USER" }}
       DB_HOST: {{ requiredEnv "TANUKI_PG_HOST" }}
       DB_TLS_SSLMODE: "require"
@@ -45,11 +44,13 @@ orchestrate:
       DB_PASSWORD: {{ requiredEnv "TANUKI_PG_PWD" }} 
 
   txListener:
-    environment: {}
+    environment:
+      API_URL: {{ requiredEnv "API_URL" }}
     environmentSecrets: {}
 
   txSender:
     environment:
+      API_URL: {{ requiredEnv "API_URL" }}
       REDIS_HOST: {{ requiredEnv "TANUKI_REDIS_ENDPOINT" }}
       REDIS_PORT: {{ env "TANUKI_REDIS_PORT" | default "6379" }}
 
