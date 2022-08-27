@@ -19,6 +19,7 @@ orchestrate:
       repository: {{ env "ORCHESTRATE_REPOSITORY" | default "consensys/orchestrate" }}
       tag: {{ env "ORCHESTRATE_TAG" | default $tag | quote }}
     environment: 
+      API_URL: {{ requiredEnv "API_URL" }}
       DB_USER: {{ requiredEnv "TANUKI_PG_USER" }}
       DB_HOST: {{ requiredEnv "TANUKI_PG_HOST" }}
       DB_TLS_SSLMODE: "require"
@@ -39,7 +40,7 @@ orchestrate:
     environment:
       DB_USER: {{ requiredEnv "TANUKI_PG_USER" }}
       DB_HOST: {{ requiredEnv "TANUKI_PG_HOST" }}
-      DB_TLS_SSLMODE: "require"  
+      DB_TLS_SSLMODE: "require"
     environmentSecrets:
       DB_PASSWORD: {{ requiredEnv "TANUKI_PG_PWD" }} 
 
