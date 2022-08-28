@@ -3,6 +3,12 @@ orchestrate:
     environment:
       MULTI_TENANCY_ENABLED: true
       DB_DATABASE: orchestrate_qa
+      TOPIC_API: "qa-topic-api"
+      TOPIC_TX_SENDER: "qa-topic-tx-sender"
+      TOPIC_TX_LISTENER: "qa-topic-tx-listener"
+      TOPIC_NOTIFIER: "qa-topic-notifier"
+      TOPIC_NOTIFICATIONS: "qa-topic-notifications"
+      MQ_CONSUMER_GROUP_NAME: "qa-orchestrate-qa-group"
     environmentSecrets:
       AUTH_API_KEY: with-key
 
