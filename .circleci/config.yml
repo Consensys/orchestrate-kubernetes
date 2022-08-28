@@ -66,14 +66,11 @@ jobs:
         type: string
       docker-password:
         type: string
-      kafka-sasl-password:
-        type: string
     steps:
       - init
       - run:
           name: helmfile sync
           command: |
-            export KAFKA_SASL_PASSWORD="<< parameters.kafka-sasl-password >>"
             export REGISTRY_URL="<< parameters.docker-image-registry >>"
             export REGISTRY_USERNAME="<< parameters.docker-user >>"
             export REGISTRY_PASSWORD="<< parameters.docker-password >>"
@@ -94,14 +91,11 @@ jobs:
         type: string
       docker-password:
         type: string
-      kafka-sasl-password:
-        type: string
     steps:
       - init
       - run:
           name: helmfile apply
           command: |
-            export KAFKA_SASL_PASSWORD="<< parameters.kafka-sasl-password >>"
             export REGISTRY_URL="<< parameters.docker-image-registry >>"
             export REGISTRY_USERNAME="<< parameters.docker-user >>"
             export REGISTRY_PASSWORD="<< parameters.docker-password >>"
@@ -147,7 +141,6 @@ workflows:
             - cloudsmith-tanuki-rw
             - cloudsmith-protocols
             - tanuki-orchestrate-<< pipeline.parameters.orchestrate-namespace >>
-          kafka-sasl-password: ${KAFKA_SASL_PASSWORD}
           docker-password: ${CLOUDSMITH_API_KEY}
           docker-user: ${CLOUDSMITH_USER}
           docker-image-registry: ${CLOUDSMITH_DEV_REPO}
@@ -160,7 +153,6 @@ workflows:
             - cloudsmith-tanuki-rw
             - cloudsmith-protocols
             - tanuki-orchestrate-<< pipeline.parameters.orchestrate-namespace >>
-          kafka-sasl-password: ${KAFKA_SASL_PASSWORD}
           docker-password: ${CLOUDSMITH_API_KEY}
           docker-user: ${CLOUDSMITH_USER}
           docker-image-registry: ${CLOUDSMITH_DEV_REPO}

@@ -22,13 +22,6 @@ orchestrate:
       DB_USER: {{ requiredEnv "TANUKI_PG_USER" }}
       DB_HOST: {{ requiredEnv "TANUKI_PG_HOST" }}
       DB_TLS_SSLMODE: "require"
-      KAFKA_TLS_ENABLED: true
-      KAFKA_URL: {{ env "KAFKA_URL" }}
-      KAFKA_SASL_ENABLED: {{ env "KAFKA_SASL_ENABLED" }}
-      KAFKA_TLS_INSECURE_SKIP_VERIFY: true
-      KAFKA_SASL_USER: {{ env "KAFKA_SASL_USER" }}
-      KAFKA_SASL_PASSWORD: {{ env "KAFKA_SASL_PASSWORD" }}
-      KAFKA_SASL_MECHANISM: "PLAIN"
       NATS_URLS: {{ requiredEnv "NATS_URLS" }}      
       
     environmentSecrets:
