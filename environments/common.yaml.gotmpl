@@ -1,7 +1,7 @@
 ---
 {{ $defaultNamespace := "orchestrate" }}
 {{ $defaultOrchestrateChart := "consensys/orchestrate" }}
-{{ $defaultOrchestrateChartVersion := "2.0.7" }}
+{{ $defaultOrchestrateChartVersion := "3.0.0" }}
 {{ $tag := "v21.12.7" }}
 
 orchestrate:
@@ -37,6 +37,7 @@ orchestrate:
   api:
     enabled: true
     environment:
+      HTTP_ADDR: 0.0.0.0:8080
       DB_USER: {{ requiredEnv "TANUKI_PG_USER" }}
       DB_HOST: {{ requiredEnv "TANUKI_PG_HOST" }}
       DB_TLS_SSLMODE: "require"
@@ -45,11 +46,13 @@ orchestrate:
 
   txListener:
     environment:
+      HTTP_ADDR: 0.0.0.0:8080
       API_URL: {{ requiredEnv "API_URL" }}
     environmentSecrets: {}
 
   txSender:
     environment:
+      HTTP_ADDR: 0.0.0.0:8080
       API_URL: {{ requiredEnv "API_URL" }}
       REDIS_HOST: {{ requiredEnv "TANUKI_REDIS_ENDPOINT" }}
       REDIS_PORT: {{ env "TANUKI_REDIS_PORT" | default "6379" }}
